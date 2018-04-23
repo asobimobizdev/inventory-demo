@@ -1,7 +1,9 @@
 <template>
   <section class="host">
     <div class="content">
-      <collection class="goods" :items="goods" :isGrid="true"></collection>
+      <collection class="goods" :items="goods" :isGrid="true">
+        <div class="good"></div>
+      </collection>
       <collection class="friends" :items="friends" :isGrid="false"></collection>
       
     </div>
@@ -43,21 +45,16 @@ export default {
   width 100%
   height 100vh
   display flex
+  background-color #fff
 
   >.content
-    background-color #f00
+    background-color #f0f0f0
     width 100%
-    // flex 1 1 auto
-    padding 10px
+    padding 4px
     display flex
-    // flex-direction: row;
-    // flex-wrap: nowrap;
-    // justify-content: flex-start;
-    // align-content: stretch;
-    // align-items: stretch;
 
     >.goods
-      margin-right 10px
+      margin-right 4px
       height 100%
 
     >.friends
