@@ -6,7 +6,7 @@
   "scripts": {
     "test": "truffle test",
     "compile": "truffle compile",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "solium --dir contracts && eslint tests",
     "precommit": "npm run lint"
   },
   "repository": {
@@ -21,5 +21,9 @@
   "homepage": "https://github.com/asobicoin/inventory-demo#readme",
   "dependencies": {
     "truffle": "^4.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "solium": "^1.1.6"
   }
 }
