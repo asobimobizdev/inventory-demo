@@ -32,7 +32,7 @@ export default {
     itemsStyle() {
       return {
         height: this.isGrid ? "120px" : "60px",
-        background: this.isGrid ? "" : "#f0f0f0"
+        background: this.isGrid ? "#f0f0f0" : "#f0f0f0"
       };
     }
   }
@@ -41,11 +41,9 @@ export default {
 
 <style lang="stylus" scoped>
 .host
+  display flex
   flex-direction: column;
-  flex-wrap: wrap;
   justify-content: flex-start;
-  align-content: stretch;
-  align-items: stretch; 
 
   overflow-x hidden
   overflow-y scroll 
@@ -75,11 +73,11 @@ export default {
         display grid   
         padding 4px
         grid-gap 4px
-        grid-template-columns repeat(auto-fit, 1fr);
+        // grid-template-columns repeat(auto-fit, 1fr);
         
-      >.item
-        height: 60px
-        display flex   
+      // >.item
+      //   height: 60px
+      //   display flex   
 
   &.grid
     >.container
@@ -88,10 +86,10 @@ export default {
         grid-gap 4px
         grid-template-columns repeat(auto-fit, minmax(120px,1fr));
         
-      >.item
-        background-color alpha(#fff,0.3)
-        height 120px
-        margin 0px
-        margin-bottom 0px
+      // >.item
+      //   background-color alpha(#fff,0.3)
+      //   height 120px
+      //   margin 0px
+      //   margin-bottom 0px
 
 </style>
