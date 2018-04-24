@@ -1,15 +1,20 @@
 <template>
   <div class="host" :class="layoutClass">
     <div class="container" >
-      <div class="item" v-for="item in items" :key="item.id" :style="itemsStyle">
-        <slot></slot>
+      <div class="item" v-for="(item, index) in items" :key="item.id" :style="itemsStyle">
+        <slot :name="['item',index].join('-')"></slot>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import draggable from "vuedraggable";
+
 export default {
+  components: {
+    draggable
+  },
   props: {
     items: Array,
     isGrid: {

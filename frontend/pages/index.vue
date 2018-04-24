@@ -2,7 +2,7 @@
   <section class="host">
     <div class="content">
       <collection class="goods" :items="goods" :isGrid="true">
-        <div class="good"></div>
+        <div class="good" v-for="(good, index) in goods" :slot="['item',index].join('-')" :key="good.id"></div>
       </collection>
       <collection class="friends" :items="friends" :isGrid="false"></collection>
       
