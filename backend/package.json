@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "scripts": {
+    "test": "truffle test",
+    "compile": "truffle compile",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "precommit": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asobicoin/inventory-demo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asobicoin/inventory-demo/issues"
+  },
+  "homepage": "https://github.com/asobicoin/inventory-demo#readme",
+  "dependencies": {
+    "truffle": "^4.1.7"
+  }
+}
