@@ -10,6 +10,7 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint-fix": "eslint --ext .js,.vue --ignore-path .gitignore . --fix",
     "precommit": "npm run lint"
   },
   "dependencies": {
@@ -19,7 +20,8 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vue-localstorage": "^0.6.2",
-    "vuedraggable": "^2.16.0"
+    "vuedraggable": "^2.16.0",
+    "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
