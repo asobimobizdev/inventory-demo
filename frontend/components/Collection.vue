@@ -40,7 +40,7 @@ export default {
         return this.items;
       },
       set(value) {
-        console.log(value);
+        alert(value);
         // this.items = value;
       }
     }

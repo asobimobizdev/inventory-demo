@@ -1,20 +1,35 @@
 <template>
 
-<el-container>
+  <el-container>
 
-  <el-header>   
-    <el-menu :router="true" :default-active="activeLink" class="el-menu-demo" mode="horizontal">
-      <el-menu-item index="/"><nuxt-link to="/">Cover</nuxt-link></el-menu-item>
-      <el-menu-item index="/admin-goods"><nuxt-link to="/admin-goods">Goods Admin</nuxt-link></el-menu-item>
-      <el-menu-item index="/inventory"><nuxt-link to="/inventory">inventory</nuxt-link></el-menu-item>
-    </el-menu>
-  </el-header>
+    <el-header>
+      <el-menu
+        :router="true"
+        :default-active="activeLink"
+        class="el-menu-demo"
+        mode="horizontal">
+        <el-menu-item index="/">
+          <nuxt-link to="/">Cover
+          </nuxt-link>
+        </el-menu-item>
+        <el-menu-item index="/admin-goods">
+          <nuxt-link to="/admin-goods">
+            Goods Admin
+          </nuxt-link>
+        </el-menu-item>
+        <el-menu-item index="/inventory">
+          <nuxt-link to="/inventory">
+            inventory
+          </nuxt-link>
+        </el-menu-item>
+      </el-menu>
+    </el-header>
 
-  <el-main>
-    <nuxt class="content"/>  
-  </el-main>
+    <el-main>
+      <nuxt class="content"/>
+    </el-main>
 
-</el-container>
+  </el-container>
 
 </template>
 
@@ -33,10 +48,10 @@ export default {
 
 
 <style lang="stylus">
-html, body 
+html, body
   height 100%
 
-html 
+html
   // font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
@@ -45,9 +60,8 @@ html
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
-  
 
-*, *:before, *:after 
+*, *:before, *:after
   box-sizing: border-box;
   margin: 0;
 
@@ -57,5 +71,4 @@ main
 
   >.content
     min-height 100vh
-    
 </style>

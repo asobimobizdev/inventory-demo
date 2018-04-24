@@ -145,7 +145,7 @@ export default {
         if (valid) {
           alert("submit!");
         } else {
-          console.log("error submit!!");
+          alert("error submit!!");
           return false;
         }
       });
