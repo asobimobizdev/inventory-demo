@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Smart contracts and tests for demo",
   "main": "truffle-config.js",
   "scripts": {
     "test": "truffle test",
