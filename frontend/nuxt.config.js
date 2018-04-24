@@ -1,14 +1,15 @@
 // import { path } from 'path'
 
 module.exports = {
+  mode: 'spa',
   /*
   ** Headers of the page
   */
   head: {
-    title: 'inventory-demo',
+    title: 'ASOBIMO - INVENTRY DEMO',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no' },
       { hid: 'description', name: 'description', content: 'Nuxt.js project' }
     ],
     link: [
@@ -18,7 +19,7 @@ module.exports = {
   /*
   ** Customize the progress bar color
   */
-  loading: { color: '#3B8070' },
+  loading: { color: '#ffdd00' },
   /*
   ** Build configuration
   */
@@ -47,10 +48,16 @@ module.exports = {
       'axios'
     ]
   },
-  // css: [
-  //   '@/assets/css/main.styl'
-  // ],
+  css: [
+    '@/assets/css/main.styl',
+    'element-ui/lib/theme-chalk/reset.css',
+    'element-ui/lib/theme-chalk/index.css'
+  ],
   generate: {
     dir: "../dist"
-  }
+  },
+  plugins: [
+    '@/plugins/element-ui',
+    '@/plugins/localstorage'
+  ]
 }

@@ -1,0 +1,48 @@
+.collection
+  display flex
+  flex-direction: column;
+  justify-content: flex-start;
+
+  overflow-x hidden
+  overflow-y scroll 
+
+  background-color: alpha(#000, 0.1)
+  
+  >.container
+    &:emty
+      min-height 100%
+
+    background-color alpha(#f00,0.3)
+    >.item
+      background-color: alpha(#000, 0.0)
+      display flex
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+
+  &.list 
+    >.container
+        display grid   
+        padding 4px
+        grid-gap 4px
+        // grid-template-columns repeat(auto-fit, 1fr);
+        
+      >.item
+        margin 2px
+        // height: 60px
+        // display flex   
+
+  &.grid
+    >.container
+        display grid   
+        padding 4px
+        grid-gap 4px
+        grid-template-columns repeat(auto-fit, minmax(120px,1fr));
+        
+      // >.item
+      //   background-color alpha(#fff,0.3)
+      //   height 120px
+      //   margin 0px
+      //   margin-bottom 0px
