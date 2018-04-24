@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/asobicoin/inventory-demo#readme",
   "dependencies": {
-    "truffle": "^4.1.7"
+    "truffle": "^4.1.7",
+    "zeppelin-solidity": "~1.8.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
