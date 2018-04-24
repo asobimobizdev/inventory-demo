@@ -4,10 +4,10 @@
   justify-content: flex-start;
 
   overflow-x hidden
-  overflow-y scroll 
+  overflow-y scroll
 
   background-color: alpha(#000, 0.1)
-  
+
   >.container
     &:emty
       min-height 100%
@@ -22,25 +22,25 @@
       align-content: center;
       align-items: center;
 
-  &.list 
+  &.list
     >.container
-        display grid   
+        display grid
         padding 4px
         grid-gap 4px
         // grid-template-columns repeat(auto-fit, 1fr);
-        
+
       >.item
         margin 2px
         // height: 60px
-        // display flex   
+        // display flex
 
   &.grid
     >.container
-        display grid   
+        display grid
         padding 4px
         grid-gap 4px
         grid-template-columns repeat(auto-fit, minmax(120px,1fr));
-        
+
       // >.item
       //   background-color alpha(#fff,0.3)
       //   height 120px

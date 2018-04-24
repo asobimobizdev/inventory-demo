@@ -1,7 +1,7 @@
 <template>
   <section class="host">
     <div class="content">
-      
+
       <!-- <collection class="goods" :items="goods" :isGrid="true" groupId="porco">
         <div class="good" v-for="(good, index) in goods" :slot="['item',index].join('-')" :key="good.id">
           <div class="icon"></div>
@@ -16,8 +16,8 @@
           </div>
         </div>
       </collection> -->
-      
-      <div class="goods collection grid"> 
+
+      <div class="goods collection grid">
         <draggable class="container" :options="{group:'people'}">
           <div class="item" v-for="(good, index) in goods" :key="good.id">
             <div class="good" >
@@ -81,7 +81,7 @@ export default {
 
 <style lang="stylus" scoped>
 .host
-  
+
   width 100%
   min-height 100%
   display flex
@@ -132,12 +132,12 @@ export default {
           align-content: flex-start;
           align-items: flex-end;
           height calc(100% - 16px)
-              
+
           >label
             text-align center
             height 20px
             display block
-            width 100%  
+            width 100%
             margin-bottom 4px
             flex 1 1 auto
 
@@ -149,5 +149,5 @@ export default {
             border-radius 30px
             box-shadow 0 1px 2px alpha(#000,0.1)
             align-self: flex-end;
-          
+
 </style>

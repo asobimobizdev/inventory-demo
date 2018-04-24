@@ -3,7 +3,7 @@
 </template>
 
 <style lang="stylus">
-.el-header 
+.el-header
   // background-color: #fd0;
   color: #333;
   line-height: 60px;
