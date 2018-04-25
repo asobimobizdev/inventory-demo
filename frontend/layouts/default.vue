@@ -1,7 +1,5 @@
 <template>
-
   <el-container>
-
     <el-header>
       <el-menu
         :router="true"
@@ -9,22 +7,18 @@
         class="el-menu-demo"
         mode="horizontal">
         <el-menu-item index="/">
-          <nuxt-link to="/">Cover
+          <nuxt-link to="/">
+            Inventory
           </nuxt-link>
         </el-menu-item>
-        <el-menu-item index="/create">
-          <nuxt-link to="/create">
-            Create
+        <el-menu-item index="/deploy-contract">
+          <nuxt-link to="/deploy-contract">
+            Deploy Contract
           </nuxt-link>
         </el-menu-item>
-        <el-menu-item index="/admin-goods">
-          <nuxt-link to="/admin-goods">
-            Goods Admin
-          </nuxt-link>
-        </el-menu-item>
-        <el-menu-item index="/inventory">
-          <nuxt-link to="/inventory">
-            inventory
+        <el-menu-item index="/mint-token">
+          <nuxt-link to="/mint-token">
+            Mint Token
           </nuxt-link>
         </el-menu-item>
       </el-menu>
@@ -35,7 +29,6 @@
     </el-main>
 
   </el-container>
-
 </template>
 
 <script>
@@ -57,7 +50,6 @@ html, body
   height 100%
 
 html
-  // font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;
