@@ -12,6 +12,11 @@
           <nuxt-link to="/">Cover
           </nuxt-link>
         </el-menu-item>
+        <el-menu-item index="/create">
+          <nuxt-link to="/create">
+            Create
+          </nuxt-link>
+        </el-menu-item>
         <el-menu-item index="/admin-goods">
           <nuxt-link to="/admin-goods">
             Goods Admin

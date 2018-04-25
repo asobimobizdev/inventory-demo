@@ -1,11 +1,11 @@
-/* global web3 */
 import Web3 from "web3";
 import MintableERC721 from "../../backend/build/contracts/MintableERC721.json";
 
+
 export default class Dapp {
   constructor() {
-    if (typeof web3 !== "undefined") {
-      this.web3 = new Web3(web3.currentProvider);
+    if (typeof window.web3 !== "undefined") {
+      this.web3 = new Web3(window.web3.currentProvider);
     }
 
     this.contracts = {
@@ -13,8 +13,25 @@ export default class Dapp {
     };
   }
 
+  initialize(callback) {
+    this.web3.eth.getAccounts().then((accounts) => {
+      if (accounts.length === 0) {
+        window.alert("Unlock your web3 wallet and reload this page");
+      }
+      this.defaultAccount = accounts[0];
+      this.web3.eth.defaultAccount = this.defaultAccount;
+    }).then(callback);
+  }
+
   getContract(contract) {
-    return new this.web3.eth.Contract(contract);
+    const options = {
+      from: this.web3.eth.defaultAccount
+    };
+    return new this.web3.eth.Contract(
+      contract.abi,
+      null,
+      options,
+    );
   }
 
   getContractAt(contract, address) {
@@ -30,6 +47,6 @@ export default class Dapp {
         args,
         data: contract.bytecode,
       }
-    );
+    ).send();
   }
 }
