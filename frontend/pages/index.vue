@@ -47,11 +47,16 @@
 </template>
 
 <script>
-// import Adoption from "~/truffle/contracts/Adoption.sol";
-import Collection from "@/components/Collection.vue";
 import draggable from "vuedraggable";
 
+import Collection from "@/components/Collection.vue";
+import dappMixin from "@/mixins/dapp";
+
+
 export default {
+  mixins: [
+    dappMixin,
+  ],
   components: {
     collection: Collection,
     draggable
@@ -75,6 +80,10 @@ export default {
       goods,
       friends
     };
+  },
+  methods: {
+    ready() {
+    }
   }
 };
 </script>

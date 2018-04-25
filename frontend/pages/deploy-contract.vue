@@ -7,15 +7,12 @@
 </template>
 
 <script>
-import Dapp from "@/lib/dapp";
+import dappMixin from "@/mixins/dapp";
 
 export default {
-  components: {
-  },
-  mounted() {
-    this.dapp = new Dapp();
-    this.dapp.initialize(this.ready());
-  },
+  mixins: [
+    dappMixin,
+  ],
   data() {
     return {
     };

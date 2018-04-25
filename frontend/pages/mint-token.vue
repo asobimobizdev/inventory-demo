@@ -59,13 +59,12 @@
 </style>
 
 <script>
-import Dapp from "@/lib/dapp";
+import dappMixin from "@/mixins/dapp";
 
 export default {
-  mounted() {
-    this.dapp = new Dapp();
-    this.dapp.initialize(this.ready());
-  },
+  mixins: [
+    dappMixin,
+  ],
   data() {
     const item = {
       date: "2016-05-02",
