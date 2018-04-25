@@ -30,11 +30,12 @@ export default class Dapp {
     const options = {
       from: this.web3.eth.defaultAccount,
     };
-    return new this.web3.eth.Contract(
+    const result = new this.web3.eth.Contract(
       contract.abi,
       null,
       options,
     );
+    return result;
   }
 
   getContractAt(contract, address) {
