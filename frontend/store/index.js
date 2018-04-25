@@ -63,6 +63,7 @@ const createStore = () => {
 
         //TODO :: commit something to the store
         context.commit("");
+        context.dispatch("getItems");
       },
 
       async checkMintOwner(context) {
