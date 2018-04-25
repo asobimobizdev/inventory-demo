@@ -1,6 +1,9 @@
 <template>
 
 <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+  <label>
+    {{ isOwner }}
+  </label>
   <el-form-item label="Activity name" prop="name">
     <el-input v-model="ruleForm.name"></el-input>
   </el-form-item>
@@ -56,7 +59,13 @@
 </style>
 
 <script>
+import Dapp from "@/lib/dapp";
+
 export default {
+  mounted() {
+    this.dapp = new Dapp();
+    this.dapp.initialize(this.ready());
+  },
   data() {
     const item = {
       date: "2016-05-02",
@@ -64,6 +73,9 @@ export default {
       address: "No. 189, Grove St, Los Angeles"
     };
     return {
+      // web3 part
+      isOwner: false,
+      // end of web3 part
       tableData: Array(20).fill(item),
 
       ruleForm: {
@@ -140,6 +152,16 @@ export default {
   },
 
   methods: {
+    ready() {
+      this.token = this.dapp.getContractAt(
+        this.dapp.contracts.MintableERC721,
+        "0xDB2E91f83cA869421d22E795a86b623a24c03edB",
+      );
+      console.log(this.token);
+      this.token.methods.owner().call().then((ownerAddress) => {
+        this.isOwner = ownerAddress == this.dapp.defaultAccount;
+      });
+    },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {

@@ -14,19 +14,24 @@ export default class Dapp {
   }
 
   initialize(callback) {
-    this.web3.eth.getAccounts().then((accounts) => {
-      if (accounts.length === 0) {
-        window.alert("Unlock your web3 wallet and reload this page");
-      }
-      this.defaultAccount = accounts[0];
-      this.web3.eth.defaultAccount = this.defaultAccount;
-    }).then(callback);
+    this._initialize().then(callback);
   }
+
+  async _initialize() {
+    const accounts = await this.web3.eth.getAccounts();
+    if (accounts.length === 0) {
+      window.alert("Unlock your web3 wallet and reload this page");
+    }
+    this.defaultAccount = accounts[0];
+    this.web3.eth.defaultAccount = this.defaultAccount;
+  }
+
 
   getContract(contract) {
     const options = {
       from: this.web3.eth.defaultAccount
     };
+    console.log(contract);
     return new this.web3.eth.Contract(
       contract.abi,
       null,
