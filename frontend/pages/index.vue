@@ -2,21 +2,6 @@
   <section class="host">
     <div class="content">
 
-      <!-- <collection class="goods" :items="goods" :isGrid="true" groupId="porco">
-        <div class="good" v-for="(good, index) in goods" :slot="['item',index].join('-')" :key="good.id">
-          <div class="icon"></div>
-          <label>{{index}}</label>
-        </div>
-      </collection>
-
-      <collection class="friends" :items="friends" :isGrid="false" groupId="porco">
-        <div class="good" v-for="(friend, index) in friends" :slot="['item',index].join('-')" :key="friend.id">
-          <label>{{index}}</label>
-          <div class="goods" >
-          </div>
-        </div>
-      </collection> -->
-
       <div class="goods collection grid">
         <draggable class="container" :options="{group:'people'}">
           <div class="item" v-for="(good, index) in goods" :key="good.id">
@@ -38,9 +23,6 @@
           </div>
         </draggable>
       </div>
-
-
-
 
     </div>
   </section>
@@ -82,18 +64,6 @@ export default {
     };
   },
   methods: {
-    ready() {
-    },
-    async transferToken() {
-      const receiverAddress = "0x0";
-      const tokenID = "0";
-      await this.token.methods.approve(receiverAddress, tokenID);
-      await this.token.methods.transferFrom(
-        this.dapp.defaultAccount,
-        receiverAddress,
-        tokenID,
-      );
-    },
   }
 };
 </script>

@@ -10,23 +10,17 @@
 import dappMixin from "@/mixins/dapp";
 
 export default {
-  mixins: [
-    dappMixin,
-  ],
+  mixins: [dappMixin],
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
-    ready() {
-
-    },
     createToken() {
-      this.dapp.deployContract(this.dapp.contracts.MintableERC721);
+      this.$store.dispatch("createToken");
     },
     tokenCreated(contract) {
-      alert(`contract created ${contract}`);
-    },
+      this.$store.dispatch("tokenCreated", contract);
+    }
   }
 };
 </script>

@@ -1,9 +1,10 @@
-import Dapp from "@/lib/dapp";
-
+import { dapp } from "@/lib/dapp";
 
 export default {
-  mounted() {
-    this.dapp = new Dapp();
-    this.dapp.initialize(this.ready());
-  },
+  fetch({ store }){
+    if(store.state.dappInit) return;
+    dapp.initialize(()=>{
+      store.commit("dapp/initialized", true );
+    });
+  }
 };

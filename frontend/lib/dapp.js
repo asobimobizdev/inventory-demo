@@ -54,3 +54,5 @@ export default class Dapp {
     ).send();
   }
 }
+
+export const dapp = new Dapp();
