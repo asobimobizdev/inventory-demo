@@ -31,14 +31,14 @@ const createStore = () => {
       createToken() {
         dapp.deployContract(dapp.contracts.MintableERC721);
       },
-      tokenCreated(contex, contract) {
+      tokenCreated(context, contract) {
         alert(`contract created ${contract}`);
 
         //TODO :: commit something to the store
-        contex.commit("");
+        context.commit("");
       },
 
-      async transferToken(contex) {
+      async transferToken(context) {
         const receiverAddress = "0x0";
         const tokenID = "0";
         await token.methods.approve(receiverAddress, tokenID);
@@ -49,24 +49,24 @@ const createStore = () => {
         );
 
         //TODO :: commit something to the store
-        contex.commit("");
+        context.commit("");
       },
 
-      async checkMintOwner(contex) {
+      async checkMintOwner(context) {
         token = dapp.getContractAt(
           dapp.contracts.MintableERC721,
           "0xDB2E91f83cA869421d22E795a86b623a24c03edB"
         );
         const ownerAddress = await token.methods.owner().call();
         const isOwner = ownerAddress == dapp.defaultAccount;
-        contex.commit("isMintOwner", isOwner);
+        context.commit("isMintOwner", isOwner);
       },
 
-      async mintToken(contex, { receiverAddress, tokenID }) {
+      async mintToken(context, { receiverAddress, tokenID }) {
         await token.methods.mint(receiverAddress, tokenID).send();
 
         //TODO :: commit something to the store
-        contex.commit("");
+        context.commit("");
       },
 
     },
