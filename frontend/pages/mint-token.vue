@@ -2,9 +2,9 @@
 
 <div class="host">
   <el-form v-if="isOwner" :model="form" :rules="rules" ref="form" label-width="120px" class="demo-form">
-    
-    <el-form-item label="Reciver" prop="receiver">
-      <el-input v-model="form.receiver"></el-input>
+
+    <el-form-item label="Reciver" prop="receiverAddress">
+      <el-input v-model="form.receiverAddress"></el-input>
     </el-form-item>
     <el-form-item label="Token ID" prop="tokenID">
       <el-input v-model="form.tokenID"></el-input>
@@ -18,7 +18,7 @@
     <el-alert v-if="submitMessage" title="Success" type="success" @close="successAlertClose">
       {{submitMessage}}
     </el-alert>
-    
+
     <el-alert v-if="submitErrorMessage" title="Error" type="error" @close="errorAlertClose">
       {{submitErrorMessage}}
     </el-alert>
@@ -43,11 +43,11 @@ export default {
   data() {
     return {
       form: {
-        receiver: "",
+        receiverAddress: "",
         tokenID: "",
       },
       rules: {
-        receiver: [
+        receiverAddress: [
           {
             required: true,
             message: "Please input Receiver",
@@ -82,14 +82,18 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.submitMessage = `Submit! ${this.form.receiver} ${
+          this.submitMessage = `Submit! ${this.form.receiverAddress} ${
             this.form.tokenID
           }`;
+          this.mintToken().then(
+            this.successAlertClose
+          ).catch(
+            this.errorAlertClose
+          );
           this.submitErrorMessage = null;
           this.$refs[formName].resetFields();
         } else {
           this.submitMessage = null;
-
           return false;
         }
       });
