@@ -1,6 +1,8 @@
 import Vuex from "vuex";
 import { dapp } from "@/lib/dapp";
 
+const localStorage = window.localStorage;
+
 let token;
 
 const createStore = () => {
@@ -9,6 +11,7 @@ const createStore = () => {
       dappInit: false,
       isMintOwner: false,
       items: [],
+      friends: [],
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -20,8 +23,18 @@ const createStore = () => {
       ["items"](state, items) {
         state.items = items;
       },
+      ["friends"](state, friends) {
+        state.friends = friends;
+      },
     },
     actions: {
+      getFriendList(context) {
+        const friends = JSON.parse(localStorage.getItem("friends"));
+        context.commit("friends", friends);
+      },
+      setFriendList(context) {
+        localStorage.setItem("friends", JSON.stringify(context.state.friends));
+      },
       async getItems(context) {
         const items = [
           1, 2, 3,
