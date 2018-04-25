@@ -156,7 +156,6 @@ export default {
         this.dapp.contracts.MintableERC721,
         "0xDB2E91f83cA869421d22E795a86b623a24c03edB",
       );
-      console.log(this.token);
       this.token.methods.owner().call().then((ownerAddress) => {
         this.isOwner = ownerAddress == this.dapp.defaultAccount;
       });

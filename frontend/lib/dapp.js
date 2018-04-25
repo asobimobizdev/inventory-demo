@@ -29,9 +29,8 @@ export default class Dapp {
 
   getContract(contract) {
     const options = {
-      from: this.web3.eth.defaultAccount
+      from: this.web3.eth.defaultAccount,
     };
-    console.log(contract);
     return new this.web3.eth.Contract(
       contract.abi,
       null,
