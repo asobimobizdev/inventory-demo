@@ -39,8 +39,8 @@ export default {
   computed: {
     activeLink() {
       return this.$nuxt.$route.path;
-    }
-  }
+    },
+  },
 };
 </script>
 

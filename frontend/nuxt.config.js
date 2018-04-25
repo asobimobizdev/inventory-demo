@@ -10,11 +10,11 @@ module.exports = {
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" },
-      { hid: "description", name: "description", content: "Nuxt.js project" }
+      { hid: "description", name: "description", content: "Nuxt.js project" },
     ],
     link: [
-      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" }
-    ]
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+    ],
   },
   /*
   ** Customize the progress bar color
@@ -33,7 +33,7 @@ module.exports = {
           enforce: "pre",
           test: /\.(js|vue)$/,
           loader: "eslint-loader",
-          exclude: /(node_modules)/
+          exclude: /(node_modules)/,
         });
 
         // config.module.rules.push({
@@ -45,19 +45,19 @@ module.exports = {
       }
     },
     vendor: [
-      "axios"
-    ]
+      "axios",
+    ],
   },
   css: [
     "@/assets/css/main.styl",
     "element-ui/lib/theme-chalk/reset.css",
-    "element-ui/lib/theme-chalk/index.css"
+    "element-ui/lib/theme-chalk/index.css",
   ],
   generate: {
-    dir: "../dist"
+    dir: "../dist",
   },
   plugins: [
     "@/plugins/element-ui",
-    "@/plugins/localstorage"
-  ]
+    "@/plugins/localstorage",
+  ],
 };

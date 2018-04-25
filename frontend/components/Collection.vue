@@ -17,9 +17,9 @@ export default {
     items: Array,
     isGrid: {
       type: Boolean,
-      dafault: false
+      dafault: false,
     },
-    groupId: { type: String, default: null }
+    groupId: { type: String, default: null },
   },
   data() {
     return {};
@@ -31,7 +31,7 @@ export default {
     itemsStyle() {
       return {
         height: this.isGrid ? "120px" : "60px",
-        background: this.isGrid ? "#f0f0f0" : "#f0f0f0"
+        background: this.isGrid ? "#f0f0f0" : "#f0f0f0",
       };
     },
 
@@ -42,9 +42,9 @@ export default {
       set(value) {
         alert(value);
         // this.items = value;
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 

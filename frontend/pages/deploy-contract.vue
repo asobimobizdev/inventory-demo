@@ -20,8 +20,8 @@ export default {
     },
     tokenCreated(contract) {
       this.$store.dispatch("tokenCreated", contract);
-    }
-  }
+    },
+  },
 };
 </script>
 

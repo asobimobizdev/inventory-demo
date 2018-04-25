@@ -41,30 +41,30 @@ export default {
   ],
   components: {
     collection: Collection,
-    draggable
+    draggable,
   },
   data() {
     let goods = [];
     for (let i = 0; i < 20; i++) {
       goods.push({
-        id: i
+        id: i,
       });
     }
 
     let friends = [];
     for (let i = 0; i < 3; i++) {
       friends.push({
-        id: i
+        id: i,
       });
     }
 
     return {
       goods,
-      friends
+      friends,
     };
   },
   methods: {
-  }
+  },
 };
 </script>
 

@@ -23,3 +23,6 @@ rules:
     - warn
     - always
   no-console: warn
+  comma-dangle:
+    - warn
+    - always-multiline

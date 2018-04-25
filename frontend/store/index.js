@@ -67,9 +67,9 @@ const createStore = () => {
 
         //TODO :: commit something to the store
         contex.commit("");
-      }
+      },
 
-    }
+    },
   });
 };
 export default createStore;

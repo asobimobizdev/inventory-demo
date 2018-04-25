@@ -7,6 +7,6 @@ export default () => {
 
   Vue.use(VueLocalStorage, {
     name: "asobimo-inventory-demo",
-    bind: true
+    bind: true,
   });
 };

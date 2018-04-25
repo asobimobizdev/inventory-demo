@@ -44,33 +44,33 @@ export default {
     return {
       form: {
         receiver: "",
-        tokenID: ""
+        tokenID: "",
       },
       rules: {
         receiver: [
           {
             required: true,
             message: "Please input Receiver",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
 
         tokenID: [
           {
             required: true,
             message: "Please input token ID",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       submitMessage: null,
-      submitErrorMessage: null
+      submitErrorMessage: null,
     };
   },
   computed: {
     isOwner() {
       return this.$store.state.isMintOwner;
-    }
+    },
   },
   mounted() {
     this.$store.dispatch("checkMintOwner");
@@ -103,7 +103,7 @@ export default {
     },
     errorAlertClose() {
       this.submitErrorMessage = null;
-    }
-  }
+    },
+  },
 };
 </script>
