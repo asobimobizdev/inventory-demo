@@ -42,8 +42,6 @@ export default {
   mixins: [dappMixin],
   data() {
     return {
-      // web3 part
-      isOwner: false,
       form: {
         receiver: "",
         tokenID: ""
@@ -69,11 +67,14 @@ export default {
       submitErrorMessage: null
     };
   },
-
-  mounted() {
-    this.$store.dispatch("checkOwner");
+  computed: {
+    isOwner() {
+      return this.$store.state.isMintOwner;
+    }
   },
-
+  mounted() {
+    this.$store.dispatch("checkMintOwner");
+  },
   methods: {
     async mintToken() {
       this.$store.dispatch("mintToken", this.form);

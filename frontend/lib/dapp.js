@@ -14,10 +14,10 @@ export default class Dapp {
   }
 
   initialize(callback) {
-    this._initialize().then(callback);
+    this.asyncInitialize().then(callback);
   }
 
-  async _initialize() {
+  async asyncInitialize() {
     const accounts = await this.web3.eth.getAccounts();
     if (accounts.length === 0) {
       window.alert("Unlock your web3 wallet and reload this page");
@@ -25,7 +25,6 @@ export default class Dapp {
     this.defaultAccount = accounts[0];
     this.web3.eth.defaultAccount = this.defaultAccount;
   }
-
 
   getContract(contract) {
     const options = {

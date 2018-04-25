@@ -6,17 +6,14 @@ const createStore = () => {
   return new Vuex.Store({
     state: {
       dappInit: false,
-      isOwner: false
+      isMintOwner: false
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
         state.dappInit = isInit;
       },
-      ["test"](state, payload) {
-        state.test = payload;
-      },
-      ["isOwner"](state, isOwner) {
-        state.isOwner = isOwner;
+      ["isMintOwner"](state, isMintOwner) {
+        state.isMintOwner = isMintOwner;
       }
     },
     actions: {
@@ -44,7 +41,7 @@ const createStore = () => {
         contex.commit("");
       },
 
-      checkOwner(contex) {
+      checkMintOwner(contex) {
 
         token = dapp.getContractAt(
           dapp.contracts.MintableERC721,
@@ -56,7 +53,7 @@ const createStore = () => {
           .call()
           .then(ownerAddress => {
             const isOwner = ownerAddress == this.dapp.defaultAccount;
-            contex.commit("isOwner", isOwner);
+            contex.commit("isMintOwner", isOwner);
           });
 
       },
