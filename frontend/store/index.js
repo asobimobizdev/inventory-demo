@@ -7,7 +7,8 @@ const createStore = () => {
   return new Vuex.Store({
     state: {
       dappInit: false,
-      isMintOwner: false
+      isMintOwner: false,
+      items: [],
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -15,9 +16,18 @@ const createStore = () => {
       },
       ["isMintOwner"](state, isMintOwner) {
         state.isMintOwner = isMintOwner;
-      }
+      },
+      ["items"](state, items) {
+        state.items = items;
+      },
     },
     actions: {
+      async getItems(context) {
+        const items = [
+          1, 2, 3,
+        ];
+        context.commit("items", items);
+      },
       createToken() {
         dapp.deployContract(dapp.contracts.MintableERC721);
       },
