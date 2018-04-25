@@ -20,6 +20,6 @@ rules:
     - warn
     - double
   semi:
-    - error
+    - warn
     - always
   no-console: warn
