@@ -1,56 +1,33 @@
 <template>
 
-<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
-  <label>
-    {{ isOwner }}
-  </label>
-  <el-form-item label="Activity name" prop="name">
-    <el-input v-model="ruleForm.name"></el-input>
-  </el-form-item>
-  <el-form-item label="Activity zone" prop="region">
-    <el-select v-model="ruleForm.region" placeholder="Activity zone">
-      <el-option label="Zone one" value="shanghai"></el-option>
-      <el-option label="Zone two" value="beijing"></el-option>
-    </el-select>
-  </el-form-item>
-  <el-form-item label="Activity time" required>
-    <el-col :span="11">
-      <el-form-item prop="date1">
-        <el-date-picker type="date" placeholder="Pick a date" v-model="ruleForm.date1" style="width: 100%;"></el-date-picker>
-      </el-form-item>
-    </el-col>
-    <el-col class="line" :span="2">-</el-col>
-    <el-col :span="11">
-      <el-form-item prop="date2">
-        <el-time-picker type="fixed-time" placeholder="Pick a time" v-model="ruleForm.date2" style="width: 100%;"></el-time-picker>
-      </el-form-item>
-    </el-col>
-  </el-form-item>
-  <el-form-item label="Instant delivery" prop="delivery">
-    <el-switch v-model="ruleForm.delivery"></el-switch>
-  </el-form-item>
-  <el-form-item label="Activity type" prop="type">
-    <el-checkbox-group v-model="ruleForm.type">
-      <el-checkbox label="Online activities" name="type"></el-checkbox>
-      <el-checkbox label="Promotion activities" name="type"></el-checkbox>
-      <el-checkbox label="Offline activities" name="type"></el-checkbox>
-      <el-checkbox label="Simple brand exposure" name="type"></el-checkbox>
-    </el-checkbox-group>
-  </el-form-item>
-  <el-form-item label="Resources" prop="resource">
-    <el-radio-group v-model="ruleForm.resource">
-      <el-radio label="Sponsorship"></el-radio>
-      <el-radio label="Venue"></el-radio>
-    </el-radio-group>
-  </el-form-item>
-  <el-form-item label="Activity form" prop="desc">
-    <el-input type="textarea" v-model="ruleForm.desc"></el-input>
-  </el-form-item>
-  <el-form-item>
-    <el-button type="primary" @click="submitForm('ruleForm')">Create</el-button>
-    <el-button @click="resetForm('ruleForm')">Reset</el-button>
-  </el-form-item>
-</el-form>
+<div class="host">
+  <el-form v-if="isOwner" :model="form" :rules="rules" ref="form" label-width="120px" class="demo-form">
+    
+    <el-form-item label="Reciver" prop="receiver">
+      <el-input v-model="form.receiver"></el-input>
+    </el-form-item>
+    <el-form-item label="Token ID" prop="tokenID">
+      <el-input v-model="form.tokenID"></el-input>
+    </el-form-item>
+
+    <el-form-item>
+      <el-button type="primary" @click="submitForm('form')">Mint</el-button>
+      <el-button @click="resetForm('form')">Reset</el-button>
+    </el-form-item>
+
+    <el-alert v-if="submitMessage" title="Success" type="success" @close="successAlertClose">
+      {{submitMessage}}
+    </el-alert>
+    
+    <el-alert v-if="submitErrorMessage" title="Error" type="error" @close="errorAlertClose">
+      {{submitErrorMessage}}
+    </el-alert>
+
+  </el-form>
+  <div v-else>
+    <h1>You are not the owner</h1>
+  </div>
+</div>
 
 </template>
 
@@ -62,91 +39,34 @@
 import dappMixin from "@/mixins/dapp";
 
 export default {
-  mixins: [
-    dappMixin,
-  ],
+  mixins: [dappMixin],
   data() {
-    const item = {
-      date: "2016-05-02",
-      name: "Tom",
-      address: "No. 189, Grove St, Los Angeles"
-    };
     return {
       // web3 part
       isOwner: false,
-      // end of web3 part
-      tableData: Array(20).fill(item),
-
-      ruleForm: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
+      form: {
+        receiver: "",
+        tokenID: ""
       },
       rules: {
-        name: [
+        receiver: [
           {
             required: true,
-            message: "Please input Activity name",
-            trigger: "blur"
-          },
-          {
-            min: 3,
-            max: 5,
-            message: "Length should be 3 to 5",
+            message: "Please input Receiver",
             trigger: "blur"
           }
         ],
-        region: [
+
+        tokenID: [
           {
             required: true,
-            message: "Please select Activity zone",
-            trigger: "change"
-          }
-        ],
-        date1: [
-          {
-            type: "date",
-            required: true,
-            message: "Please pick a date",
-            trigger: "change"
-          }
-        ],
-        date2: [
-          {
-            type: "date",
-            required: true,
-            message: "Please pick a time",
-            trigger: "change"
-          }
-        ],
-        type: [
-          {
-            type: "array",
-            required: true,
-            message: "Please select at least one activity type",
-            trigger: "change"
-          }
-        ],
-        resource: [
-          {
-            required: true,
-            message: "Please select activity resource",
-            trigger: "change"
-          }
-        ],
-        desc: [
-          {
-            required: true,
-            message: "Please input activity form",
+            message: "Please input token ID",
             trigger: "blur"
           }
         ]
-      }
+      },
+      submitMessage: null,
+      submitErrorMessage: null
     };
   },
 
@@ -154,11 +74,14 @@ export default {
     ready() {
       this.token = this.dapp.getContractAt(
         this.dapp.contracts.MintableERC721,
-        "0xDB2E91f83cA869421d22E795a86b623a24c03edB",
+        "0xDB2E91f83cA869421d22E795a86b623a24c03edB"
       );
-      this.token.methods.owner().call().then((ownerAddress) => {
-        this.isOwner = ownerAddress == this.dapp.defaultAccount;
-      });
+      this.token.methods
+        .owner()
+        .call()
+        .then(ownerAddress => {
+          this.isOwner = ownerAddress == this.dapp.defaultAccount;
+        });
     },
     async mintToken() {
       // TODO
@@ -171,15 +94,27 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          alert("submit!");
+          this.submitMessage = `Submit! ${this.form.receiver} ${
+            this.form.tokenID
+          }`;
+          this.submitErrorMessage = null;
+          this.$refs[formName].resetFields();
         } else {
-          alert("error submit!!");
+          this.submitMessage = null;
+
           return false;
         }
       });
     },
     resetForm(formName) {
+      this.submitMessage = null;
       this.$refs[formName].resetFields();
+    },
+    successAlertClose() {
+      this.submitMessage = null;
+    },
+    errorAlertClose() {
+      this.submitErrorMessage = null;
     }
   }
 };
