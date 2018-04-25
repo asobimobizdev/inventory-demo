@@ -160,6 +160,14 @@ export default {
         this.isOwner = ownerAddress == this.dapp.defaultAccount;
       });
     },
+    async mintToken() {
+      // TODO
+      // these values need to come from somewhere
+      const receiverAddress = "0x0";
+      const tokenID = "0";
+      // end TODO
+      await this.token.methods.mint(receiverAddress, tokenID).send();
+    },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {

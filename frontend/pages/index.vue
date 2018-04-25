@@ -83,7 +83,17 @@ export default {
   },
   methods: {
     ready() {
-    }
+    },
+    async transferToken() {
+      const receiverAddress = "0x0";
+      const tokenID = "0";
+      await this.token.methods.approve(receiverAddress, tokenID);
+      await this.token.methods.transferFrom(
+        this.dapp.defaultAccount,
+        receiverAddress,
+        tokenID,
+      );
+    },
   }
 };
 </script>
