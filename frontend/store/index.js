@@ -23,7 +23,8 @@ let testFriendGoods = Array.from(Array(2)).map((it, i) => {
 
 let testFriends = Array.from(Array(3)).map((it, i) => {
   return {
-    id: uuid()
+    id: uuid(),
+    name: `Franco ${i}`
   };
 });
 //-------------
@@ -73,6 +74,18 @@ const createStore = () => {
       },
       setFriendList(context) {
         localStorage.setItem("friends", JSON.stringify(context.state.friends));
+      },
+
+      addFriend(context, friend) {
+        const friends = [...context.state.friends, { ...friend }];
+        context.commit("friends", friends);
+      },
+
+      deleteFriend(context, friend) {
+        const friends = context.state.friends.filter(it => {
+          return !(it.id == friend.id);
+        })
+        context.commit("friends", friends);
       },
 
       async getGoods(context) {

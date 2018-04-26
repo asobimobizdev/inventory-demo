@@ -11,6 +11,11 @@
             Inventory
           </nuxt-link>
         </el-menu-item>
+        <el-menu-item index="/friends">
+          <nuxt-link to="/friends">
+            Friends
+          </nuxt-link>
+        </el-menu-item>
         <el-menu-item index="/deploy-contract">
           <nuxt-link to="/deploy-contract">
             Deploy Contract
@@ -39,8 +44,8 @@ export default {
   computed: {
     activeLink() {
       return this.$nuxt.$route.path;
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -36,38 +36,38 @@ export default {
     return {
       form: {
         receiverAddress: "",
-        tokenID: "",
+        tokenID: ""
       },
       rules: {
         receiverAddress: [
           {
             required: true,
             message: "Please input Receiver",
-            trigger: "blur",
-          },
+            trigger: "blur"
+          }
         ],
 
         tokenID: [
           {
             required: true,
             message: "Please input token ID",
-            trigger: "blur",
-          },
-        ],
-      },
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
   computed: {
     isOwner() {
       return this.$store.state.isMintOwner;
-    },
+    }
   },
   mounted() {
     this.$store.dispatch("checkMintOwner");
   },
   methods: {
     async mintToken() {
-      this.$store.dispatch("mintToken", this.form);
+      return this.$store.dispatch("mintToken", this.form);
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -78,7 +78,7 @@ export default {
                 message: `Submit! ${this.form.receiverAddress} ${
                   this.form.tokenID
                 }`,
-                type: "success",
+                type: "success"
               });
             })
             .catch(() => {
@@ -95,7 +95,7 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
-    },
-  },
+    }
+  }
 };
 </script>

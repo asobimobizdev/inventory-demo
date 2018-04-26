@@ -62,8 +62,7 @@ export default {
       get() {
         return this.$store.state.friendGoods;
       },
-      set(value) {
-      }
+      set(value) {}
     }
   },
   methods: {
