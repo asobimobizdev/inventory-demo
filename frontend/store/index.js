@@ -5,8 +5,21 @@ const localStorage = window.localStorage;
 
 let token;
 
-const createStore = () => {
+//TMP TEST CODE
+let testGoods = Array.from(Array(3)).map((it, i) => {
+  return {
+    id: i
+  };
+});
 
+let testFriends = Array.from(Array(3)).map((it, i) => {
+  return {
+    id: i
+  };
+});
+//-------------
+
+const createStore = () => {
   return new Vuex.Store({
     state: {
       dappInit: false,
@@ -14,7 +27,7 @@ const createStore = () => {
       goods: [],
       friends: [],
       selectedFriend: null,
-      friendGoods: [1, 2, 3, 4]
+      friendGoods: []
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -33,6 +46,10 @@ const createStore = () => {
       },
       ["friends"](state, friends) {
         state.friends = friends;
+        state.selectedFriend = friends.length > 0 ? 0 : null;
+      },
+      ["friendGoods"](state, goods) {
+        state.friendGoods = goods;
       },
     },
     actions: {
@@ -45,6 +62,11 @@ const createStore = () => {
       },
 
       async getGoods(context) {
+
+        //TMP TEST CODE
+        context.commit("goods", testGoods);
+        //
+
         const items = [
         ];
         console.log("goods", items);
@@ -59,6 +81,21 @@ const createStore = () => {
           );
         }
         context.commit("goods", items);
+
+      },
+
+      async getFriends(context) {
+        //TMP TEST CODE
+        context.commit("friends", testFriends);
+        return;
+        //
+      },
+
+      async getSelectedFriendGoods(context) {
+        //TMP TEST CODE
+        context.commit("friendGoods", testGoods);
+        return;
+        //
       },
 
       createToken() {
