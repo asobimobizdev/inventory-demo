@@ -8,13 +8,13 @@ let token;
 //TMP TEST CODE
 let testGoods = Array.from(Array(3)).map((it, i) => {
   return {
-    id: i
+    id: i,
   };
 });
 
 let testFriends = Array.from(Array(3)).map((it, i) => {
   return {
-    id: i
+    id: i,
   };
 });
 //-------------
@@ -27,7 +27,7 @@ const createStore = () => {
       goods: [],
       friends: [],
       selectedFriend: null,
-      friendGoods: []
+      friendGoods: [],
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {

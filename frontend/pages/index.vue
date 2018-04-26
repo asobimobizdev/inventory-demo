@@ -43,7 +43,7 @@ export default {
   },
   components: {
     collection: Collection,
-    draggable
+    draggable,
   },
   data() {
     return {};
@@ -56,7 +56,7 @@ export default {
       set(value) {
         console.log(value);
         // this.$store.commit("updateGoods", value);
-      }
+      },
     },
     friendGoods: {
       get() {
@@ -64,8 +64,8 @@ export default {
       },
       set(value) {
         console.log(value);
-      }
-    }
+      },
+    },
   },
   methods: {
     styleForGood(good) {
@@ -79,8 +79,8 @@ export default {
     },
     checkMoveFromFriendGoods(e) {
       return false;
-    }
-  }
+    },
+  },
 };
 </script>
 
