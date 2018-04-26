@@ -72,11 +72,7 @@ export default {
     },
     selectedFriendIndex: {
       get() {
-        const friendIndex = this.$store.state.selectedFriendIndex;
-        let friend = this.$store.state.friends[friendIndex];
-        console.log("selected friend", friend);
-
-        return friend;
+        return this.$store.state.selectedFriendIndex;
       },
       set(value) {
         this.$store.dispatch("selectFriend", value);
