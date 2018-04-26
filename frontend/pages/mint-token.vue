@@ -15,14 +15,6 @@
       <el-button @click="resetForm('form')">Reset</el-button>
     </el-form-item>
 
-    <el-alert v-if="submitMessage" title="Success" type="success" @close="successAlertClose">
-      {{submitMessage}}
-    </el-alert>
-
-    <el-alert v-if="submitErrorMessage" title="Error" type="error" @close="errorAlertClose">
-      {{submitErrorMessage}}
-    </el-alert>
-
   </el-form>
   <div v-else>
     <h1>You are not the owner</h1>
@@ -44,33 +36,31 @@ export default {
     return {
       form: {
         receiverAddress: "",
-        tokenID: "",
+        tokenID: ""
       },
       rules: {
         receiverAddress: [
           {
             required: true,
             message: "Please input Receiver",
-            trigger: "blur",
-          },
+            trigger: "blur"
+          }
         ],
 
         tokenID: [
           {
             required: true,
             message: "Please input token ID",
-            trigger: "blur",
-          },
-        ],
-      },
-      submitMessage: null,
-      submitErrorMessage: null,
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
   computed: {
     isOwner() {
       return this.$store.state.isMintOwner;
-    },
+    }
   },
   mounted() {
     this.$store.dispatch("checkMintOwner");
@@ -82,32 +72,30 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.submitMessage = `Submit! ${this.form.receiverAddress} ${
-            this.form.tokenID
-          }`;
-          this.mintToken().then(
-            this.successAlertClose
-          ).catch(
-            this.errorAlertClose
-          );
-          this.submitErrorMessage = null;
+          this.mintToken()
+            .then(() => {
+              this.$message({
+                message: `Submit! ${this.form.receiverAddress} ${
+                  this.form.tokenID
+                }`,
+                type: "success"
+              });
+            })
+            .catch(() => {
+              this.$message.error(
+                `Error! ${this.form.receiverAddress} ${this.form.tokenID}`
+              );
+            });
+
           this.$refs[formName].resetFields();
         } else {
-          this.submitMessage = null;
           return false;
         }
       });
     },
     resetForm(formName) {
-      this.submitMessage = null;
       this.$refs[formName].resetFields();
-    },
-    successAlertClose() {
-      this.submitMessage = null;
-    },
-    errorAlertClose() {
-      this.submitErrorMessage = null;
-    },
-  },
+    }
+  }
 };
 </script>
