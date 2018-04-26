@@ -79,7 +79,7 @@ export default {
         return friend;
       },
       set(value) {
-        this.$store.commit("setSelectedFriendIndex", value);
+        this.$store.dispatch("selectFriend", value);
       }
     },
     goods: {
@@ -115,7 +115,8 @@ export default {
       let oldIndex = e.oldIndex;
       let good = this.$store.state.goods[oldIndex];
 
-      this.$store.dispatch("transferGoodToSelectedFriendIndex", good);
+      this.$store.dispatch("transferGoodToSelectedFriend", good);
+      this.$store.dispatch("getSelectedFriendGoods", good);
     }
   }
 };

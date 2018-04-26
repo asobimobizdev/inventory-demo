@@ -56,6 +56,10 @@ const createStore = () => {
       },
     },
     actions: {
+      selectFriend(context, friendIndex) {
+        context.commit("setSelectedFriendIndex", friendIndex);
+        context.dispatch("getSelectedFriendGoods");
+      },
       getFriends(context) {
         const friends = JSON.parse(localStorage.getItem("friends"));
         context.commit("friends", friends);
@@ -75,6 +79,7 @@ const createStore = () => {
           return !(it.id == friend.id);
         })
         context.commit("friends", friends);
+        context.dispatch("saveFriends");
       },
 
       async getOwnGoods(context) {
