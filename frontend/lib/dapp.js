@@ -29,6 +29,7 @@ export default class Dapp {
   getContract(contract) {
     const options = {
       from: this.web3.eth.defaultAccount,
+      gasPrice: this.web3.utils.toWei("100", "gwei"),
     };
     const result = new this.web3.eth.Contract(
       contract.abi,
