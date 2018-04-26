@@ -53,6 +53,21 @@ export default class Dapp {
       }
     ).send();
   }
+
+  async getTokensForAddress(token) {
+    const address = dapp.defaultAccount;
+    const balance = await token.methods.balanceOf(address).call();
+    const items = [];
+    for (let i = 0; i < balance; i += 1) {
+      items.push(
+        {
+          id: await token.methods.tokenOfOwnerByIndex(address, i).call(),
+          confirmed: true,
+        }
+      );
+    }
+    return items;
+  }
 }
 
 export const dapp = new Dapp();

@@ -71,26 +71,11 @@ const createStore = () => {
       },
 
       async getGoods(context) {
-
-        //TMP TEST CODE
-        context.commit("goods", testGoods);
-        //
-
-        const items = [
-        ];
-        console.log("goods", items);
-        console.log(token.methods);
-        const balance = await token.methods.balanceOf(
+        const items = await dapp.getTokensForAddress(
+          token,
           dapp.defaultAccount,
-        ).call();
-        console.log("balance", balance);
-        for (let i = 0; i < balance; i += 1) {
-          items.push(
-            await token.methods.tokenOfOwnerByIndex(i).call()
-          );
-        }
+        );
         context.commit("goods", items);
-
       },
 
       async getFriends(context) {
@@ -102,6 +87,8 @@ const createStore = () => {
 
       async getSelectedFriendGoods(context) {
         //TMP TEST CODE
+        // const address = context.state.selectedFriend.id;
+        // const goods = dapp.getTokensForAddress(token, selectedFriend);
         context.commit("friendGoods", testFriendGoods);
         return;
         //
