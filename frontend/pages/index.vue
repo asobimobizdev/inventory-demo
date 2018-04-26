@@ -57,7 +57,7 @@ export default {
   mounted() {
     this.$store.dispatch("getOwnGoods");
     this.$store.dispatch("getFriends");
-    // this.$store.dispatch("getSelectedFriendIndexGoods");
+    this.$store.dispatch("getSelectedFriendGoods");
   },
   components: {
     collection: Collection,
