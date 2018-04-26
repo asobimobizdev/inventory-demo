@@ -99,7 +99,10 @@ const createStore = () => {
       },
 
       createToken() {
-        dapp.deployContract(dapp.contracts.MintableERC721);
+        dapp.deployContract(
+          dapp.contracts.MintableERC721,
+          ["Non-Fungible Token", "NFT"],
+        );
       },
 
       tokenCreated(context, contract) {
