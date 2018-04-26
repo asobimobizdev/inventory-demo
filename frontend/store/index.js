@@ -121,10 +121,9 @@ const createStore = () => {
       },
 
       async transferToken(context, { receiverAddress, tokenID }) {
-
         await token.methods.approve(receiverAddress, tokenID);
         await token.methods.transferFrom(
-          this.dapp.defaultAccount,
+          dapp.defaultAccount,
           receiverAddress,
           tokenID,
         );
