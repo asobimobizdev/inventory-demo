@@ -11,8 +11,10 @@ const createStore = () => {
     state: {
       dappInit: false,
       isMintOwner: false,
-      items: [],
+      goods: [],
       friends: [],
+      selectedFriend: null,
+      friendGoods: [1, 2, 3, 4]
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -26,8 +28,8 @@ const createStore = () => {
       ["isMintOwner"](state, isMintOwner) {
         state.isMintOwner = isMintOwner;
       },
-      ["items"](state, items) {
-        state.items = items;
+      ["goods"](state, goods) {
+        state.goods = goods;
       },
       ["friends"](state, friends) {
         state.friends = friends;
@@ -41,10 +43,11 @@ const createStore = () => {
       setFriendList(context) {
         localStorage.setItem("friends", JSON.stringify(context.state.friends));
       },
-      async getItems(context) {
+
+      async getGoods(context) {
         const items = [
         ];
-        console.log("items", items);
+        console.log("goods", items);
         console.log(token.methods);
         const balance = await token.methods.balanceOf(
           dapp.defaultAccount,
@@ -55,21 +58,19 @@ const createStore = () => {
             await token.methods.tokenOfOwnerByIndex(i).call()
           );
         }
-        context.commit("items", items);
+        context.commit("goods", items);
       },
+
       createToken() {
         dapp.deployContract(dapp.contracts.MintableERC721);
       },
+
       tokenCreated(context, contract) {
         alert(`contract created ${contract}`);
-
-        //TODO :: commit something to the store
-        context.commit("");
       },
 
-      async transferToken(context) {
-        const receiverAddress = "0x0";
-        const tokenID = "0";
+      async transferToken(context, { receiverAddress, tokenID }) {
+
         await token.methods.approve(receiverAddress, tokenID);
         await token.methods.transferFrom(
           this.dapp.defaultAccount,
@@ -77,9 +78,7 @@ const createStore = () => {
           tokenID,
         );
 
-        //TODO :: commit something to the store
-        context.commit("");
-        context.dispatch("getItems");
+        context.dispatch("getGoods");
       },
 
       async checkMintOwner(context) {
