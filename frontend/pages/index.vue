@@ -55,7 +55,6 @@ export default {
         return this.$store.state.goods;
       },
       set(value) {
-        // console.log(value);
         // this.$store.commit("updateGoods", value);
       }
     },
@@ -64,17 +63,14 @@ export default {
         return this.$store.state.friendGoods;
       },
       set(value) {
-        // console.log(value);
       }
     }
   },
   methods: {
     styleForGood(good) {
-      console.log("good", good);
       return {};
     },
     checkMove(e) {
-      // console.log("move", e.draggedContext);
       return true;
       // return evt.draggedContext.element.name !== "apple";
     },

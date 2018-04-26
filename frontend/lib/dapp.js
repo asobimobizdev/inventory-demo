@@ -45,7 +45,6 @@ export default class Dapp {
   }
 
   deployContract(contract, args) {
-    console.log(contract);
     const contractInstance = this.getContract(contract);
     return contractInstance.deploy(
       {
