@@ -48,8 +48,11 @@ const createStore = () => {
         state.friendGoods = goods;
       },
       ["markConfirmed"](state, goodId) {
-        const index = state.goods.find((good) => {return good.id === goodId});
+        const index = state.goods.find((good) => { return good.id === goodId });
         state.goods[index].confirmed = true;
+      },
+      ["setSelectedFriendIndex"](state, index) {
+        state.selectedFriendIndex = index;
       },
     },
     actions: {
@@ -92,6 +95,9 @@ const createStore = () => {
         const goods = await dapp.getTokensForAddress(token, address);
         context.commit("friendGoods", goods);
       },
+
+
+
 
       createToken() {
         dapp.deployContract(
