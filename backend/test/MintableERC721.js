@@ -17,7 +17,7 @@ contract("MintableERC721", accounts => {
   let token;
 
   beforeEach(async () => {
-    token = await Token.new();
+    token = await Token.new("Non-Fungible Token", "NFT");
   });
 
   it("should be created correctly", async () => {
