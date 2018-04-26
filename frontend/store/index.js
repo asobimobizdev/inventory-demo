@@ -44,7 +44,7 @@ const createStore = () => {
 
         token = dapp.getContractAt(
           dapp.contracts.MintableERC721,
-          "0x925630803E45475323960540bE0d2e6530e911Aa",
+          "0xa0a6181616e04593d6F00EE6ed43037bB69848A6",
         );
       },
       ["isMintOwner"](state, isMintOwner) {
