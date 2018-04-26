@@ -3,8 +3,8 @@
 
   <el-form v-if="isOwner" :model="form" :rules="rules" ref="form" label-width="120px" class="demo-form">
 
-    <el-form-item label="Reciver" prop="receiverAddress">
-      <el-input v-model="form.receiverAddress"></el-input>
+    <el-form-item label="Reciver" prop="address">
+      <el-input v-model="form.address"></el-input>
     </el-form-item>
     <el-form-item label="Token ID" prop="tokenID">
       <el-input v-model="form.tokenID"></el-input>
@@ -35,11 +35,11 @@ export default {
   data() {
     return {
       form: {
-        receiverAddress: "",
+        address: "",
         tokenID: ""
       },
       rules: {
-        receiverAddress: [
+        address: [
           {
             required: true,
             message: "Please input Receiver",
@@ -75,7 +75,7 @@ export default {
           this.mintToken()
             .then(() => {
               this.$message({
-                message: `Submit! ${this.form.receiverAddress} ${
+                message: `Submit! ${this.form.address} ${
                   this.form.tokenID
                 }`,
                 type: "success"
@@ -83,7 +83,7 @@ export default {
             })
             .catch(() => {
               this.$message.error(
-                `Error! ${this.form.receiverAddress} ${this.form.tokenID}`
+                `Error! ${this.form.address} ${this.form.tokenID}`
               );
             });
 

@@ -33,7 +33,6 @@ const createStore = () => {
         state.isMintOwner = isMintOwner;
       },
       ["goods"](state, goods) {
-        console.log(state);
         goods = goods.filter((item) => {
           return !state.friendGoods.find((friendItem) => {
             return item.id == friendItem.id;
@@ -90,7 +89,6 @@ const createStore = () => {
         let address = context.state.friends[
           context.state.selectedFriendIndex
         ].id;
-        console.log(address);
         const goods = await dapp.getTokensForAddress(token, address);
         context.commit("friendGoods", goods);
       },
@@ -124,7 +122,6 @@ const createStore = () => {
       },
 
       async transferToken(context, { address, tokenID }) {
-        console.log("Test");
         await token.methods.approve(address, tokenID).send();
         await token.methods.transferFrom(
           dapp.defaultAccount,
