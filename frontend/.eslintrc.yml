@@ -26,3 +26,5 @@ rules:
   comma-dangle:
     - warn
     - always-multiline
+  no-unused-vars:
+    - warn
