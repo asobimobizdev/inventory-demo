@@ -80,6 +80,7 @@ export default {
     onDrop(e) {
       let from = e.from.id;
       let to = e.to.id;
+      if (from != "goodsContainer" || to != "friendGoodsContainer") return;
       let oldIndex = e.oldIndex;
       let good = this.$store.state.goods[oldIndex];
 
