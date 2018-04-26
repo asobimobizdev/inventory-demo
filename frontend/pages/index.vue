@@ -2,10 +2,10 @@
   <section class="host">
     <div class="content">
 
-      <div class="items collection grid">
-        <draggable class="container" :options="{group:'people'}">
-          <div class="item" v-for="(good, index) in items" :key="good.id">
-            <div class="good" >
+      <div class="goods collection grid">
+        <draggable v-model='goods' class="container" :options="{group:'goods'}">
+          <div class="item" v-for="(good, index) in goods" :key="good">
+            <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
               <label>{{index}}</label>
             </div>
@@ -13,10 +13,10 @@
         </draggable>
       </div>
 
-      <div class="friends collection list">
-        <draggable class="container" :options="{group:'people'}">
-          <div class="item" v-for="(friend, index) in friends" :key="friend.id">
-            <div class="friend" >
+      <div class="friend-goods collection list">
+        <draggable v-model='goods' class="container" :options="{group:'goods'}">
+          <div class="item" v-for="(good, index) in friendGoods" :key="good">
+            <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
               <label>{{index}}</label>
             </div>
@@ -34,37 +34,37 @@ import draggable from "vuedraggable";
 import Collection from "@/components/Collection.vue";
 import dappMixin from "@/mixins/dapp";
 
-
 export default {
-  mixins: [
-    dappMixin,
-  ],
+  mixins: [dappMixin],
   mounted() {
-    this.$store.dispatch("getItems");
+    this.$store.dispatch("getGoods");
   },
   components: {
     collection: Collection,
-    draggable,
-  },
-  computed: {
-    items() {
-      return this.$store.state.items;
-    },
+    draggable
   },
   data() {
-    let friends = [];
-    for (let i = 0; i < 3; i++) {
-      friends.push({
-        id: i,
-      });
+    return {};
+  },
+  computed: {
+    goods: {
+      get() {
+        return this.$store.state.goods;
+      },
+      set(value) {
+        this.$store.commit("updateGoods", value);
+      }
+    },
+    friendGoods() {
+      return this.$store.state.friendGoods;
     }
-
-    return {
-      friends,
-    };
   },
   methods: {
-  },
+    styleForGood(good) {
+      console.log("good", good);
+      return {};
+    }
+  }
 };
 </script>
 
@@ -82,7 +82,7 @@ export default {
     padding 4px
     display flex
 
-    >.items
+    >.goods
       margin-right 4px
       height 100%
       flex 1 1 auto
@@ -103,7 +103,7 @@ export default {
           >label
             text-align center
 
-    >.friends
+    >.friend-goods
       width 300px
       height 100%
       .item
