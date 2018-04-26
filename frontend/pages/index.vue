@@ -3,22 +3,23 @@
     <div class="content">
 
       <div class="goods collection grid">
-        <draggable v-model='goods' class="container" :options="{group:'goods'}" :move="checkMove">
-          <div class="item" v-for="(good, index) in goods" :key="good.id">
+        <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
+          <div class="item" v-for="(good) in goods" :key="good.id">
             <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
-              <label>{{index}}</label>
+              <label>{{good.id}}</label>
             </div>
           </div>
         </draggable>
       </div>
 
       <div class="friend-goods collection list">
-        <draggable v-model='friendGoods' class="container" :options="{group:'goods'}" :move="checkMoveFromFriendGoods">
-          <div class="item" v-for="(good, index) in friendGoods" :key="good.id">
+        <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods'}" :move="checkMoveFromFriendGoods">
+          <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed">
             <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
-              <label>{{index}}</label>
+              <label>{{good.id}}</label>
+              
             </div>
           </div>
         </draggable>
@@ -43,7 +44,7 @@ export default {
   },
   components: {
     collection: Collection,
-    draggable,
+    draggable
   },
   data() {
     return {};
@@ -54,18 +55,18 @@ export default {
         return this.$store.state.goods;
       },
       set(value) {
-        console.log(value);
+        // console.log(value);
         // this.$store.commit("updateGoods", value);
-      },
+      }
     },
     friendGoods: {
       get() {
         return this.$store.state.friendGoods;
       },
       set(value) {
-        console.log(value);
-      },
-    },
+        // console.log(value);
+      }
+    }
   },
   methods: {
     styleForGood(good) {
@@ -73,14 +74,22 @@ export default {
       return {};
     },
     checkMove(e) {
-      console.log(e.draggedContext);
+      // console.log("move", e.draggedContext);
       return true;
       // return evt.draggedContext.element.name !== "apple";
     },
     checkMoveFromFriendGoods(e) {
       return false;
     },
-  },
+    onDrop(e) {
+      let from = e.from.id;
+      let to = e.to.id;
+      let oldIndex = e.oldIndex;
+      let good = this.$store.state.goods[oldIndex];
+
+      this.$store.dispatch("transferGoodToSelectedFriend", good);
+    }
+  }
 };
 </script>
 
@@ -98,7 +107,7 @@ export default {
     padding 4px
     display flex
 
-    >.goods
+    >.goods, .friend-goods
       margin-right 4px
       height 100%
       flex 1 1 auto

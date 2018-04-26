@@ -1,5 +1,6 @@
 import Vuex from "vuex";
 import { dapp } from "@/lib/dapp";
+import uuid from "uuid/v1";
 
 const localStorage = window.localStorage;
 
@@ -8,13 +9,21 @@ let token;
 //TMP TEST CODE
 let testGoods = Array.from(Array(3)).map((it, i) => {
   return {
-    id: i,
+    id: uuid(),
+    confirmed: true
+  };
+});
+
+let testFriendGoods = Array.from(Array(2)).map((it, i) => {
+  return {
+    id: uuid(),
+    confirmed: true
   };
 });
 
 let testFriends = Array.from(Array(3)).map((it, i) => {
   return {
-    id: i,
+    id: uuid()
   };
 });
 //-------------
@@ -93,7 +102,7 @@ const createStore = () => {
 
       async getSelectedFriendGoods(context) {
         //TMP TEST CODE
-        context.commit("friendGoods", testGoods);
+        context.commit("friendGoods", testFriendGoods);
         return;
         //
       },
@@ -107,6 +116,21 @@ const createStore = () => {
 
       tokenCreated(context, contract) {
         alert(`contract created ${contract}`);
+      },
+
+      transferGoodToSelectedFriend(context, good) {
+        let receiverAddress = context.state.selectedFriend.id;
+        let tokenID = good.id;
+
+        const newGoods = context.state.goods.filter(it => {
+          return it.id != good.id;
+        })
+        context.commit("goods", newGoods);
+        good.confirmed = false;
+        const newFriendGoods = [...context.state.friendGoods, good];
+        context.commit("friendGoods", newFriendGoods);
+
+        context.dispatch("transferToken", { receiverAddress, tokenID });
       },
 
       async transferToken(context, { receiverAddress, tokenID }) {
