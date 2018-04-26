@@ -3,8 +3,8 @@
     <div class="content">
 
       <div class="goods collection grid">
-        <draggable v-model='goods' class="container" :options="{group:'goods'}">
-          <div class="item" v-for="(good, index) in goods" :key="good">
+        <draggable v-model='goods' class="container" :options="{group:'goods'}" :move="checkMove">
+          <div class="item" v-for="(good, index) in goods" :key="good.id">
             <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
               <label>{{index}}</label>
@@ -14,8 +14,8 @@
       </div>
 
       <div class="friend-goods collection list">
-        <draggable v-model='goods' class="container" :options="{group:'goods'}">
-          <div class="item" v-for="(good, index) in friendGoods" :key="good">
+        <draggable v-model='friendGoods' class="container" :options="{group:'goods'}" :move="checkMoveFromFriendGoods">
+          <div class="item" v-for="(good, index) in friendGoods" :key="good.id">
             <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
               <label>{{index}}</label>
@@ -38,6 +38,8 @@ export default {
   mixins: [dappMixin],
   mounted() {
     this.$store.dispatch("getGoods");
+    this.$store.dispatch("getFriends");
+    this.$store.dispatch("getSelectedFriendGoods");
   },
   components: {
     collection: Collection,
@@ -52,17 +54,31 @@ export default {
         return this.$store.state.goods;
       },
       set(value) {
-        this.$store.commit("updateGoods", value);
+        console.log(value);
+        // this.$store.commit("updateGoods", value);
       }
     },
-    friendGoods() {
-      return this.$store.state.friendGoods;
+    friendGoods: {
+      get() {
+        return this.$store.state.friendGoods;
+      },
+      set(value) {
+        console.log(value);
+      }
     }
   },
   methods: {
     styleForGood(good) {
       console.log("good", good);
       return {};
+    },
+    checkMove(e) {
+      console.log(e.draggedContext);
+      return true;
+      // return evt.draggedContext.element.name !== "apple";
+    },
+    checkMoveFromFriendGoods(e) {
+      return false;
     }
   }
 };
