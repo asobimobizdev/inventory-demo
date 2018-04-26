@@ -6,7 +6,7 @@
     <div slot="header" class="clearfix">
       <h1 align="center">Add a Friend!</h1>
     </div>
-    <el-form :inline="false" :model="form" :rules="rules" ref="form" label-width="90px" class="demo-form">
+    <el-form :inline="false" label-position="top" :model="form" :rules="rules" ref="form" label-width="90px" class="demo-form">
       
       <el-form-item label="Name" prop="name">
         <el-input v-model="form.name"></el-input>

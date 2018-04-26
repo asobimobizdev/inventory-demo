@@ -8,9 +8,9 @@
         </div>
         <div class="collection grid">
           <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
-            <div class="item" v-for="(good) in goods" :key="good.id">
-              <div class="good" :style="styleForGood(good)">
-                <div class="icon"></div>
+            <div class="item" v-for="(good) in goods" :key="good.id" :style="styleForBgGood(good)">
+              <div class="good">
+                <div class="icon" :style="styleForIconGood(good)"></div>
                 <label>{{good.id}}</label>
               </div>
             </div>
@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="friend-goods">
+      <div class="friend-goods" v-if="hasFriends">
         <div class="head">
           <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
             <el-option
@@ -31,10 +31,10 @@
 
         </div>
         <div class="collection list">
-          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods'}" :move="checkMoveFromFriendGoods">
-            <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed">
-              <div class="good" :style="styleForGood(good)">
-                <div class="icon"></div>
+          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true }" :move="checkMoveFromFriendGoods">
+            <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed" :style="styleForBgGood(good)">
+              <div class="good">
+                <div class="icon" :style="styleForIconGood(good)"></div>
                 <label>{{good.id}}</label>
               </div>
             </div>
@@ -70,6 +70,9 @@ export default {
     friends() {
       return this.$store.state.friends;
     },
+    hasFriends() {
+      return this.$store.state.friends.length > 0;
+    },
     selectedFriendIndex: {
       get() {
         return this.$store.state.selectedFriendIndex;
@@ -82,9 +85,7 @@ export default {
       get() {
         return this.$store.state.goods;
       },
-      set(value) {
-        // this.$store.commit("updateGoods", value);
-      }
+      set(value) {}
     },
     friendGoods: {
       get() {
@@ -94,12 +95,8 @@ export default {
     }
   },
   methods: {
-    styleForGood(good) {
-      return {};
-    },
     checkMove(e) {
       return true;
-      // return evt.draggedContext.element.name !== "apple";
     },
     checkMoveFromFriendGoods(e) {
       return false;
@@ -113,6 +110,39 @@ export default {
 
       this.$store.dispatch("transferGoodToSelectedFriend", good);
       this.$store.dispatch("getSelectedFriendGoods", good);
+    },
+    styleForBgGood(good) {
+      let seed = this.stringToHashNumber(good.id);
+      let angle = (seed * 1330.443445) % 120 - 60;
+      let colorH = (seed * 156.4223445) % 360;
+      let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
+      let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
+      return {
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`
+      };
+    },
+    styleForIconGood(good) {
+      let seed = this.stringToHashNumber(good.id);
+      let angle = (seed * 130.43445) % 360;
+      let colorH = (seed * 156.4223445) % 360;
+      let startColor = `hsl(${colorH},     80%, 70%)`;
+      let stopColor = `hsl(${colorH + 70}, 80%, 70%)`;
+      let shadowColor = `hsla(${colorH + 80}, 100%, 40%,0.2)`;
+      let shadowColor2 = `hsla(${colorH}, 90%, 30%,0.1)`;
+      let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
+      return {
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
+        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
+      };
+    },
+    stringToHashNumber(str) {
+      str = String(str);
+      return str
+        .split("")
+        .map(it => {
+          return it.charCodeAt(0) * 12345678;
+        })
+        .reduce((a, b) => a * b);
     }
   }
 };
@@ -133,15 +163,26 @@ export default {
     display flex
 
 .goods, .friend-goods
+  display flex
+  flex-direction column
+  flex-wrap nowrap
+  justify-content flex-start
+  align-content stretch
+  align-items stretch
+
   .head
     background-color #fff
     height 60px
     padding 10px
     >h1
       line-height 40px
+  .collection
+    flex 1 1 auto
 
   .item
+    color:#fff
     background-color alpha(#fff,0.9)
+    overflow: hidden 
     >*
       display flex
       flex-direction: column;
@@ -149,13 +190,21 @@ export default {
 
       >.icon
         background-color #f88
-        width 60px
-        height 60px
-        border-radius 30px
-        box-shadow 0 1px 2px alpha(#000,0.1)
+        width 80px
+        height 80px
+        border-radius 40px
+        margin-bottom 8px
+        // box-shadow 0 1px 2px alpha(#000,0.1)
 
       >label
+        display block
+        margin 0
+        padding 0
         text-align center
+        background-color alpha(#fff,0.1)
+        line-height 16px
+        letter-spacing 0.1em
+        
 
 .goods
   margin-right 4px
@@ -187,26 +236,9 @@ export default {
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
-        justify-content: flex-start;
-        align-content: flex-start;
-        align-items: flex-end;
-        height calc(100% - 16px)
-
-        >label
-          text-align center
-          height 20px
-          display block
-          width 100%
-          margin-bottom 4px
-          flex 1 1 auto
-
-        >.items
-          background-color alpha(#fff,1)
-          box-shadow inset 0 1px 2px rgba(#000, 0.1)
-          width 100%
-          height 20px
-          border-radius 30px
-          box-shadow 0 1px 2px alpha(#000,0.1)
-          align-self: flex-end;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+       
 
 </style>

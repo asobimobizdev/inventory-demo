@@ -6,7 +6,11 @@ const localStorage = window.localStorage;
 
 let token;
 
-//-------------
+// const testGoods = Array(200).fill({}).map((it, i) => {
+//   return {
+//     id: i
+//   }
+// })
 
 const createStore = () => {
   return new Vuex.Store({
@@ -17,6 +21,10 @@ const createStore = () => {
       goods: [],
       friends: [],
       friendGoods: [],
+
+      // goods: testGoods,
+      // friends: [],
+      // friendGoods: [],
 
       selectedFriendIndex: -1,
     },
