@@ -49,7 +49,7 @@ export default class Dapp {
     const contractInstance = this.getContract(contract);
     return contractInstance.deploy(
       {
-        args,
+        arguments: args,
         data: contract.bytecode,
       }
     ).send();
