@@ -63,7 +63,7 @@ import dappMixin from "@/mixins/dapp";
 export default {
   mixins: [dappMixin],
   mounted() {
-    this.$store.dispatch("getGoods");
+    this.$store.dispatch("getOwnGoods");
     this.$store.dispatch("getFriends");
     this.$store.dispatch("getSelectedFriendGoods");
   },
