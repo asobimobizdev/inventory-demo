@@ -55,8 +55,7 @@ export default class Dapp {
     ).send();
   }
 
-  async getTokensForAddress(token) {
-    const address = dapp.defaultAccount;
+  async getTokensForAddress(token, address) {
     const balance = await token.methods.balanceOf(address).call();
     const items = [];
     for (let i = 0; i < balance; i += 1) {

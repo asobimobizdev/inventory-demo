@@ -6,27 +6,6 @@ const localStorage = window.localStorage;
 
 let token;
 
-//TMP TEST CODE
-let testGoods = Array.from(Array(30)).map((it, i) => {
-  return {
-    id: uuid(),
-    confirmed: true
-  };
-});
-
-let testFriendGoods = Array.from(Array(20)).map((it, i) => {
-  return {
-    id: uuid(),
-    confirmed: true
-  };
-});
-
-let testFriends = Array.from(Array(30)).map((it, i) => {
-  return {
-    id: uuid(),
-    name: `Franco ${i}`
-  };
-});
 //-------------
 
 const createStore = () => {
@@ -35,15 +14,11 @@ const createStore = () => {
       dappInit: false,
       isMintOwner: false,
 
-      // goods: [],
-      // friends: [],
-      // selectedFriend: -1,
-      // friendGoods: [],
+      goods: [],
+      friends: [],
+      friendGoods: [],
 
-      goods: testGoods,
-      friends: testFriends,
-      selectedFriend: 0,
-      friendGoods: testFriendGoods,
+      selectedFriendIndex: -1,
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -51,13 +26,14 @@ const createStore = () => {
 
         token = dapp.getContractAt(
           dapp.contracts.MintableERC721,
-          "0xa0a6181616e04593d6F00EE6ed43037bB69848A6",
+          "0x552e696a149d7Fe643Dd63236e5842eb93407648",
         );
       },
       ["isMintOwner"](state, isMintOwner) {
         state.isMintOwner = isMintOwner;
       },
       ["goods"](state, goods) {
+        console.log(state);
         goods = goods.filter((item) => {
           return !state.friendGoods.find((friendItem) => {
             return item.id == friendItem.id;
@@ -66,25 +42,30 @@ const createStore = () => {
         state.goods = goods;
       },
       ["friends"](state, friends) {
-        state.friends = friends;
-        state.selectedFriend = friends.length > 0 ? 0 : -1;
+        state.friends = friends || [];
+        state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
       },
       ["friendGoods"](state, goods) {
         state.friendGoods = goods;
       },
+      ["markConfirmed"](state, goodId) {
+        const index = state.goods.find((good) => {return good.id === goodId});
+        state.goods[index].confirmed = true;
+      },
     },
     actions: {
-      getFriendList(context) {
+      getFriends(context) {
         const friends = JSON.parse(localStorage.getItem("friends"));
         context.commit("friends", friends);
       },
-      setFriendList(context) {
+      saveFriends(context) {
         localStorage.setItem("friends", JSON.stringify(context.state.friends));
       },
 
       addFriend(context, friend) {
         const friends = [...context.state.friends, { ...friend }];
         context.commit("friends", friends);
+        context.dispatch("saveFriends");
       },
 
       deleteFriend(context, friend) {
@@ -94,7 +75,7 @@ const createStore = () => {
         context.commit("friends", friends);
       },
 
-      async getGoods(context) {
+      async getOwnGoods(context) {
         let items = await dapp.getTokensForAddress(
           token,
           dapp.defaultAccount,
@@ -102,20 +83,16 @@ const createStore = () => {
         context.commit("goods", items);
       },
 
-      async getFriends(context) {
-        //TMP TEST CODE
-        context.commit("friends", testFriends);
-        return;
-        //
-      },
-
       async getSelectedFriendGoods(context) {
-        //TMP TEST CODE
-        // const address = context.state.selectedFriend.id;
-        // const goods = dapp.getTokensForAddress(token, selectedFriend);
-        context.commit("friendGoods", testFriendGoods);
-        return;
-        //
+        if (context.state.selectedFriendIndex == -1) {
+          return;
+        }
+        let address = context.state.friends[
+          context.state.selectedFriendIndex
+        ].id;
+        console.log(address);
+        const goods = await dapp.getTokensForAddress(token, address);
+        context.commit("friendGoods", goods);
       },
 
       createToken() {
@@ -130,7 +107,9 @@ const createStore = () => {
       },
 
       transferGoodToSelectedFriend(context, good) {
-        let receiverAddress = context.state.selectedFriend.id;
+        let address = context.state.friends[
+          context.state.selectedFriendIndex
+        ].id;
         let tokenID = good.id;
 
         const newGoods = context.state.goods.filter(it => {
@@ -141,18 +120,19 @@ const createStore = () => {
         const newFriendGoods = [...context.state.friendGoods, good];
         context.commit("friendGoods", newFriendGoods);
 
-        context.dispatch("transferToken", { receiverAddress, tokenID });
+        context.dispatch("transferToken", { address, tokenID });
       },
 
-      async transferToken(context, { receiverAddress, tokenID }) {
-        await token.methods.approve(receiverAddress, tokenID);
+      async transferToken(context, { address, tokenID }) {
+        console.log("Test");
+        await token.methods.approve(address, tokenID).send();
         await token.methods.transferFrom(
           dapp.defaultAccount,
-          receiverAddress,
+          address,
           tokenID,
-        );
-
-        context.dispatch("getGoods");
+        ).send();
+        // mark token as confirmed!
+        context.dispatch("getOwnGoods");
       },
 
       async checkMintOwner(context) {
@@ -161,8 +141,8 @@ const createStore = () => {
         context.commit("isMintOwner", isOwner);
       },
 
-      async mintToken(context, { receiverAddress, tokenID }) {
-        await token.methods.mint(receiverAddress, tokenID).send();
+      async mintToken(context, { address, tokenID }) {
+        await token.methods.mint(address, tokenID).send();
 
         //TODO :: commit something to the store
         context.commit("");

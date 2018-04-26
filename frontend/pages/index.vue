@@ -19,7 +19,7 @@
             <div class="good" :style="styleForGood(good)">
               <div class="icon"></div>
               <label>{{good.id}}</label>
-              
+
             </div>
           </div>
         </draggable>
@@ -38,7 +38,7 @@ import dappMixin from "@/mixins/dapp";
 export default {
   mixins: [dappMixin],
   mounted() {
-    this.$store.dispatch("getGoods");
+    this.$store.dispatch("getOwnGoods");
     this.$store.dispatch("getFriends");
     this.$store.dispatch("getSelectedFriendGoods");
   },
