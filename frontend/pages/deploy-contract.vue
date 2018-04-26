@@ -1,9 +1,7 @@
 <template>
-  <form v-on:submit.prevent="createToken()">
-    <button>
-      Create NFT
-    </button>
-  </form>
+  <el-main class="full-centered-content">
+    <el-button @click="createToken()" type="primary" round >Create NFT</el-button>
+  </el-main>
 </template>
 
 <script>
@@ -20,8 +18,8 @@ export default {
     },
     tokenCreated(contract) {
       this.$store.dispatch("tokenCreated", contract);
-    },
-  },
+    }
+  }
 };
 </script>
 

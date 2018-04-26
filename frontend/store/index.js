@@ -7,21 +7,21 @@ const localStorage = window.localStorage;
 let token;
 
 //TMP TEST CODE
-let testGoods = Array.from(Array(3)).map((it, i) => {
+let testGoods = Array.from(Array(30)).map((it, i) => {
   return {
     id: uuid(),
     confirmed: true
   };
 });
 
-let testFriendGoods = Array.from(Array(2)).map((it, i) => {
+let testFriendGoods = Array.from(Array(20)).map((it, i) => {
   return {
     id: uuid(),
     confirmed: true
   };
 });
 
-let testFriends = Array.from(Array(3)).map((it, i) => {
+let testFriends = Array.from(Array(30)).map((it, i) => {
   return {
     id: uuid(),
     name: `Franco ${i}`
@@ -34,10 +34,16 @@ const createStore = () => {
     state: {
       dappInit: false,
       isMintOwner: false,
-      goods: [],
-      friends: [],
-      selectedFriend: null,
-      friendGoods: [],
+
+      // goods: [],
+      // friends: [],
+      // selectedFriend: -1,
+      // friendGoods: [],
+
+      goods: testGoods,
+      friends: testFriends,
+      selectedFriend: 0,
+      friendGoods: testFriendGoods,
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -61,7 +67,7 @@ const createStore = () => {
       },
       ["friends"](state, friends) {
         state.friends = friends;
-        state.selectedFriend = friends.length > 0 ? 0 : null;
+        state.selectedFriend = friends.length > 0 ? 0 : -1;
       },
       ["friendGoods"](state, goods) {
         state.friendGoods = goods;

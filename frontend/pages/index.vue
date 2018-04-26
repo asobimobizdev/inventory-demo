@@ -93,7 +93,7 @@ export default {
 .host
 
   width 100%
-  min-height 100%
+  min-height calc(100% - 100px)
   display flex
   background-color #fff
 
@@ -104,12 +104,7 @@ export default {
     display flex
 
     >.goods, .friend-goods
-      margin-right 4px
-      height 100%
-      flex 1 1 auto
       .item
-        background-color #fff
-        height 120px
         >*
           display flex
           flex-direction: column;
@@ -123,6 +118,15 @@ export default {
             box-shadow 0 1px 2px alpha(#000,0.1)
           >label
             text-align center
+
+    >.goods
+      margin-right 4px
+      height 100%
+      flex 1 1 auto
+      .item
+        background-color #fff
+        height 120px
+
 
     >.friend-goods
       width 300px

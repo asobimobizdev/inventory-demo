@@ -1,8 +1,8 @@
 <template>
-  <div class="host">
 
+<el-main class="host full-centered-content">
 
-  <el-card class="box-card">
+  <el-card class="add-box">
     <div slot="header" class="clearfix">
       <h1 align="center">Add a Friend!</h1>
     </div>
@@ -16,18 +16,19 @@
         <el-input v-model="form.id"></el-input>
       </el-form-item>
 
-      <el-form-item>
-        <el-button type="primary" @click="submitForm('form')">Add</el-button>
+      <el-form-item align="center">
+        <el-button type="primary" @click="submitForm('form')" round>Add</el-button>
       </el-form-item>
 
     </el-form>
   </el-card>
 
-
-    
+  <h1 class="title" align="center">Friends List</h1>
   <el-table
     :data="friends"
-    style="width: 100%">
+    style="width: 100%"
+    height="100"
+    >
     <el-table-column
       prop="name"
       label="Name"
@@ -41,7 +42,9 @@
     <el-table-column
       fixed="right"
       label=""
-      width="50">
+      width="60"
+      align="center"
+      >
       
       <template slot-scope="scope" align="right">
         
@@ -52,7 +55,7 @@
   </el-table>
   
     
-  </div>
+</el-main>
 </template>
 
 <script>
@@ -79,7 +82,7 @@ export default {
           }
         ],
 
-        address: [
+        name: [
           {
             required: true,
             message: "Please input friend address",
@@ -115,5 +118,10 @@ export default {
 
 
 <style lang="stylus" scoped>
+.add-box
+  width 100%
+
+.title
+  margin-top 30px
 
 </style>

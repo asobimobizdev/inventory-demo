@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="host">
     <el-header>
       <el-menu
         :router="true"
@@ -29,10 +29,8 @@
       </el-menu>
     </el-header>
 
-    <el-main>
-      <nuxt class="content"/>
-    </el-main>
-
+    <nuxt class="content"/>
+    
   </el-container>
 </template>
 
@@ -67,10 +65,9 @@ html
   box-sizing: border-box;
   margin: 0;
 
-main
+.host
   width 100vw
-  min-height 100vh
+  height calc(100vh - 0px)
+  overflow hidden
 
-  >.content
-    min-height 100vh
 </style>

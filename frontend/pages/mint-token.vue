@@ -1,6 +1,6 @@
 <template>
+<el-main class="host full-centered-content">
 
-<div class="host">
   <el-form v-if="isOwner" :model="form" :rules="rules" ref="form" label-width="120px" class="demo-form">
 
     <el-form-item label="Reciver" prop="receiverAddress">
@@ -16,11 +16,11 @@
     </el-form-item>
 
   </el-form>
-  <div v-else>
-    <h1>You are not the owner</h1>
-  </div>
-</div>
+  <el-container v-else class="full-centered-content spring">
+    <h1>You are not the owner!</h1>
+  </el-container>
 
+</el-main>
 </template>
 
 <style>
