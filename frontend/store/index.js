@@ -141,8 +141,8 @@ const createStore = () => {
       async mintToken(context, { address, tokenID }) {
         await token.methods.mint(address, tokenID).send();
 
-        //TODO :: commit something to the store
-        context.commit("");
+        // TODO :: commit something to the store
+        // context.commit("");
       },
 
     },
