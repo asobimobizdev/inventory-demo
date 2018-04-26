@@ -103,6 +103,7 @@ export default {
         if (!valid) return;
 
         this.$store.dispatch("addFriend", this.form);
+        this.resetForm(formName);
       });
     },
     resetForm(formName) {
