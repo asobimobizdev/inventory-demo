@@ -2,9 +2,9 @@
   <section class="host">
     <div class="content">
 
-      <div class="goods collection grid">
+      <div class="items collection grid">
         <draggable class="container" :options="{group:'people'}">
-          <div class="item" v-for="(good, index) in goods" :key="good.id">
+          <div class="item" v-for="(good, index) in items" :key="good.id">
             <div class="good" >
               <div class="icon"></div>
               <label>{{index}}</label>
@@ -39,18 +39,19 @@ export default {
   mixins: [
     dappMixin,
   ],
+  mounted() {
+    this.$store.dispatch("getItems");
+  },
   components: {
     collection: Collection,
     draggable,
   },
+  computed: {
+    items() {
+      return this.$store.state.items;
+    },
+  },
   data() {
-    let goods = [];
-    for (let i = 0; i < 20; i++) {
-      goods.push({
-        id: i,
-      });
-    }
-
     let friends = [];
     for (let i = 0; i < 3; i++) {
       friends.push({
@@ -59,7 +60,6 @@ export default {
     }
 
     return {
-      goods,
       friends,
     };
   },
@@ -82,7 +82,7 @@ export default {
     padding 4px
     display flex
 
-    >.goods
+    >.items
       margin-right 4px
       height 100%
       flex 1 1 auto
@@ -130,7 +130,7 @@ export default {
             margin-bottom 4px
             flex 1 1 auto
 
-          >.goods
+          >.items
             background-color alpha(#fff,1)
             box-shadow inset 0 1px 2px rgba(#000, 0.1)
             width 100%

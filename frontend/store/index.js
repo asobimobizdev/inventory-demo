@@ -6,6 +6,7 @@ const localStorage = window.localStorage;
 let token;
 
 const createStore = () => {
+
   return new Vuex.Store({
     state: {
       dappInit: false,
@@ -16,6 +17,11 @@ const createStore = () => {
     mutations: {
       ["dapp/initialized"](state, isInit) {
         state.dappInit = isInit;
+
+        token = dapp.getContractAt(
+          dapp.contracts.MintableERC721,
+          "0x925630803E45475323960540bE0d2e6530e911Aa",
+        );
       },
       ["isMintOwner"](state, isMintOwner) {
         state.isMintOwner = isMintOwner;
@@ -37,8 +43,18 @@ const createStore = () => {
       },
       async getItems(context) {
         const items = [
-          1, 2, 3,
         ];
+        console.log("items", items);
+        console.log(token.methods);
+        const balance = await token.methods.balanceOf(
+          dapp.defaultAccount,
+        ).call();
+        console.log("balance", balance);
+        for (let i = 0; i < balance; i += 1) {
+          items.push(
+            await token.methods.tokenOfOwnerByIndex(i).call()
+          );
+        }
         context.commit("items", items);
       },
       createToken() {
@@ -67,10 +83,6 @@ const createStore = () => {
       },
 
       async checkMintOwner(context) {
-        token = dapp.getContractAt(
-          dapp.contracts.MintableERC721,
-          "0xDB2E91f83cA869421d22E795a86b623a24c03edB"
-        );
         const ownerAddress = await token.methods.owner().call();
         const isOwner = ownerAddress == dapp.defaultAccount;
         context.commit("isMintOwner", isOwner);
