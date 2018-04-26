@@ -51,6 +51,11 @@ const createStore = () => {
         state.isMintOwner = isMintOwner;
       },
       ["goods"](state, goods) {
+        goods = goods.filter((item) => {
+          return !state.friendGoods.find((friendItem) => {
+            return item.id == friendItem.id;
+          });
+        });
         state.goods = goods;
       },
       ["friends"](state, friends) {
@@ -71,7 +76,7 @@ const createStore = () => {
       },
 
       async getGoods(context) {
-        const items = await dapp.getTokensForAddress(
+        let items = await dapp.getTokensForAddress(
           token,
           dapp.defaultAccount,
         );
