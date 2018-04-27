@@ -1,27 +1,21 @@
 <template>
 <el-main class="host full-centered-content">
-
   <el-form v-if="isOwner" :model="form" :rules="rules" ref="form" label-width="120px" class="demo-form">
-
     <el-form-item label="Receiver" prop="address">
       <el-input v-model="form.address"></el-input>
     </el-form-item>
-
     <el-form-item>
       <el-button type="primary" @click="submitForm('form')">Mint</el-button>
       <el-button @click="resetForm('form')">Reset</el-button>
     </el-form-item>
-
   </el-form>
   <el-container v-else class="full-centered-content spring">
     <h1>You are not the owner!</h1>
   </el-container>
-
 </el-main>
 </template>
 
 <style>
-
 </style>
 
 <script>
@@ -51,32 +45,33 @@ export default {
     isOwner() {
       return this.$store.state.isMintOwner;
     },
-    tokenID() {
-      return utils.randomHex(32);
-    },
   },
   mounted() {
     this.$store.dispatch("checkMintOwner");
   },
   methods: {
-    async mintToken() {
-      return this.$store.dispatch("mintToken", this.form);
+    generateTokenID() {
+      return utils.randomHex(32);
+    },
+    async mintToken(address, tokenID) {
+      return this.$store.dispatch("mintToken", {address, tokenID});
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.mintToken()
+          const tokenID = this.generateTokenID();
+          this.mintToken(this.form.address, tokenID)
             .then(() => {
               this.$message({
                 message: `Submit! ${this.form.address} ${
-                  this.form.tokenID
+                  tokenID
                 }`,
                 type: "success"
               });
             })
             .catch(() => {
               this.$message.error(
-                `Error! ${this.form.address} ${this.form.tokenID}`
+                `Error! ${this.form.address} ${tokenID}`
               );
             });
 
