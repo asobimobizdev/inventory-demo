@@ -21,7 +21,9 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vuedraggable": "^2.16.0",
-    "web3": "^1.0.0-beta.34"
+    "web3": "^1.0.0-beta.34",
+    "web3-providers-ws": "^1.0.0-beta.34",
+    "websocket": "^1.0.26"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
