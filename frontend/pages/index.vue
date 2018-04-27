@@ -48,8 +48,6 @@
 
 <script>
 import draggable from "vuedraggable";
-
-import Collection from "@/components/Collection.vue";
 import dappMixin from "@/mixins/dapp";
 
 export default {
@@ -60,7 +58,6 @@ export default {
     this.$store.dispatch("getSelectedFriendGoods");
   },
   components: {
-    collection: Collection,
     draggable
   },
   data() {
