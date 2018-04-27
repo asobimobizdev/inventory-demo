@@ -1,7 +1,7 @@
 <template>
   <section class="host">
     <div class="content">
-      
+
       <div class="goods">
         <div class="head">
           <h1>My Goods</h1>
@@ -186,14 +186,14 @@ export default {
   .item
     color #fff
     background-color alpha(#fff,0.9)
-    overflow hidden 
+    overflow hidden
     padding 0px
     position relative
     >*
       display flex
       flex-direction column
       flex-wrap wrap
-      justify-content center 
+      justify-content center
       align-content center
       align-items center
       position absolute
@@ -217,26 +217,26 @@ export default {
         text-align center
         background-color alpha(#fff,0.1)
         line-height 20px
-        height 20px 
+        height 20px
         letter-spacing 0.1em
-        white-space nowrap 
+        white-space nowrap
         overflow hidden
         text-overflow ellipsis
-        
+
         position absolute
-        
+
         bottom 0
         left 0
         right 0
 
-.goods  
+.goods
   height 100%
   flex 1 1 auto
   >.head
     >*
       text-align center
 
-  >.collection  
+  >.collection
     .item
       height 120px
 
@@ -247,7 +247,7 @@ export default {
   >.head
     >*
       width 100%
-  >.collection  
+  >.collection
     .item
       height 120px
 

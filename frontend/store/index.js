@@ -65,10 +65,12 @@ const createStore = () => {
         context.commit("setSelectedFriendIndex", friendIndex);
         context.dispatch("getSelectedFriendGoods");
       },
+
       getFriends(context) {
         const friends = JSON.parse(localStorage.getItem("friends"));
         context.commit("friends", friends);
       },
+
       saveFriends(context) {
         localStorage.setItem("friends", JSON.stringify(context.state.friends));
       },
@@ -105,9 +107,6 @@ const createStore = () => {
         const goods = await dapp.getTokensForAddress(token, address);
         context.commit("friendGoods", goods);
       },
-
-
-
 
       createToken() {
         dapp.deployContract(
