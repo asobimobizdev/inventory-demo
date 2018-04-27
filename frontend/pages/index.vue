@@ -149,6 +149,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@keyframes icon-rotation
+  from
+    transform rotate(0deg)
+  to
+    transform rotate(360deg)
+
 .host
 
   width 100%
@@ -204,7 +210,10 @@ export default {
         height 80px
         border-radius 40px
         margin-bottom 20px
-        // box-shadow 0 1px 2px alpha(#000,0.1)
+        animation-name icon-rotation
+        animation-duration 20s
+        animation-iteration-count infinite
+        animation-timing-function linear
 
       >.label
         display block
