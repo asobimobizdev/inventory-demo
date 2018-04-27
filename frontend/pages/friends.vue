@@ -7,7 +7,7 @@
       <h1 align="center">Add a Friend!</h1>
     </div>
     <el-form :inline="false" label-position="top" :model="form" :rules="rules" ref="form" label-width="90px" class="demo-form">
-      
+
       <el-form-item label="Name" prop="name">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
@@ -45,16 +45,16 @@
       width="60"
       align="center"
       >
-      
+
       <template slot-scope="scope" align="right">
-        
+
         <el-button @click="deleteFriendAt(scope.$index)" type="danger" icon="el-icon-delete" circle></el-button>
 
       </template>
     </el-table-column>
   </el-table>
-  
-    
+
+
 </el-main>
 </template>
 
@@ -63,9 +63,6 @@ import dappMixin from "@/mixins/dapp";
 export default {
   mixins: [dappMixin],
   mounted() {
-    this.$store.dispatch("getOwnGoods");
-    this.$store.dispatch("getFriends");
-    this.$store.dispatch("getSelectedFriendGoods");
   },
   data() {
     return {
