@@ -105,7 +105,10 @@ const createStore = () => {
         let address = context.state.friends[
           context.state.selectedFriendIndex
         ].id;
-        const goods = await dapp.getTokensForAddress(context.state.contract, address);
+        const goods = await dapp.getTokensForAddress(
+          context.state.contract,
+          address,
+        );
         context.commit("friendGoods", goods);
       },
 
@@ -123,12 +126,24 @@ const createStore = () => {
         if (!address) {
           return;
         }
-        context.commit("contract", address);
+        context.dispatch("registerContract", address);
       },
 
       setContract(context, address) {
-        context.commit("contract", address);
+        context.dispatch("registerContract", address);
         localStorage.setItem("contractAddress", address);
+      },
+
+      registerContract(context, address) {
+        context.commit("contract", address);
+        console.log("Registering event listener");
+
+        // XXX hack Justus 2018-04-2"7",
+        const a = () => {
+          context.dispatch("getOwnGoods");
+          window.setTimeout(a, 1000);
+        };
+        let index = window.setTimeout(a, 1000);
       },
 
       transferGoodToSelectedFriend(context, good) {
