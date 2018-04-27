@@ -11,7 +11,7 @@
             <div class="item" v-for="(good) in goods" :key="good.id" :style="styleForBgGood(good)">
               <div class="good">
                 <div class="icon" :style="styleForIconGood(good)"></div>
-                <label>{{good.id}}</label>
+                <div class="label">{{good.id}}</div>
               </div>
             </div>
           </draggable>
@@ -35,7 +35,7 @@
             <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed" :style="styleForBgGood(good)">
               <div class="good">
                 <div class="icon" :style="styleForIconGood(good)"></div>
-                <label>{{good.id}}</label>
+                <div class="label">{{good.id}}</div>
               </div>
             </div>
           </draggable>
@@ -140,9 +140,11 @@ export default {
       return str
         .split("")
         .map(it => {
-          return it.charCodeAt(0) * 12345678;
+          return it.charCodeAt(0) * 0.12345678;
         })
-        .reduce((a, b) => a * b);
+        .reduce((a, b) => {
+          return (a * b) % (Number.MAX_VALUE - 1);
+        });
     }
   }
 };
@@ -180,34 +182,52 @@ export default {
     flex 1 1 auto
 
   .item
-    color:#fff
+    color #fff
     background-color alpha(#fff,0.9)
-    overflow: hidden 
+    overflow hidden 
+    padding 0px
+    position relative
     >*
       display flex
-      flex-direction: column;
-      justify-content: center;
+      flex-direction column
+      flex-wrap wrap
+      justify-content center 
+      align-content center
+      align-items center
+      position absolute
+      top 0
+      left 0
+      right 0
+      bottom 0
 
       >.icon
         background-color #f88
         width 80px
         height 80px
         border-radius 40px
-        margin-bottom 8px
+        margin-bottom 20px
         // box-shadow 0 1px 2px alpha(#000,0.1)
 
-      >label
+      >.label
         display block
         margin 0
-        padding 0
+        padding 0 10px
         text-align center
         background-color alpha(#fff,0.1)
-        line-height 16px
+        line-height 20px
+        height 20px 
         letter-spacing 0.1em
+        white-space nowrap 
+        overflow hidden
+        text-overflow ellipsis
         
+        position absolute
+        
+        bottom 0
+        left 0
+        right 0
 
-.goods
-  margin-right 4px
+.goods  
   height 100%
   flex 1 1 auto
   >.head
@@ -228,17 +248,5 @@ export default {
   >.collection  
     .item
       height 120px
-      >*
-        margin 8px
-        // background-color alpha(#000,0.3)
-        flex 1 1 auto
-
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-content: center;
-        align-items: center;
-       
 
 </style>

@@ -8,7 +8,7 @@ let token;
 
 // const testGoods = Array(200).fill({}).map((it, i) => {
 //   return {
-//     id: i
+//     id: uuid()
 //   }
 // })
 
@@ -18,13 +18,10 @@ const createStore = () => {
       dappInit: false,
       isMintOwner: false,
 
+      // goods: testGoods,
       goods: [],
       friends: [],
       friendGoods: [],
-
-      // goods: testGoods,
-      // friends: [],
-      // friendGoods: [],
 
       selectedFriendIndex: -1,
     },
