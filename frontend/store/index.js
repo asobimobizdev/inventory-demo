@@ -126,9 +126,9 @@ const createStore = () => {
         context.commit("contract", address);
       },
 
-      async setContract(context, address) {
-        localStorage.setItem("contractAddress", address);
+      setContract(context, address) {
         context.commit("contract", address);
+        localStorage.setItem("contractAddress", address);
       },
 
       transferGoodToSelectedFriend(context, good) {
