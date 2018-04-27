@@ -27,17 +27,17 @@ export default {
   data() {
     return {
       form: {
-        address: ""
+        address: "",
       },
       rules: {
         address: [
           {
             required: true,
             message: "Please input a contract address",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   methods: {
@@ -49,7 +49,7 @@ export default {
 
         this.$message({
           message: `Address ${this.form.address} saved!`,
-          type: "success"
+          type: "success",
         });
 
         this.resetForm(formName);
@@ -57,8 +57,8 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
-    }
-  }
+    },
+  },
 };
 </script>
 

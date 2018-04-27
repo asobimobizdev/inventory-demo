@@ -68,25 +68,25 @@ export default {
     return {
       form: {
         id: "",
-        name: ""
+        name: "",
       },
       rules: {
         id: [
           {
             required: true,
             message: "Please input friend name",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
 
         name: [
           {
             required: true,
             message: "Please input friend address",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   computed: {
@@ -117,7 +117,7 @@ export default {
       const friend = this.$store.state.friends[index];
       this.$store.dispatch("deleteFriend", friend);
     },
-  }
+  },
 };
 </script>
 

@@ -14,7 +14,7 @@ import AddContract from "@/components/AddContract.vue";
 export default {
   mixins: [dappMixin],
   components: {
-    "add-contract": AddContract
+    "add-contract": AddContract,
   },
   data() {
     return {};
@@ -22,8 +22,8 @@ export default {
   methods: {
     createContract() {
       this.$store.dispatch("createContract");
-    }
-  }
+    },
+  },
 };
 </script>
 

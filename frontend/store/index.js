@@ -1,6 +1,5 @@
 import Vuex from "vuex";
 import { dapp } from "@/lib/dapp";
-import uuid from "uuid/v1";
 
 const localStorage = window.localStorage;
 
@@ -47,7 +46,9 @@ const createStore = () => {
         state.friendGoods = goods;
       },
       ["markConfirmed"](state, goodId) {
-        const index = state.goods.find((good) => { return good.id === goodId });
+        const index = state.goods.find(
+          (good) => { return good.id === goodId; },
+        );
         state.goods[index].confirmed = true;
       },
       ["setSelectedFriendIndex"](state, index) {
@@ -58,8 +59,7 @@ const createStore = () => {
           dapp.contracts.MintableERC721,
           address,
         );
-        // state.dappInit = true;
-      }
+      },
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -85,7 +85,7 @@ const createStore = () => {
       deleteFriend(context, friend) {
         const friends = context.state.friends.filter(it => {
           return !(it.id == friend.id);
-        })
+        });
         context.commit("friends", friends);
         context.dispatch("saveFriends");
       },
@@ -136,14 +136,13 @@ const createStore = () => {
 
       registerContract(context, address) {
         context.commit("contract", address);
-        console.log("Registering event listener");
 
         // XXX hack Justus 2018-04-2"7",
         const a = () => {
           context.dispatch("getOwnGoods");
           window.setTimeout(a, 1000);
         };
-        let index = window.setTimeout(a, 1000);
+        window.setTimeout(a, 1000);
       },
 
       transferGoodToSelectedFriend(context, good) {
@@ -154,7 +153,7 @@ const createStore = () => {
 
         const newGoods = context.state.goods.filter(it => {
           return it.id != good.id;
-        })
+        });
         context.commit("goods", newGoods);
         good.confirmed = false;
         const newFriendGoods = [...context.state.friendGoods, good];
@@ -176,7 +175,8 @@ const createStore = () => {
       },
 
       async checkGoodsAdmin(context) {
-        const ownerAddress = await context.state.contract.methods.owner().call();
+        const ownerAddress = await context.state.contract.methods.owner(
+        ).call();
         const isOwner = ownerAddress == dapp.defaultAccount;
         context.commit("isGoodsAdmin", isOwner);
       },
@@ -184,9 +184,6 @@ const createStore = () => {
       async createGoodFor(context, address) {
         const tokenID = dapp.generateTokenID();
         await context.state.contract.methods.mint(address, tokenID).send();
-
-        // TODO :: commit something to the store
-        // context.commit("");
       },
 
     },
