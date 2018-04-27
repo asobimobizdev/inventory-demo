@@ -16,9 +16,9 @@
             Friends
           </nuxt-link>
         </el-menu-item>
-        <el-menu-item index="/deploy-contract">
-          <nuxt-link to="/deploy-contract">
-            Deploy Contract
+        <el-menu-item index="/contract">
+          <nuxt-link to="/contract">
+            Contract
           </nuxt-link>
         </el-menu-item>
       </el-menu>
