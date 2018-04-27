@@ -1,6 +1,6 @@
 <template>
   <el-main class="full-centered-content">
-    <el-button @click="createToken()" type="primary" round >Create NFT</el-button>
+    <el-button @click="createContract()" type="primary" round >Create NFT</el-button>
   </el-main>
 </template>
 
@@ -13,12 +13,9 @@ export default {
     return {};
   },
   methods: {
-    createToken() {
-      this.$store.dispatch("createToken");
+    createContract() {
+      this.$store.dispatch("createContract");
     },
-    tokenCreated(contract) {
-      this.$store.dispatch("tokenCreated", contract);
-    }
   }
 };
 </script>

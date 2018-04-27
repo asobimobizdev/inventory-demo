@@ -4,8 +4,6 @@ import uuid from "uuid/v1";
 
 const localStorage = window.localStorage;
 
-let token;
-
 // const testGoods = Array(200).fill({}).map((it, i) => {
 //   return {
 //     id: uuid()
@@ -17,6 +15,7 @@ const createStore = () => {
     state: {
       dappInit: false,
       isGoodsAdmin: false,
+      contract: null,
 
       // goods: testGoods,
       goods: [],
@@ -28,11 +27,6 @@ const createStore = () => {
     mutations: {
       ["dapp/initialized"](state, isInit) {
         state.dappInit = isInit;
-
-        token = dapp.getContractAt(
-          dapp.contracts.MintableERC721,
-          "0x552e696a149d7Fe643Dd63236e5842eb93407648",
-        );
       },
       ["isGoodsAdmin"](state, isGoodsAdmin) {
         state.isGoodsAdmin = isGoodsAdmin;
@@ -59,6 +53,13 @@ const createStore = () => {
       ["setSelectedFriendIndex"](state, index) {
         state.selectedFriendIndex = index;
       },
+      ["contract"](state, address) {
+        state.contract = dapp.getContractAt(
+          dapp.contracts.MintableERC721,
+          address,
+        );
+        // state.dappInit = true;
+      }
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -91,7 +92,7 @@ const createStore = () => {
 
       async getOwnGoods(context) {
         let items = await dapp.getTokensForAddress(
-          token,
+          context.state.contract,
           dapp.defaultAccount,
         );
         context.commit("goods", items);
@@ -104,19 +105,30 @@ const createStore = () => {
         let address = context.state.friends[
           context.state.selectedFriendIndex
         ].id;
-        const goods = await dapp.getTokensForAddress(token, address);
+        const goods = await dapp.getTokensForAddress(context.state.contract, address);
         context.commit("friendGoods", goods);
       },
 
-      createToken() {
-        dapp.deployContract(
+      async createContract(context) {
+        const contract = await dapp.deployContract(
           dapp.contracts.MintableERC721,
           ["Non-Fungible Token", "NFT"],
         );
+        const address = contract.options.address;
+        context.dispatch("setContract", address);
       },
 
-      tokenCreated(context, contract) {
-        alert(`contract created ${contract}`);
+      getContract(context) {
+        const address = localStorage.getItem("contractAddress");
+        if (!address) {
+          return;
+        }
+        context.commit("contract", address);
+      },
+
+      async setContract(context, address) {
+        localStorage.setItem("contractAddress", address);
+        context.commit("contract", address);
       },
 
       transferGoodToSelectedFriend(context, good) {
@@ -137,8 +149,8 @@ const createStore = () => {
       },
 
       async transferToken(context, { address, tokenID }) {
-        await token.methods.approve(address, tokenID).send();
-        await token.methods.transferFrom(
+        await context.state.contract.methods.approve(address, tokenID).send();
+        await context.state.contract.methods.transferFrom(
           dapp.defaultAccount,
           address,
           tokenID,
@@ -149,14 +161,14 @@ const createStore = () => {
       },
 
       async checkGoodsAdmin(context) {
-        const ownerAddress = await token.methods.owner().call();
+        const ownerAddress = await context.state.contract.methods.owner().call();
         const isOwner = ownerAddress == dapp.defaultAccount;
         context.commit("isGoodsAdmin", isOwner);
       },
 
       async createGoodFor(context, { address }) {
         const tokenID = dapp.generateTokenID();
-        await token.methods.mint(address, tokenID).send();
+        await context.state.contract.methods.mint(address, tokenID).send();
 
         // TODO :: commit something to the store
         // context.commit("");
