@@ -21,16 +21,11 @@
             Deploy Contract
           </nuxt-link>
         </el-menu-item>
-        <el-menu-item index="/mint-token">
-          <nuxt-link to="/mint-token">
-            Mint Token
-          </nuxt-link>
-        </el-menu-item>
       </el-menu>
     </el-header>
 
     <nuxt class="content"/>
-    
+
   </el-container>
 </template>
 
