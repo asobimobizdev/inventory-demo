@@ -145,6 +145,7 @@ const createStore = () => {
         ).send();
         // mark token as confirmed!
         context.dispatch("getOwnGoods");
+        context.dispatch("getSelectedFriendGoods");
       },
 
       async checkMintOwner(context) {

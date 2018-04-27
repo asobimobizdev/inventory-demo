@@ -3,11 +3,8 @@
 
   <el-form v-if="isOwner" :model="form" :rules="rules" ref="form" label-width="120px" class="demo-form">
 
-    <el-form-item label="Reciver" prop="address">
+    <el-form-item label="Receiver" prop="address">
       <el-input v-model="form.address"></el-input>
-    </el-form-item>
-    <el-form-item label="Token ID" prop="tokenID">
-      <el-input v-model="form.tokenID"></el-input>
     </el-form-item>
 
     <el-form-item>
@@ -28,6 +25,7 @@
 </style>
 
 <script>
+import {utils} from "web3";
 import dappMixin from "@/mixins/dapp";
 
 export default {
@@ -36,7 +34,6 @@ export default {
     return {
       form: {
         address: "",
-        tokenID: ""
       },
       rules: {
         address: [
@@ -47,20 +44,16 @@ export default {
           }
         ],
 
-        tokenID: [
-          {
-            required: true,
-            message: "Please input token ID",
-            trigger: "blur"
-          }
-        ]
       }
     };
   },
   computed: {
     isOwner() {
       return this.$store.state.isMintOwner;
-    }
+    },
+    tokenID() {
+      return utils.randomHex(32);
+    },
   },
   mounted() {
     this.$store.dispatch("checkMintOwner");
