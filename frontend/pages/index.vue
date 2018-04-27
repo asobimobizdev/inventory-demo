@@ -102,11 +102,13 @@ export default {
       return false;
     },
     onDrop(e) {
-      let from = e.from.id;
-      let to = e.to.id;
-      if (from != "goodsContainer" || to != "friendGoodsContainer") return;
-      let oldIndex = e.oldIndex;
-      let good = this.$store.state.goods[oldIndex];
+      const from = e.from.id;
+      const to = e.to.id;
+      if (from != "goodsContainer" || to != "friendGoodsContainer") {
+        return;
+      }
+      const oldIndex = e.oldIndex;
+      const good = this.$store.state.goods[oldIndex];
 
       this.$store.dispatch("transferGoodToSelectedFriend", good);
       this.$store.dispatch("getSelectedFriendGoods", good);
