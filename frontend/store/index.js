@@ -166,7 +166,7 @@ const createStore = () => {
         context.commit("isGoodsAdmin", isOwner);
       },
 
-      async createGoodFor(context, { address }) {
+      async createGoodFor(context, address) {
         const tokenID = dapp.generateTokenID();
         await context.state.contract.methods.mint(address, tokenID).send();
 

@@ -111,7 +111,7 @@ export default {
     },
     createGoodForFriendAt(index) {
       const friend = this.$store.state.friends[index];
-      this.$store.dispatch("createGoodFor", friend);
+      this.$store.dispatch("createGoodFor", friend.id);
     },
     deleteFriendAt(index) {
       const friend = this.$store.state.friends[index];
