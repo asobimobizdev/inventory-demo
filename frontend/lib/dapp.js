@@ -68,6 +68,10 @@ export default class Dapp {
     }
     return items;
   }
+
+  generateTokenID() {
+    return this.web3.utils.randomHex(32);
+  }
 }
 
 export const dapp = new Dapp();

@@ -16,7 +16,7 @@ const createStore = () => {
   return new Vuex.Store({
     state: {
       dappInit: false,
-      isMintOwner: false,
+      isGoodsAdmin: false,
 
       // goods: testGoods,
       goods: [],
@@ -34,8 +34,8 @@ const createStore = () => {
           "0x552e696a149d7Fe643Dd63236e5842eb93407648",
         );
       },
-      ["isMintOwner"](state, isMintOwner) {
-        state.isMintOwner = isMintOwner;
+      ["isGoodsAdmin"](state, isGoodsAdmin) {
+        state.isGoodsAdmin = isGoodsAdmin;
       },
       ["goods"](state, goods) {
         goods = goods.filter((item) => {
@@ -148,13 +148,14 @@ const createStore = () => {
         context.dispatch("getSelectedFriendGoods");
       },
 
-      async checkMintOwner(context) {
+      async checkGoodsAdmin(context) {
         const ownerAddress = await token.methods.owner().call();
         const isOwner = ownerAddress == dapp.defaultAccount;
-        context.commit("isMintOwner", isOwner);
+        context.commit("isGoodsAdmin", isOwner);
       },
 
-      async mintToken(context, { address, tokenID }) {
+      async createGoodFor(context, { address }) {
+        const tokenID = dapp.generateTokenID();
         await token.methods.mint(address, tokenID).send();
 
         // TODO :: commit something to the store

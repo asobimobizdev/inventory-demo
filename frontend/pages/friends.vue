@@ -45,11 +45,9 @@
       width="60"
       align="center"
       >
-
       <template slot-scope="scope" align="right">
-
+        <el-button v-if="isGoodsAdmin" @click="createGoodForFriendAt(scope.$index)" type="success" icon="el-icon-plus" circle></el-button>
         <el-button @click="deleteFriendAt(scope.$index)" type="danger" icon="el-icon-delete" circle></el-button>
-
       </template>
     </el-table-column>
   </el-table>
@@ -63,6 +61,8 @@ import dappMixin from "@/mixins/dapp";
 export default {
   mixins: [dappMixin],
   mounted() {
+    this.$store.dispatch("getFriends");
+    this.$store.dispatch("checkGoodsAdmin");
   },
   data() {
     return {
@@ -92,7 +92,10 @@ export default {
   computed: {
     friends() {
       return this.$store.state.friends;
-    }
+    },
+    isGoodsAdmin() {
+      return this.$store.state.isGoodsAdmin;
+    },
   },
   methods: {
     submitForm(formName) {
@@ -106,10 +109,14 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
+    createGoodForFriendAt(index) {
+      const friend = this.$store.state.friends[index];
+      this.$store.dispatch("createGoodFor", friend);
+    },
     deleteFriendAt(index) {
       const friend = this.$store.state.friends[index];
       this.$store.dispatch("deleteFriend", friend);
-    }
+    },
   }
 };
 </script>
