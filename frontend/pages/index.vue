@@ -111,7 +111,6 @@ export default {
       const good = this.$store.state.goods[oldIndex];
 
       this.$store.dispatch("transferGoodToSelectedFriend", good);
-      this.$store.dispatch("getSelectedFriendGoods", good);
     },
     styleForBgGood(good) {
       let seed = this.stringToHashNumber(good.id);
