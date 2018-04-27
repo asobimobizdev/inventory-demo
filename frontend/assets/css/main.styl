@@ -37,12 +37,9 @@
         display grid
         padding 4px
         grid-gap 4px
-        // grid-template-columns repeat(auto-fit, 1fr);
 
       >.item
         margin 2px
-        // height: 60px
-        // display flex
 
   &.grid
     >.container
@@ -51,8 +48,7 @@
         grid-gap 4px
         grid-template-columns repeat(auto-fit, minmax(120px,1fr));
 
-      // >.item
-      //   background-color alpha(#fff,0.3)
-      //   height 120px
-      //   margin 0px
-      //   margin-bottom 0px
+.el-loading-mask
+  background-color alpha(#fff,0.1) !important
+  >.el-loading-spinner
+    top: calc(50% - 10px) !important
