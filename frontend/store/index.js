@@ -17,13 +17,12 @@ const createStore = () => {
       dappInit: false,
       isGoodsAdmin: false,
       contract: null,
-
-      // goods: testGoods,
+      accountAddress: null,
       goods: [],
       friends: [],
       friendGoods: [],
-
       selectedFriendIndex: -1,
+      unconfirmedTransactions: {}
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -33,11 +32,22 @@ const createStore = () => {
         state.isGoodsAdmin = isGoodsAdmin;
       },
       ["goods"](state, goods) {
+
         goods = goods.filter((item) => {
           return !state.friendGoods.find((friendItem) => {
             return item.id == friendItem.id;
           });
         });
+
+        goods.forEach(good => {
+          const from = state.accountAddress;
+          const to = state.friends[state.selectedFriendIndex].id;
+          const tID = `${to}-${from}-${good.id}`;
+          delete state.unconfirmedTransactions[tID];
+        });
+
+        goods.sort((a, b) => { return a.id > b.id; })
+
         state.goods = goods;
       },
       ["friends"](state, friends) {
@@ -45,6 +55,15 @@ const createStore = () => {
         state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
       },
       ["friendGoods"](state, goods) {
+
+        goods.forEach(good => {
+          const from = state.accountAddress;
+          const to = state.friends[state.selectedFriendIndex].id;
+          const tID = `${from}-${to}-${good.id}`;
+          delete state.unconfirmedTransactions[tID];
+        });
+
+        goods.sort((a, b) => { return a.id > b.id; })
         state.friendGoods = goods;
       },
       ["markConfirmed"](state, goodId) {
@@ -61,7 +80,18 @@ const createStore = () => {
           dapp.contracts.MintableERC721,
           address,
         );
+        state.accountAddress = state.contract.defaultAccount;
       },
+
+      ["addUnconfirmedTransaction"](state, transaction) {
+        const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
+        state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
+      },
+
+      ["removeUnconfirmedTransaction"](state, transaction) {
+        const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
+        delete state.unconfirmedTransactions[tID];
+      }
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -142,25 +172,27 @@ const createStore = () => {
         // XXX hack Justus 2018-04-2"7",
         const a = () => {
           context.dispatch("getOwnGoods");
-          window.setTimeout(a, 1000);
+          context.dispatch("getSelectedFriendGoods");
+          if (this.getOwnGoodsTimer) {
+            window.clearTimeout(this.getOwnGoodsTimer);
+          }
+          this.getOwnGoodsTimer = window.setTimeout(a, 1000);
         };
-        window.setTimeout(a, 1000);
+        a();
+
+        p2pManager.subscribe(context.state.accountAddress, context);
       },
 
       transferGoodToSelectedFriend(context, good) {
         let address = context.state.friends[
           context.state.selectedFriendIndex
         ].id;
-        let tokenID = good.id;
 
-        const newGoods = context.state.goods.filter(it => {
-          return it.id != good.id;
-        });
-        context.commit("goods", newGoods);
-        good.confirmed = false;
-        const newFriendGoods = [...context.state.friendGoods, good];
-        context.commit("friendGoods", newFriendGoods);
+        const tokenID = good.id;
 
+        p2pManager.dispatchTransaction(context.state.accountAddress, address, good.id);
+
+        context.commit("addUnconfirmedTransaction", { from: context.state.accountAddress, to: address, goodID: good.id })
         context.dispatch("transferToken", { address, tokenID });
       },
 
@@ -188,6 +220,69 @@ const createStore = () => {
         await context.state.contract.methods.mint(address, tokenID).send();
       },
 
+    },
+    getters: {
+      selectFriend: state => {
+        const index = state.selectedFriendIndex;
+        const friend = state.friends[index];
+        return friend;
+      },
+      allGoods: state => {
+        let transaction;
+        const unconfirmedGoods = [];
+        const goodsToRemove = {};
+
+        // state.unconfirmedTransactions.forEach(transaction => {
+        for (let tID in state.unconfirmedTransactions) {
+          transaction = state.unconfirmedTransactions[tID];
+
+          if (transaction.from == state.accountAddress) {
+            goodsToRemove[transaction.goodID] = transaction.goodID;
+            continue;
+          }
+
+          unconfirmedGoods.push({
+            id: transaction.goodID,
+            confirmed: false
+          })
+        }
+
+        const goods = state.goods.filter(good => {
+          return !goodsToRemove[good.id]
+        });
+
+        return [...goods, ...unconfirmedGoods]
+      },
+      allFriendGoods: state => {
+
+        let transaction;
+        const unconfirmedGoods = [];
+        const goodsToRemove = {};
+
+        const friend = state.friends[state.selectedFriendIndex];
+        if (!friend) return;
+
+        // state.unconfirmedTransactions.forEach(transaction => {
+        for (let tID in state.unconfirmedTransactions) {
+          transaction = state.unconfirmedTransactions[tID];
+          if (transaction.from == friend.id) {
+            goodsToRemove[transaction.goodID] = transaction.goodID;
+            continue;
+          }
+          if (transaction.to != friend.id) continue;
+
+          unconfirmedGoods.push({
+            id: transaction.goodID,
+            confirmed: false
+          })
+        }
+
+        const goods = state.friendGoods.filter(good => {
+          return !goodsToRemove[good.id]
+        });
+
+        return [...goods, ...unconfirmedGoods];
+      },
     },
   });
 };

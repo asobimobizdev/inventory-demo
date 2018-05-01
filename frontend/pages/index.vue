@@ -8,7 +8,7 @@
         </div>
         <div class="collection grid">
           <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
-            <div class="item" v-for="(good) in goods" :key="good.id" :style="styleForBgGood(good)">
+            <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" :style="styleForBgGood(good)">
               <div class="good">
                 <div class="icon" :style="styleForIconGood(good)"></div>
                 <div class="label">{{good.id}}</div>
@@ -58,7 +58,7 @@ export default {
     this.$store.dispatch("getSelectedFriendGoods");
   },
   components: {
-    draggable,
+    draggable
   },
   data() {
     return {};
@@ -76,20 +76,20 @@ export default {
       },
       set(value) {
         this.$store.dispatch("selectFriend", value);
-      },
+      }
     },
     goods: {
       get() {
-        return this.$store.state.goods;
+        return this.$store.getters.allGoods;
       },
-      set(value) {},
+      set(value) {}
     },
     friendGoods: {
       get() {
-        return this.$store.state.friendGoods;
+        return this.$store.getters.allFriendGoods;
       },
-      set(value) {},
-    },
+      set(value) {}
+    }
   },
   methods: {
     checkMove(e) {
@@ -104,8 +104,11 @@ export default {
       if (from != "goodsContainer" || to != "friendGoodsContainer") {
         return;
       }
+
       const oldIndex = e.oldIndex;
-      const good = this.$store.state.goods[oldIndex];
+      const good = this.goods[oldIndex];
+
+      if (!good.confirmed) return;
 
       this.$store.dispatch("transferGoodToSelectedFriend", good);
     },
@@ -116,7 +119,7 @@ export default {
       let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
       let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
       return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`
       };
     },
     styleForIconGood(good) {
@@ -130,7 +133,7 @@ export default {
       let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
       return {
         background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`,
+        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
       };
     },
     stringToHashNumber(str) {
@@ -143,8 +146,8 @@ export default {
         .reduce((a, b) => {
           return (a * b) % (Number.MAX_VALUE - 1);
         });
-    },
-  },
+    }
+  }
 };
 </script>
 
