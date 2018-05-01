@@ -1,5 +1,7 @@
 import Vuex from "vuex";
 import { dapp } from "@/lib/dapp";
+import uuid from "uuid/v1";
+import { p2pManager } from "@/lib/p2p.js";
 
 const localStorage = window.localStorage;
 
