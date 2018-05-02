@@ -11,6 +11,18 @@ const localStorage = window.localStorage;
 //   }
 // })
 
+function isEqual(a, b) {
+  if (a.length != b.length) {
+    return false
+  }
+
+  for (let i = 0; i < a.length; i++) {
+    if (!b[i] || a[i].id != b[i].id) return false
+  }
+
+  return true;
+}
+
 const createStore = () => {
   return new Vuex.Store({
     state: {
@@ -46,8 +58,6 @@ const createStore = () => {
           delete state.unconfirmedTransactions[tID];
         });
 
-        goods.sort((a, b) => { return a.id > b.id; })
-
         state.goods = goods;
       },
       ["friends"](state, friends) {
@@ -63,7 +73,6 @@ const createStore = () => {
           delete state.unconfirmedTransactions[tID];
         });
 
-        goods.sort((a, b) => { return a.id > b.id; })
         state.friendGoods = goods;
       },
       ["markConfirmed"](state, goodId) {
@@ -123,11 +132,13 @@ const createStore = () => {
       },
 
       async getOwnGoods(context) {
-        let items = await dapp.getTokensForAddress(
+        let goods = await dapp.getTokensForAddress(
           context.state.contract,
           dapp.defaultAccount,
         );
-        context.commit("goods", items);
+        goods.sort((a, b) => { return a.id > b.id; })
+        if (isEqual(context.state.goods, goods)) return
+        context.commit("goods", goods);
       },
 
       async getSelectedFriendGoods(context) {
@@ -141,6 +152,8 @@ const createStore = () => {
           context.state.contract,
           address,
         );
+        goods.sort((a, b) => { return a.id > b.id; })
+        if (isEqual(context.state.friendGoods, goods)) return
         context.commit("friendGoods", goods);
       },
 
