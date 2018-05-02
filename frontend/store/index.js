@@ -31,8 +31,11 @@ const createStore = () => {
       contract: null,
       accountAddress: null,
       goods: [],
+      goodsLoading: false,
       friends: [],
+      friendsLoading: false,
       friendGoods: [],
+      friendGoodsLoading: false,
       selectedFriendIndex: -1,
       unconfirmedTransactions: {}
     },
@@ -44,13 +47,6 @@ const createStore = () => {
         state.isGoodsAdmin = isGoodsAdmin;
       },
       ["goods"](state, goods) {
-
-        goods = goods.filter((item) => {
-          return !state.friendGoods.find((friendItem) => {
-            return item.id == friendItem.id;
-          });
-        });
-
         goods.forEach(good => {
           const from = state.accountAddress;
           const to = state.friends[state.selectedFriendIndex].id;
@@ -60,9 +56,15 @@ const createStore = () => {
 
         state.goods = goods;
       },
+      ["goodsLoading"](state, loading) {
+        state.goodsLoading = loading;
+      },
       ["friends"](state, friends) {
         state.friends = friends || [];
         state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
+      },
+      ["friendsLoading"](state, loading) {
+        state.friendsLoading = loading;
       },
       ["friendGoods"](state, goods) {
 
@@ -74,6 +76,9 @@ const createStore = () => {
         });
 
         state.friendGoods = goods;
+      },
+      ["friendGoodsLoading"](state, loading) {
+        state.friendGoodsLoading = loading;
       },
       ["markConfirmed"](state, goodId) {
         const index = state.goods.find(
@@ -137,11 +142,14 @@ const createStore = () => {
           dapp.defaultAccount,
         );
         goods.sort((a, b) => { return a.id > b.id; })
-        if (isEqual(context.state.goods, goods)) return
-        context.commit("goods", goods);
+        if (!isEqual(context.state.goods, goods)) {
+          context.commit("goods", goods);
+          context.commit("goodsLoading", false);
+        }
       },
 
       async getSelectedFriendGoods(context) {
+        // context.commit("friendGoodsLoading", true);
         if (context.state.selectedFriendIndex == -1) {
           return;
         }
@@ -152,9 +160,12 @@ const createStore = () => {
           context.state.contract,
           address,
         );
+
         goods.sort((a, b) => { return a.id > b.id; })
-        if (isEqual(context.state.friendGoods, goods)) return
-        context.commit("friendGoods", goods);
+        if (!isEqual(context.state.friendGoods, goods)) {
+          context.commit("friendGoods", goods);
+          context.commit("friendGoodsLoading", false);
+        }
       },
 
       async createContract(context) {
