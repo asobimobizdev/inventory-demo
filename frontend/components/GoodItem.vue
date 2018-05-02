@@ -46,7 +46,10 @@ export default {
       };
     },
     characteristics() {
-      const numItems = this.random.intBetween(3, 7);
+      const minCount = 3;
+      const maxCount = 11;
+      const numItems = this.random.intBetween(minCount, maxCount);
+      const normNumItems = (numItems - minCount) / (maxCount - minCount);
 
       const items = Array(numItems)
         .fill({})
@@ -54,8 +57,12 @@ export default {
           return {
             x: this.random.floatBetween(-1, 1),
             y: this.random.floatBetween(-1, 1),
-            r: this.random.floatBetween(0.1, 1),
-            deg: this.random.floatBetween(0, 360)
+            r: this.random.floatBetween(0.01, 1.6),
+            deg: this.random.floatBetween(0, 360),
+            opacity: this.random.floatBetween(0.1, 0.7),
+            normCount: normNumItems,
+            // color: this.random(100) > 0 ? "255" : "0"
+            color: "255"
           };
         });
       return items;
@@ -68,6 +75,7 @@ export default {
   methods: {
     styleForCt(ct) {
       const scale = 50;
+      const colorStr = `${ct.color},${ct.color},${ct.color}`;
       return {
         width: `${ct.r * 2 * scale}px`,
         height: `${ct.r * 2 * scale}px`,
@@ -75,7 +83,8 @@ export default {
         top: `calc(50% + ${ct.y * scale}px)`,
         background: `linear-gradient(${
           ct.deg
-        }deg, rgba(255,255,255,0.3),  rgba(255,255,255,0.0) )`
+        }deg, rgba(${colorStr},${ct.opacity /
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
       };
     },
     stringToHashNumber(str) {
