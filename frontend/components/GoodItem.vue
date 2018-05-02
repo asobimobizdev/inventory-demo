@@ -1,11 +1,17 @@
 <template>
 <div class="good" :style="styleForBg">
-  <div class="icon" :style="styleForIcon"></div>
+  <div class="icon" :style="styleForIcon">
+    <div class="chars">
+      <div v-for="(char,index) in characteristics" :key="index" :style="styleForCt(char)"></div>
+    </div>
+  </div>
   <div class="label">{{id}}</div>
 </div>
 </template>
 
 <script>
+import randGen from "random-seed";
+
 export default {
   props: {
     id: String,
@@ -38,10 +44,40 @@ export default {
         background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
         boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
       };
+    },
+    characteristics() {
+      const numItems = this.random.intBetween(3, 7);
+
+      const items = Array(numItems)
+        .fill({})
+        .map((it, i) => {
+          return {
+            x: this.random.floatBetween(-1, 1),
+            y: this.random.floatBetween(-1, 1),
+            r: this.random.floatBetween(0.1, 1),
+            deg: this.random.floatBetween(0, 360)
+          };
+        });
+      return items;
+    },
+    random() {
+      return new randGen(this.seed);
     }
   },
 
   methods: {
+    styleForCt(ct) {
+      const scale = 50;
+      return {
+        width: `${ct.r * 2 * scale}px`,
+        height: `${ct.r * 2 * scale}px`,
+        left: `calc(50% + ${ct.x * scale}px)`,
+        top: `calc(50% + ${ct.y * scale}px)`,
+        background: `linear-gradient(${
+          ct.deg
+        }deg, rgba(255,255,255,0.3),  rgba(255,255,255,0.0) )`
+      };
+    },
     stringToHashNumber(str) {
       str = String(str);
       return str
@@ -79,6 +115,20 @@ export default {
     border-radius 40px
     margin-bottom 0px
     transition all 300ms ease-in-out
+    position relative
+    overflow hidden
+    .chars
+      position absolute
+      top 0
+      left 0
+      width 100%
+      height 100%
+
+      >div
+        position absolute
+        border-radius 50%
+        transform translate(-50%, -50%)
+
 
   >.label
     display block
