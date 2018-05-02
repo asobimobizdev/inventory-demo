@@ -48,9 +48,10 @@
         grid-gap 4px
         grid-template-columns repeat(auto-fit, minmax(120px,1fr));
 
-.el-loading-mask
-  background-color alpha(#fff,0.3) !important
-  >.el-loading-spinner
-    top: calc(50% - 10px) !important
-    circle
-      stroke: #fff
+.item.el-loading-parent--relative
+  >div.el-loading-mask
+    background-color alpha(#fff,0.3) !important
+    >.el-loading-spinner
+      top: calc(50% - 0px) !important
+      circle
+        stroke: #fff

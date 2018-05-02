@@ -194,7 +194,8 @@ export default {
     overflow hidden
     padding 0px
     position relative
-    >*
+
+    >.good
       display flex
       flex-direction column
       flex-wrap wrap
@@ -212,11 +213,12 @@ export default {
         width 80px
         height 80px
         border-radius 40px
-        margin-bottom 20px
-        animation-name icon-rotation
-        animation-duration 20s
-        animation-iteration-count infinite
-        animation-timing-function linear
+        margin-bottom 0px
+        // animation-name icon-rotation
+        // animation-duration 20s
+        // animation-iteration-count infinite
+        // animation-timing-function linear
+        transition all 300ms ease-in-out
 
       >.label
         display block
@@ -236,6 +238,15 @@ export default {
         bottom 0
         left 0
         right 0
+
+        transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
+        transform translate(0,20px)
+
+      &:hover,&:active
+        >.icon
+          transform translate(0,-10px)
+        >.label
+          transform translate(0,0px)
 
 .goods
   height 100%
