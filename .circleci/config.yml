@@ -6,7 +6,6 @@ jobs:
     working_directory: ~/asobicoin
     steps:
       - checkout
-      - run: cd ~/asobicoin/contracts
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "contracts/package.json" }}
@@ -22,3 +21,17 @@ jobs:
             npm run test
             npm run lint
           working_directory: ~/asobicoin/contracts
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "app/package.json" }}
+      - run:
+          command: npm install
+          working_directory: ~/asobicoin/app
+      - save_cache:
+          paths:
+            - ~/asobicoin/app/node_modules
+          key: v1-dependencies-{{ checksum "app/package.json" }}
+      - run:
+          command: |
+            npm run lint
+          working_directory: ~/asobicoin/app
