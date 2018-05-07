@@ -1,0 +1,1 @@
+# ASOBI COIN Inventory Demo
