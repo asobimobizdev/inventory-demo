@@ -2,13 +2,20 @@ root: true
 globals:
   __meteor_runtime_config__: false
   Meteor: False
+  artifacts: false
+  contract: false
+  assert: false
+  Npm: false
+  Package: false
 env:
   browser: true
   node: true
+  mocha: true
 parserOptions:
   parser: babel-eslint
   sourceType: module
   allowImportExportEverywhere: true
+  ecmaVersion: 2017
 extends:
 - eslint:recommended
 - plugin:vue/essential
