@@ -1,6 +1,6 @@
 import Web3 from "web3";
-import { MintableERC721 } from '../../../contracts/MintableERC721.sol';
-
+import { Goods } from "../../../contracts/Goods.sol";
+import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 
 export default class Dapp {
   constructor() {
@@ -9,7 +9,8 @@ export default class Dapp {
     }
 
     this.contracts = {
-      MintableERC721,
+      Goods,
+      AsobiCoin,
     };
   }
 
@@ -26,33 +27,34 @@ export default class Dapp {
     this.web3.eth.defaultAccount = this.defaultAccount;
   }
 
-  getContract(contract) {
+  getContract(contract, address) {
     const options = {
       from: this.web3.eth.defaultAccount,
       gasPrice: this.web3.utils.toWei("10", "gwei"),
+      data: contract.bytecode,
     };
-    const result = new this.web3.eth.Contract(
+    const instance = new this.web3.eth.Contract(
       contract.abi,
-      null,
+      address,
       options,
     );
-    return result;
+    return instance;
   }
 
   getContractAt(contract, address) {
-    const contractInstance = this.getContract(contract);
-    contractInstance.options.address = address;
+    const contractInstance = this.getContract(contract, address);
     return contractInstance;
   }
 
-  deployContract(contract, args) {
+  async deployContract(contract, args) {
     const contractInstance = this.getContract(contract);
-    return contractInstance.deploy(
+    const promise = contractInstance.deploy(
       {
         arguments: args,
-        data: contract.bytecode,
-      }
-    ).send();
+      },
+    );
+    const gas = await promise.estimateGas();
+    return await promise.send({gas});
   }
 
   async getTokensForAddress(token, address) {

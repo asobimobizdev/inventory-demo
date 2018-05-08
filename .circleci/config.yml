@@ -20,6 +20,8 @@ jobs:
             - ~/.meteor
           key: v1-dependencies-{{ checksum "package.json" }}
       - run:
+          command: npm run lint
+      - run:
           command: npm run truffle-lint
           working_directory: ~/asobicoin
       - run:

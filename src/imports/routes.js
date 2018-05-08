@@ -19,7 +19,8 @@ export default [
 export const beforeEach = async function (to, from, next) {
   if (to.matched.some(record => record.meta.requiresWeb3) && !store.state.dappInit) {
     await dapp.asyncInitialize();
-    store.dispatch("getContract");
+    store.dispatch("getGoodsContract");
+    store.dispatch("getAsobiCoinContract");
     store.commit("dapp/initialized", true);
   }
 

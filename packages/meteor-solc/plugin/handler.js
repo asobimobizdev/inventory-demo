@@ -1,16 +1,16 @@
-const fs = Npm.require('fs');
-const path = Npm.require('path');
-const solc = Npm.require('solc');
+const fs = Npm.require("fs");
+const path = Npm.require("path");
+const solc = Npm.require("solc");
 
 
 class SolidityCompiler {
   findImports(p) {
-    const fullPath = path.join('node_modules', p);
+    const fullPath = path.join("node_modules", p);
     if (!fs.existsSync(fullPath)) {
-      return { error: 'File not found' }
+      return { error: "File not found" };
     }
     const contents = {
-      contents: fs.readFileSync(fullPath, "utf8")
+      contents: fs.readFileSync(fullPath, "utf8"),
     };
 
     return contents;
@@ -24,7 +24,7 @@ class SolidityCompiler {
     files.forEach((file) => {
       const fileName = file.getPathInPackage();
       if (/node_modules\/.+sol/.test(fileName)) {
-        return
+        return;
       }
 
       const input = {
@@ -40,12 +40,12 @@ class SolidityCompiler {
             // Enable the metadata and bytecode outputs of every single contract.
             "*": {
               "*": [
-                "abi", "evm.bytecode.opcodes",
-              ]
+                "abi", "evm.bytecode.object",
+              ],
             },
           },
         },
-      }
+      };
 
       const output = solc.compileStandardWrapper(
         JSON.stringify(input),
@@ -59,19 +59,23 @@ class SolidityCompiler {
         contractFile = contractFile.split("/").pop().split(".sol")[0];
         for (let contractName in contracts) {
           const contract = contracts[contractName];
-          jsContent += `${contractName}: ${JSON.stringify(contract)},\n`;
+          const contractOut = {
+            abi: contract.abi,
+            bytecode: contract.evm.bytecode.object,
+          };
+          jsContent += `${contractName}: ${JSON.stringify(contractOut)},\n`;
         }
       }
-      jsContent += "};"
+      jsContent += "};";
 
       file.addJavaScript({
         data: jsContent,
-        path: `${file.getPathInPackage()}.js`
+        path: `${file.getPathInPackage()}.js`,
       });
     });
   }
 }
 
 Plugin.registerCompiler({
-  extensions: ['sol'],
+  extensions: ["sol"],
 }, () => new SolidityCompiler);

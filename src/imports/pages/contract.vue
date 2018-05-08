@@ -2,7 +2,10 @@
   <el-main class="full-centered-content">
     <add-contract class="add-contract" ></add-contract>
     <el-card class="create-contract-box full-centered-content">
-      <el-button @click="createContract()" type="primary" round >Create NFT</el-button>
+      <el-button @click="createGoodsContract()" type="primary" round >Create Goods Contract</el-button>
+    </el-card>
+    <el-card class="create-contract-box full-centered-content">
+      <el-button @click="createAsobiCoinContract()" type="primary" round >Create Asobi Coin Contract</el-button>
     </el-card>
   </el-main>
 </template>
@@ -20,8 +23,11 @@ export default {
     return {};
   },
   methods: {
-    createContract() {
-      this.$store.dispatch("createContract");
+    createGoodsContract() {
+      this.$store.dispatch("createGoodsContract");
+    },
+    createAsobiCoinContract() {
+      this.$store.dispatch("createAsobiCoinContract");
     },
   },
 };
