@@ -1,6 +1,5 @@
 import Web3 from "web3";
-import MintableERC721 from '../../../contracts/MintableERC721.sol';
-console.log(MintableERC721);
+import { MintableERC721 } from '../../../contracts/MintableERC721.sol';
 
 
 export default class Dapp {

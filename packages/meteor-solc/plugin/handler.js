@@ -53,15 +53,16 @@ class SolidityCompiler {
       );
 
       const outData = JSON.parse(output);
-      let jsContent = "";
+      let jsContent = "module.exports = {";
       for (let contractFile in outData.contracts) {
         const contracts = outData.contracts[contractFile];
         contractFile = contractFile.split("/").pop().split(".sol")[0];
         for (let contractName in contracts) {
           const contract = contracts[contractName];
-          jsContent += `const ${contractName} = ${JSON.stringify(contract)};\n\n`;
+          jsContent += `${contractName}: ${JSON.stringify(contract)},\n`;
         }
       }
+      jsContent += "};"
 
       file.addJavaScript({
         data: jsContent,
