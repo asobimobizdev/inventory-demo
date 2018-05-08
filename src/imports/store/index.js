@@ -241,6 +241,10 @@ const createStore = () => {
         await context.state.goodsContract.methods.mint(address, tokenID).send();
       },
 
+      async sendCoinsToFriend(context, { friend, ammount }) {
+        const address = friend.id;
+        console.log("sendCoinsToFriend", address, ammount);
+      }
     },
     getters: {
       selectFriend: state => {
