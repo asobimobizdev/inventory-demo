@@ -22,9 +22,11 @@ class SolidityCompiler {
   // https://docs.meteor.com/api/packagejs.html#build-plugin-compilers
   processFilesForTarget(files) {
     files.forEach((file) => {
-      if (/node_modules\/.+sol/.test(file.getPathInPackage())) {
+      const fileName = file.getPathInPackage();
+      if (/node_modules\/.+sol/.test(fileName)) {
         return
       }
+
       const input = {
         language: "Solidity",
         sources: {
@@ -33,6 +35,7 @@ class SolidityCompiler {
           },
         },
         settings: {
+          evmVersion: "byzantium",
           outputSelection: {
             // Enable the metadata and bytecode outputs of every single contract.
             "*": {
@@ -48,10 +51,18 @@ class SolidityCompiler {
         JSON.stringify(input),
         this.findImports,
       );
-      console.log(JSON.parse(output));
+
+      const outData = JSON.parse(output);
+      let jsContent = "";
+      for (let name in outData.contracts) {
+        const contract = outData.contracts[name];
+        name = name.split("/").pop().split(".sol")[0];
+        console.log(name, "\n-----------------------\n", contract, "\n-------------------------------------------------------------------------------");
+        jsContent += `const ${name} = ${JSON.stringify(contract)};\n\n`;
+      }
 
       file.addJavaScript({
-        data: output,
+        data: jsContent,
         path: `${file.getPathInPackage()}.js`
       });
     });
