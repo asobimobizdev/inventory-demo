@@ -5,12 +5,12 @@ import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 
 
 /**
- * @title MintableERC721 allows its owner to mint and burn new NFT
+ * @title Goods
  */
-contract MintableERC721 is Ownable, ERC721Token {
+contract Goods is Ownable, ERC721Token {
     constructor(string name, string symbol)
         public
-        ERC721Token(name, symbol) {
+        ERC721Token("Goods", "GDS") {
     }
 
     function mint(address _to, uint256 _tokenId) onlyOwner public {

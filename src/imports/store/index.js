@@ -87,7 +87,7 @@ const createStore = () => {
       },
       ["contract"](state, address) {
         state.contract = dapp.getContractAt(
-          dapp.contracts.MintableERC721,
+          dapp.contracts.Goods,
           address,
         );
         state.accountAddress = state.contract.defaultAccount;
@@ -164,10 +164,9 @@ const createStore = () => {
         }
       },
 
-      async createContract(context) {
+      async createGoodsContract(context) {
         const contract = await dapp.deployContract(
-          dapp.contracts.MintableERC721,
-          ["Non-Fungible Token", "NFT"],
+          dapp.contracts.Goods, []
         );
         const address = contract.options.address;
         context.dispatch("setContract", address);

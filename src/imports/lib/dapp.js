@@ -1,5 +1,6 @@
 import Web3 from "web3";
-import { MintableERC721 } from '../../../contracts/MintableERC721.sol';
+import { Goods } from '../../../contracts/Goods.sol';
+import { AsobiCoin } from '../../../contracts/AsobiCoin.sol';
 
 
 export default class Dapp {
@@ -9,7 +10,7 @@ export default class Dapp {
     }
 
     this.contracts = {
-      MintableERC721,
+      Goods,
     };
   }
 

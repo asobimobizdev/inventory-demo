@@ -2,9 +2,9 @@ const assertRejected = require("assert-rejected");
 // const testHelper = require("truffle-test-helpers");
 // const utils = require("web3-utils");
 
-const Token = artifacts.require("contracts/MintableERC721.sol");
+const Token = artifacts.require("contracts/Goods.sol");
 
-contract("MintableERC721", accounts => {
+contract("Goods", accounts => {
   const account = accounts[0];
   const otherAccount = accounts[1];
   const thirdAccount = accounts[2];
