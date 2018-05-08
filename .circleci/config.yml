@@ -8,30 +8,17 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "contracts/package.json" }}
+          - v1-dependencies-{{ checksum "package.json" }}
       - run:
           command: npm install
-          working_directory: ~/asobicoin/contracts
+          working_directory: ~/asobicoin
       - save_cache:
           paths:
-            - ~/asobicoin/contracts/node_modules
-          key: v1-dependencies-{{ checksum "contracts/package.json" }}
+            - ~/asobicoin/node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run:
-          command: |
-            npm run test
-            npm run lint
-          working_directory: ~/asobicoin/contracts
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "app/package.json" }}
+          command: npm run truffle-lint
+          working_directory: ~/asobicoin
       - run:
-          command: npm install
-          working_directory: ~/asobicoin/app
-      - save_cache:
-          paths:
-            - ~/asobicoin/app/node_modules
-          key: v1-dependencies-{{ checksum "app/package.json" }}
-      - run:
-          command: |
-            npm run lint
-          working_directory: ~/asobicoin/app
+          command: npm run truffle-test
+          working_directory: ~/asobicoin
