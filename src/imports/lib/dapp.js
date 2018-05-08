@@ -46,14 +46,15 @@ export default class Dapp {
     return contractInstance;
   }
 
-  deployContract(contract, args) {
+  async deployContract(contract, args) {
     const contractInstance = this.getContract(contract);
     const promise = contractInstance.deploy(
       {
         arguments: args,
       },
     );
-    return promise.send();
+    const gas = await promise.estimateGas();
+    return await promise.send({gas});
   }
 
   async getTokensForAddress(token, address) {

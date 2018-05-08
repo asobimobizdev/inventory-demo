@@ -5,6 +5,9 @@ import { p2pManager } from "../lib/p2p.js";
 
 const localStorage = window.localStorage;
 
+const GOODS_ADDRESS = "0x3E87ccbD9Fc564d1dB41CC10687B85d5C1cA715D";
+const ASOBI_COIN_ADDRESS = "0xc191e855c3EDeD11db42A3f78E5c6e1FC1c404bA";
+
 function isEqual(a, b) {
   if (a.length != b.length) {
     return false;
@@ -22,7 +25,8 @@ const createStore = () => {
     state: {
       dappInit: false,
       isGoodsAdmin: false,
-      contract: null,
+      asobiCoinContract: null,
+      goodsContract: null,
       accountAddress: null,
       goods: [],
       goodsLoading: false,
@@ -63,14 +67,12 @@ const createStore = () => {
         state.friendsLoading = loading;
       },
       ["friendGoods"](state, goods) {
-
         goods.forEach(good => {
           const from = state.accountAddress;
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
         });
-
         state.friendGoods = goods;
       },
       ["friendGoodsLoading"](state, loading) {
@@ -85,14 +87,19 @@ const createStore = () => {
       ["setSelectedFriendIndex"](state, index) {
         state.selectedFriendIndex = index;
       },
-      ["contract"](state, address) {
-        state.contract = dapp.getContractAt(
+      ["asobiCoinContract"](state, address) {
+        state.asobiCoinContract = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          address,
+        );
+      },
+      ["goodsContract"](state, address) {
+        state.goodsContract = dapp.getContractAt(
           dapp.contracts.Goods,
           address,
         );
-        state.accountAddress = state.contract.defaultAccount;
+        state.accountAddress = state.goodsContract.defaultAccount;
       },
-
       ["addUnconfirmedTransaction"](state, transaction) {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
@@ -134,7 +141,7 @@ const createStore = () => {
 
       async getOwnGoods(context) {
         let goods = await dapp.getTokensForAddress(
-          context.state.contract,
+          context.state.goodsContract,
           dapp.defaultAccount,
         );
         goods.sort((a, b) => { return a.id > b.id; });
@@ -153,7 +160,7 @@ const createStore = () => {
           context.state.selectedFriendIndex
         ].id;
         const goods = await dapp.getTokensForAddress(
-          context.state.contract,
+          context.state.goodsContract,
           address,
         );
 
@@ -176,37 +183,25 @@ const createStore = () => {
           dapp.contracts.Goods, []
         );
         const address = contract.options.address;
-        context.dispatch("setContract", address);
       },
 
-      getContract(context) {
-        const address = localStorage.getItem("contractAddress");
-        if (!address) {
-          return;
-        }
-        context.dispatch("registerContract", address);
-      },
-
-      setContract(context, address) {
-        context.dispatch("registerContract", address);
-        localStorage.setItem("contractAddress", address);
-      },
-
-      registerContract(context, address) {
-        context.commit("contract", address);
+      getGoodsContract(context) {
+        context.commit("goodsContract", GOODS_ADDRESS);
 
         // XXX hack Justus 2018-04-2"7",
-        const a = () => {
+        window.setInterval(() => {
           context.dispatch("getOwnGoods");
           context.dispatch("getSelectedFriendGoods");
           if (this.getOwnGoodsTimer) {
             window.clearTimeout(this.getOwnGoodsTimer);
           }
-          this.getOwnGoodsTimer = window.setTimeout(a, 1000);
-        };
-        a();
+        }, 1000);
 
         p2pManager.subscribe(context.state.accountAddress, context);
+      },
+
+      getAsobiCoinContract(context) {
+        context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
       },
 
       transferGoodToSelectedFriend(context, good) {
@@ -223,8 +218,8 @@ const createStore = () => {
       },
 
       async transferToken(context, { address, tokenID }) {
-        await context.state.contract.methods.approve(address, tokenID).send();
-        await context.state.contract.methods.transferFrom(
+        await context.state.goodsContract.methods.approve(address, tokenID).send();
+        await context.state.goodsContract.methods.transferFrom(
           dapp.defaultAccount,
           address,
           tokenID,
@@ -235,7 +230,7 @@ const createStore = () => {
       },
 
       async checkGoodsAdmin(context) {
-        const ownerAddress = await context.state.contract.methods.owner(
+        const ownerAddress = await context.state.goodsContract.methods.owner(
         ).call();
         const isOwner = ownerAddress == dapp.defaultAccount;
         context.commit("isGoodsAdmin", isOwner);
@@ -243,7 +238,7 @@ const createStore = () => {
 
       async createGoodFor(context, address) {
         const tokenID = dapp.generateTokenID();
-        await context.state.contract.methods.mint(address, tokenID).send();
+        await context.state.goodsContract.methods.mint(address, tokenID).send();
       },
 
     },
