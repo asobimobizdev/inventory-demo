@@ -40,7 +40,7 @@ class SolidityCompiler {
             // Enable the metadata and bytecode outputs of every single contract.
             "*": {
               "*": [
-                "abi", "evm.bytecode.object",
+                "abi", "evm.bytecode.opcodes",
               ]
             },
           },
@@ -54,11 +54,13 @@ class SolidityCompiler {
 
       const outData = JSON.parse(output);
       let jsContent = "";
-      for (let name in outData.contracts) {
-        const contract = outData.contracts[name];
-        name = name.split("/").pop().split(".sol")[0];
-        console.log(name, "\n-----------------------\n", contract, "\n-------------------------------------------------------------------------------");
-        jsContent += `const ${name} = ${JSON.stringify(contract)};\n\n`;
+      for (let contractFile in outData.contracts) {
+        const contracts = outData.contracts[contractFile];
+        contractFile = contractFile.split("/").pop().split(".sol")[0];
+        for (let contractName in contracts) {
+          const contract = contracts[contractName];
+          jsContent += `const ${contractName} = ${JSON.stringify(contract)};\n\n`;
+        }
       }
 
       file.addJavaScript({
