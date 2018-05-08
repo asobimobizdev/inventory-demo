@@ -4,7 +4,10 @@
   "scripts": {
     "dev": "HMR_URL=$(hostname) HMR_PORT=3030 meteor run",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "lint-fix": "eslint --ext .js,.vue --ignore-path .gitignore . --fix"
+    "lint-fix": "eslint --ext .js,.vue --ignore-path .gitignore . --fix",
+    "truffle-compile": "truffle compile",
+    "truffle-test": "truffle test",
+    "truffle-lint": "solium --dir contracts"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.40",
@@ -14,10 +17,11 @@
     "buffer": "^5.1.0",
     "element-ui": "^2.3.6",
     "highland": "^3.0.0-beta.6",
-    "meteor-node-stubs": "^0.3.2",
+    "meteor-node-stubs": "0.3.2",
     "random-seed": "^0.3.0",
     "signalhub": "^4.9.0",
     "simple-peer": "^9.0.0",
+    "truffle": "^4.1.8",
     "vue": "^2.5.13",
     "vue-meteor-tracker": "^1.2.3",
     "vue-router": "^3.0.1",
@@ -27,13 +31,18 @@
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0",
     "web3": "^1.0.0-beta.34",
-    "web3-providers-ws": "^1.0.0-beta.34"
+    "web3-providers-ws": "^1.0.0-beta.34",
+    "zeppelin-solidity": "~1.8.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
-    "eslint": "^4.15.0",
+    "eslint": "^4.19.1",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
-    "eslint-plugin-vue": "^4.0.0"
+    "eslint-plugin-vue": "^4.0.0",
+    "assert-rejected": "^1.1.1",
+    "solium": "^1.1.7",
+    "truffle-test-helpers": "0.0.5",
+    "web3-utils": "^1.0.0-beta.34"
   }
 }

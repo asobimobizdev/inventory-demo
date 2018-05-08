@@ -1,2 +1,3 @@
-**/.DS_Sore
-dist/
+node_modules/
+build/
+**/.meteor/local/

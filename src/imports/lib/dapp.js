@@ -1,6 +1,6 @@
 import Web3 from "web3";
-import MintableERC721 from "./../contracts/MintableERC721.json";
-// import MintableERC721 from "./../../../../smart-contract/build/contracts/MintableERC721.json";
+import { MintableERC721 } from '../../../contracts/MintableERC721.sol';
+
 
 export default class Dapp {
   constructor() {
