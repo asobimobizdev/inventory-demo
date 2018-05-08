@@ -164,6 +164,13 @@ const createStore = () => {
         }
       },
 
+      async createAsobiCoinContract(context) {
+        const contract = await dapp.deployContract(
+          dapp.contracts.AsobiCoin, []
+        );
+        const address = contract.options.address;
+      },
+
       async createGoodsContract(context) {
         const contract = await dapp.deployContract(
           dapp.contracts.Goods, []
