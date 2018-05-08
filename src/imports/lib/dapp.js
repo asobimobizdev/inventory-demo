@@ -1,7 +1,6 @@
 import Web3 from "web3";
-import { Goods } from '../../../contracts/Goods.sol';
-import { AsobiCoin } from '../../../contracts/AsobiCoin.sol';
-
+import { Goods } from "../../../contracts/Goods.sol";
+import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 
 export default class Dapp {
   constructor() {
@@ -49,14 +48,11 @@ export default class Dapp {
 
   deployContract(contract, args) {
     const contractInstance = this.getContract(contract);
-    console.log(contract);
-    console.log(contractInstance.deploy);
     const promise = contractInstance.deploy(
       {
         arguments: args,
       },
     );
-    console.log(promise)
     return promise.send();
   }
 

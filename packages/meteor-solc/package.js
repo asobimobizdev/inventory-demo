@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'asobicoin:solc',
-  summary: 'The solc package provides a compiler build plugin for the Meteor build tool.',
-  version: '0.4.2',
-  git: 'http://github.com/SilentCicero/meteor-solc'
+  name: "asobicoin:solc",
+  summary: "The solc package provides a compiler build plugin for the Meteor build tool.",
+  version: "0.4.2",
+  git: "http://github.com/SilentCicero/meteor-solc",
 });
 
 Package.registerBuildPlugin({
@@ -16,8 +16,8 @@ Package.registerBuildPlugin({
     "plugin/handler.js",
   ],
   npmDependencies: {
-    "solc": "0.4.23"
-  }
+    "solc": "0.4.23",
+  },
 });
 
 Package.onUse(function (api) {
