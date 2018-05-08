@@ -17,7 +17,7 @@ contract("Goods", accounts => {
   let token;
 
   beforeEach(async () => {
-    token = await Token.new("Non-Fungible Token", "NFT");
+    token = await Token.new();
   });
 
   it("should be created correctly", async () => {

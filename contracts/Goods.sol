@@ -8,7 +8,7 @@ import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
  * @title Goods
  */
 contract Goods is Ownable, ERC721Token {
-    constructor(string name, string symbol)
+    constructor()
         public
         ERC721Token("Goods", "GDS") {
     }
