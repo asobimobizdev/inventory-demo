@@ -6,6 +6,9 @@
     <el-card class="create-contract-box full-centered-content">
       <el-button @click="createAsobiCoinContract()" type="primary" round >Create Asobi Coin Contract</el-button>
     </el-card>
+    <el-card class="create-contract-box full-centered-content">
+      <el-button @click="createEscrowContract()" type="primary" round >Create Escrow Contract</el-button>
+    </el-card>
   </el-main>
 </template>
 
@@ -24,6 +27,9 @@ export default {
     createAsobiCoinContract() {
       this.$store.dispatch("createAsobiCoinContract");
     },
+    createEscrowContract() {
+      this.$store.dispatch("createEscrowContract");
+    },
   },
 };
 </script>
@@ -35,6 +41,4 @@ export default {
 
 .create-contract-box
   min-width 400px
-
-
 </style>

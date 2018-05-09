@@ -1,6 +1,8 @@
 import Web3 from "web3";
 import { Goods } from "../../../contracts/Goods.sol";
 import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
+import { Escrow } from "../../../contracts/Escrow.sol";
+
 
 export default class Dapp {
   constructor() {
@@ -11,6 +13,7 @@ export default class Dapp {
     this.contracts = {
       Goods,
       AsobiCoin,
+      Escrow,
     };
   }
 

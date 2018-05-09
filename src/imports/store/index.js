@@ -7,6 +7,7 @@ const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x3E87ccbD9Fc564d1dB41CC10687B85d5C1cA715D";
 const ASOBI_COIN_ADDRESS = "0xc191e855c3EDeD11db42A3f78E5c6e1FC1c404bA";
+const ESCROW_ADDRESS = "0x4bb12794E70F29E12d287Dd0f9Ae57a6AbE15531";
 
 function isEqual(a, b) {
   if (a.length != b.length) {
@@ -26,6 +27,7 @@ const createStore = () => {
       dappInit: false,
       isGoodsAdmin: false,
       asobiCoinContract: null,
+      escrowContract: null,
       goodsContract: null,
       accountAddress: null,
       goods: [],
@@ -102,13 +104,20 @@ const createStore = () => {
           dapp.contracts.Goods,
           address,
         );
-        state.accountAddress = state.goodsContract.defaultAccount;
+      },
+      ["escrowContract"](state, address) {
+        state.escrowContract = dapp.getContractAt(
+          dapp.contracts.EscrowContract,
+          address,
+        );
+      },
+      ["accountAddress"](state, address) {
+        state.accountAddress = address;
       },
       ["addUnconfirmedTransaction"](state, transaction) {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
       },
-
       ["removeUnconfirmedTransaction"](state, transaction) {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
@@ -182,14 +191,21 @@ const createStore = () => {
         const contract = await dapp.deployContract(
           dapp.contracts.AsobiCoin, []
         );
-        const address = contract.options.address;
       },
 
       async createGoodsContract(context) {
         const contract = await dapp.deployContract(
           dapp.contracts.Goods, []
         );
-        const address = contract.options.address;
+      },
+
+      async createEscrowContract(context) {
+        const contract = await dapp.deployContract(
+          dapp.contracts.Escrow, [
+            context.state.asobiCoinContract.options.address,
+            context.state.goodsContract.options.address,
+          ]
+        );
       },
 
       getGoodsContract(context) {
@@ -209,6 +225,10 @@ const createStore = () => {
 
       getAsobiCoinContract(context) {
         context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
+      },
+
+      getEscrowContract(context) {
+        context.commit("escrowContract", ESCROW_ADDRESS);
       },
 
       transferGoodToSelectedFriend(context, good) {
