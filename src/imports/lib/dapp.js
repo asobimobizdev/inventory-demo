@@ -65,7 +65,8 @@ export default class Dapp {
         {
           id: await token.methods.tokenOfOwnerByIndex(address, i).call(),
           confirmed: true,
-          forSale: Math.random() > 0.5,
+          forSale: Math.random() > 0.1,
+          price: Math.round(Math.random() * 100 + 10)
         }
       );
     }

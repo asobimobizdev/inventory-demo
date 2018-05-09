@@ -36,6 +36,7 @@ const createStore = () => {
       friendGoodsLoading: false,
       selectedFriendIndex: -1,
       unconfirmedTransactions: {},
+      selectedGood: null
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -52,6 +53,8 @@ const createStore = () => {
           const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+
+          good.isOwned = true;
         });
 
         state.goods = goods;
@@ -72,6 +75,7 @@ const createStore = () => {
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+          good.isOwned = false;
         });
         state.friendGoods = goods;
       },
@@ -109,6 +113,9 @@ const createStore = () => {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
       },
+      ["selectGood"](state, good) {
+        state.selectedGood = good;
+      }
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -253,6 +260,7 @@ const createStore = () => {
       async buyGood(context, { id }) {
         console.log("buyGood", id);
       },
+
     },
     getters: {
       selectFriend: state => {

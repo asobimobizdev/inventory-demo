@@ -8,14 +8,14 @@
         </div>
         <div class="collection grid">
           <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
-            <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed">
-              <good-item v-bind="good">
-                <el-switch
+            <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
+              <good-item v-bind="good" :active="isGoodSelected(good)">
+                <!-- <el-switch
                   v-model="good.forSale"
                   active-text="For Sale"
                   @change="onGoodForSaleChanged(good)"
                   >
-                  </el-switch>
+                  </el-switch> -->
               </good-item>
             </div>
           </draggable>
@@ -35,14 +35,15 @@
         </div>
         <div class="collection list">
           <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true }" :move="checkMoveFromFriendGoods">
-            <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed">
-              <good-item v-bind="good" :hasDrawer="good.forSale">
-                <el-button v-if="good.forSale" @click="buyGood(good)" round>BUY</el-button>
+            <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
+              <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
             </div>
           </draggable>
         </div>
       </div>
+
+      <good-inspector class="good-inspector" :good="selectedGood"></good-inspector>
 
     </div>
   </section>
@@ -52,6 +53,7 @@
 import draggable from "vuedraggable";
 import dappMixin from "./../mixins/dapp";
 import GoodItem from "./../components/GoodItem.vue";
+import GoodInspector from "./../components/GoodInspector.vue";
 
 export default {
   mixins: [dappMixin],
@@ -63,6 +65,7 @@ export default {
   components: {
     draggable,
     "good-item": GoodItem,
+    "good-inspector": GoodInspector
   },
   data() {
     return {};
@@ -80,20 +83,23 @@ export default {
       },
       set(value) {
         this.$store.dispatch("selectFriend", value);
-      },
+      }
     },
     goods: {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {},
+      set(value) {}
     },
     friendGoods: {
       get() {
         return this.$store.getters.allFriendGoods;
       },
-      set(value) {},
+      set(value) {}
     },
+    selectedGood() {
+      return this.$store.state.selectedGood;
+    }
   },
   methods: {
     checkMove(e) {
@@ -116,13 +122,14 @@ export default {
 
       this.$store.dispatch("transferGoodToSelectedFriend", good);
     },
-    onGoodForSaleChanged(good) {
-      this.$store.dispatch("setGoodForSale", good);
+    selectGood(good) {
+      this.$store.commit("selectGood", good);
     },
-    buyGood(good) {
-      this.$store.dispatch("buyGood", good);
-    },
-  },
+    isGoodSelected(good) {
+      if (!this.$store.state.selectedGood || !good) return false;
+      return good.id == this.$store.state.selectedGood.id;
+    }
+  }
 };
 </script>
 
@@ -134,17 +141,25 @@ export default {
     transform rotate(360deg)
 
 .host
-
   width 100%
   min-height calc(100% - 100px)
   display flex
   background-color #fff
 
   >.content
+    inMargin = 4px
     background-color #eee
     width 100%
-    padding 4px
+    padding inMargin
     display flex
+
+    position relative
+    >.good-inspector
+      position absolute
+      bottom inMargin * -1
+      left inMargin * -1
+      right inMargin * -1
+      height 216px
 
 .goods, .friend-goods
   display flex
@@ -182,6 +197,7 @@ export default {
     overflow hidden
     padding 0px
     position relative
+    cursor pointer
 
     >.good
       display flex
@@ -239,6 +255,7 @@ export default {
 .goods
   height 100%
   flex 1 1 auto
+  margin-right 8px
   >.head
     >*
       text-align center
@@ -252,22 +269,10 @@ export default {
   width 300px
   height 100%
   >.head
-    // background-color alpha(#000,0.02)
     >*
       width 100%
   >.collection
     .item
       height 120px
-
-  position relative
-  &:after
-    content: ""
-    position absolute
-    width 16px
-    background linear-gradient(90deg, alpha(#000,0.05), alpha(#000,0)), linear-gradient(90deg, alpha(#000,0.02) 0%, alpha(#000,0) 20%)
-    top 0
-    bottom 0
-    left 0
-    pointer-events none
 
 </style>

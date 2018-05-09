@@ -1,5 +1,5 @@
 <template>
-<div class="good" :style="styleForBg" :class="{ 'has-drawer': hasDrawer }">
+<div class="good" :style="styleForBg" :class="{ 'has-drawer': hasDrawer, 'active': active }">
   <div class="icon" :style="styleForIcon">
     <div class="chars">
       <div v-for="(char,index) in characteristics" :key="index" :style="styleForCt(char)"></div>
@@ -19,7 +19,8 @@ export default {
     id: String,
     confirmed: Boolean,
     forSale: Boolean,
-    hasDrawer: { type: Boolean, default: true },
+    hasDrawer: { type: Boolean, default: false },
+    active: { type: Boolean, default: false }
   },
   computed: {
     seed() {
@@ -32,7 +33,7 @@ export default {
       let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
       let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
       return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`
       };
     },
     styleForIcon() {
@@ -46,7 +47,7 @@ export default {
       let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
       return {
         background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`,
+        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
       };
     },
     characteristics() {
@@ -66,14 +67,14 @@ export default {
             opacity: this.random.floatBetween(0.1, 0.7),
             normCount: normNumItems,
             // color: this.random(100) > 0 ? "255" : "0"
-            color: "255",
+            color: "255"
           };
         });
       return items;
     },
     random() {
       return new randGen(this.seed);
-    },
+    }
   },
 
   methods: {
@@ -81,14 +82,12 @@ export default {
       const scale = 50;
       const colorStr = `${ct.color},${ct.color},${ct.color}`;
       return {
-        width: `${ct.r * 2 * scale}px`,
-        height: `${ct.r * 2 * scale}px`,
-        left: `calc(50% + ${ct.x * scale}px)`,
-        top: `calc(50% + ${ct.y * scale}px)`,
+        transform: `matrix( ${ct.r}, 0, 0, ${ct.r}, ${ct.x * scale}, ${ct.y *
+          scale})`,
         background: `linear-gradient(${
           ct.deg
         }deg, rgba(${colorStr},${ct.opacity /
-          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`,
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
       };
     },
     stringToHashNumber(str) {
@@ -101,25 +100,25 @@ export default {
         .reduce((a, b) => {
           return (a * b) % (Number.MAX_VALUE - 1);
         });
-    },
-  },
+    }
+  }
 };
 </script>
 
 
 <style lang="stylus" scoped>
 .good
+  *
+    transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
+
   display flex
   flex-direction column
   flex-wrap wrap
   justify-content center
   align-content center
   align-items center
-  position absolute
-  top 0
-  left 0
-  right 0
-  bottom 0
+  min-width 100px
+  min-height 100px
 
   >.icon
     background-color #f88
@@ -127,7 +126,7 @@ export default {
     height 80px
     border-radius 40px
     margin-bottom 0px
-    transition all 300ms ease-in-out
+    // transition all 300ms ease-in-out
     position relative
     overflow hidden
     .chars
@@ -141,6 +140,10 @@ export default {
         position absolute
         border-radius 50%
         transform translate(-50%, -50%)
+        top -10px
+        left -10px
+        width 100px
+        height 100px
 
   &.has-drawer
     >.drawer
@@ -162,7 +165,7 @@ export default {
       left 0
       right 0
 
-      transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
+      // transition transform 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
       transform translate(0,70px)
 
     &:hover,&:active
@@ -170,4 +173,8 @@ export default {
         transform translate(0,-30px)
       >.drawer
         transform translate(0,10px)
+
+  &.active
+    >.icon
+      transform scale(2,2);
 </style>
