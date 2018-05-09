@@ -20,7 +20,7 @@ export default {
     confirmed: Boolean,
     forSale: Boolean,
     hasDrawer: { type: Boolean, default: false },
-    active: { type: Boolean, default: false }
+    active: { type: Boolean, default: false },
   },
   computed: {
     seed() {
@@ -33,7 +33,7 @@ export default {
       let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
       let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
       return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
       };
     },
     styleForIcon() {
@@ -47,7 +47,7 @@ export default {
       let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
       return {
         background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
+        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`,
       };
     },
     characteristics() {
@@ -67,14 +67,14 @@ export default {
             opacity: this.random.floatBetween(0.1, 0.7),
             normCount: normNumItems,
             // color: this.random(100) > 0 ? "255" : "0"
-            color: "255"
+            color: "255",
           };
         });
       return items;
     },
     random() {
       return new randGen(this.seed);
-    }
+    },
   },
 
   methods: {
@@ -87,7 +87,7 @@ export default {
         background: `linear-gradient(${
           ct.deg
         }deg, rgba(${colorStr},${ct.opacity /
-          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`,
       };
     },
     stringToHashNumber(str) {
@@ -100,8 +100,8 @@ export default {
         .reduce((a, b) => {
           return (a * b) % (Number.MAX_VALUE - 1);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 

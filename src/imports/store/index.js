@@ -39,7 +39,7 @@ const createStore = () => {
       friendGoodsLoading: false,
       selectedFriendIndex: -1,
       unconfirmedTransactions: {},
-      selectedGood: null
+      selectedGood: null,
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -73,7 +73,7 @@ const createStore = () => {
           {
             name: "Me",
             id: state.accountAddress,
-          }
+          },
         ];
         state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
       },
@@ -133,7 +133,7 @@ const createStore = () => {
       },
       ["selectGood"](state, good) {
         state.selectedGood = good;
-      }
+      },
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -301,7 +301,7 @@ const createStore = () => {
         ).send();
         await context.state.escrowContract.methods.setPrice(
           id,
-          dapp.web3.utils.toWei(price, 'ether'), // TODO Justus 2018-05-09
+          dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
         ).send();
       },
 
@@ -324,7 +324,7 @@ const createStore = () => {
         if (allowance.lt(price)) {
           await context.state.asobiCoinContract.methods.approve(
             context.state.escrowContract.options.address,
-            dapp.web3.utils.toWei(price, 'ether'), // TODO Justus 2018-05-09
+            dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         }
         await context.state.escrowContract.methods.swap(
@@ -335,7 +335,7 @@ const createStore = () => {
 
       async sendCoinsToFriend(context, { friend, amount }) {
         const address = friend.id;
-        amount = dapp.web3.utils.toWei(amount, 'ether');
+        amount = dapp.web3.utils.toWei(amount, "ether");
         await context.state.asobiCoinContract.methods.mint(
           address,
           amount,

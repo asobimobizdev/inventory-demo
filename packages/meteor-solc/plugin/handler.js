@@ -19,7 +19,7 @@ class SolidityCompiler {
       return read(fullPath);
     }
     return {
-      error: "File not found"
+      error: "File not found",
     };
   }
 
