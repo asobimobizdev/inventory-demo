@@ -12,9 +12,6 @@
         <el-menu-item index="/friends">
           <router-link :to="{ name: 'friends' }" exact>Friends</router-link>
         </el-menu-item>
-        <el-menu-item index="/contract">
-          <router-link :to="{ name: 'contract' }" exact>Contract</router-link>
-        </el-menu-item>
       </el-menu>
     </el-header>
 
@@ -24,10 +21,7 @@
 </template>
 
 <script>
-// import AppNav from "./AppNav.vue";
-
 export default {
-  // components: { AppNav }
   created() {},
   data() {
     return {};

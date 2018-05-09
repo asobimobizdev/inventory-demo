@@ -1,6 +1,5 @@
 <template>
   <el-main class="full-centered-content">
-    <add-contract class="add-contract" ></add-contract>
     <el-card class="create-contract-box full-centered-content">
       <el-button @click="createGoodsContract()" type="primary" round >Create Goods Contract</el-button>
     </el-card>
@@ -12,13 +11,9 @@
 
 <script>
 import dappMixin from "./../mixins/dapp";
-import AddContract from "./../components/AddContract.vue";
 
 export default {
   mixins: [dappMixin],
-  components: {
-    "add-contract": AddContract,
-  },
   data() {
     return {};
   },
