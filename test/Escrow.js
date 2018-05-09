@@ -7,7 +7,7 @@ const AsobiCoin = artifacts.require("contracts/AsobiCoin.sol");
 const Escrow = artifacts.require("contracts/Escrow.sol");
 
 contract("Escrow", accounts => {
-  const owner = accounts[0]
+  const owner = accounts[0];
   const buyer = accounts[1];
   const seller = accounts[2];
   const buyerOptions = {from: buyer};
