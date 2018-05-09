@@ -9,7 +9,14 @@
         <div class="collection grid">
           <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
             <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed">
-              <good-item v-bind="good"></good-item>
+              <good-item v-bind="good">
+                <el-switch
+                  v-model="good.forSale"
+                  active-text="For Sale"
+                  @change="onGoodForSaleChanged(good)"
+                  >
+                  </el-switch>
+              </good-item>
             </div>
           </draggable>
         </div>
@@ -25,12 +32,13 @@
               :value="index">
             </el-option>
           </el-select>
-
         </div>
         <div class="collection list">
           <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true }" :move="checkMoveFromFriendGoods">
             <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed">
-              <good-item v-bind="good"></good-item>
+              <good-item v-bind="good" :hasDrawer="good.forSale">
+                <el-button v-if="good.forSale" @click="buyGood(good)" round>BUY</el-button>
+              </good-item>
             </div>
           </draggable>
         </div>
@@ -108,6 +116,12 @@ export default {
 
       this.$store.dispatch("transferGoodToSelectedFriend", good);
     },
+    onGoodForSaleChanged(good) {
+      this.$store.dispatch("setGoodForSale", good);
+    },
+    buyGood(good) {
+      this.$store.dispatch("buyGood", good);
+    },
   },
 };
 </script>
@@ -127,7 +141,7 @@ export default {
   background-color #fff
 
   >.content
-    background-color #f0f0f0
+    background-color #eee
     width 100%
     padding 4px
     display flex
@@ -144,8 +158,21 @@ export default {
     background-color #fff
     height 60px
     padding 10px
+
     >h1
       line-height 40px
+
+    position relative
+    &:after
+      content: ""
+      position absolute
+      height 16px
+      background linear-gradient(180deg, alpha(#000,0.05), alpha(#000,0)), linear-gradient(180deg, alpha(#000,0.02) 0%, alpha(#000,0) 20%)
+      left 0
+      right 0
+      bottom -16px
+      pointer-events none
+
   .collection
     flex 1 1 auto
 
@@ -225,10 +252,22 @@ export default {
   width 300px
   height 100%
   >.head
+    // background-color alpha(#000,0.02)
     >*
       width 100%
   >.collection
     .item
       height 120px
+
+  position relative
+  &:after
+    content: ""
+    position absolute
+    width 16px
+    background linear-gradient(90deg, alpha(#000,0.05), alpha(#000,0)), linear-gradient(90deg, alpha(#000,0.02) 0%, alpha(#000,0) 20%)
+    top 0
+    bottom 0
+    left 0
+    pointer-events none
 
 </style>

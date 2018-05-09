@@ -54,7 +54,7 @@ export default class Dapp {
       },
     );
     const gas = await promise.estimateGas();
-    return await promise.send({gas});
+    return await promise.send({ gas });
   }
 
   async getTokensForAddress(token, address) {
@@ -65,6 +65,7 @@ export default class Dapp {
         {
           id: await token.methods.tokenOfOwnerByIndex(address, i).call(),
           confirmed: true,
+          forSale: Math.random() > 0.5,
         }
       );
     }
