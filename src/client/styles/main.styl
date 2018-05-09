@@ -19,10 +19,10 @@
 
   background-color: alpha(#fff, 1)
 
+
   >.container
     min-height 120px
 
-    background-color alpha(#000,0.05)
     >.item
       background-color: alpha(#000, 0.0)
       display flex
@@ -33,20 +33,22 @@
       align-items: center;
 
   &.list
+    background-color alpha(#fff,1)
     >.container
-        display grid
-        padding 4px
-        grid-gap 4px
+      display grid
+      padding 8px
+      grid-gap 4px
 
       >.item
-        margin 2px
+        margin 0px
 
   &.grid
+    background-color alpha(#fff,1)
     >.container
-        display grid
-        padding 4px
-        grid-gap 4px
-        grid-template-columns repeat(auto-fit, minmax(120px,1fr));
+      display grid
+      padding 8px
+      grid-gap 4px
+      grid-template-columns repeat(auto-fit, minmax(180px,1fr));
 
 .item.el-loading-parent--relative
   >div.el-loading-mask

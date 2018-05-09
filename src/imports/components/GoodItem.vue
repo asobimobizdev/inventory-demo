@@ -1,11 +1,13 @@
 <template>
-<div class="good" :style="styleForBg">
+<div class="good" :style="styleForBg" :class="{ 'has-drawer': hasDrawer }">
   <div class="icon" :style="styleForIcon">
     <div class="chars">
       <div v-for="(char,index) in characteristics" :key="index" :style="styleForCt(char)"></div>
     </div>
   </div>
-  <div class="label">{{id}}</div>
+  <div class="drawer" v-if="hasDrawer">
+    <slot></slot>
+  </div>
 </div>
 </template>
 
@@ -16,6 +18,8 @@ export default {
   props: {
     id: String,
     confirmed: Boolean,
+    forSale: Boolean,
+    hasDrawer: { type: Boolean, default: true },
   },
   computed: {
     seed() {
@@ -138,32 +142,32 @@ export default {
         border-radius 50%
         transform translate(-50%, -50%)
 
+  &.has-drawer
+    >.drawer
+      display block
+      margin 0
+      padding 0 10px
+      text-align center
+      background-color alpha(#fff,0.8)
+      line-height 60px
+      height 70px
+      letter-spacing 0.1em
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
 
-  >.label
-    display block
-    margin 0
-    padding 0 10px
-    text-align center
-    background-color alpha(#fff,0.1)
-    line-height 20px
-    height 20px
-    letter-spacing 0.1em
-    white-space nowrap
-    overflow hidden
-    text-overflow ellipsis
+      position absolute
 
-    position absolute
+      bottom 0
+      left 0
+      right 0
 
-    bottom 0
-    left 0
-    right 0
+      transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
+      transform translate(0,70px)
 
-    transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
-    transform translate(0,20px)
-
-  &:hover,&:active
-    >.icon
-      transform translate(0,-10px)
-    >.label
-      transform translate(0,0px)
+    &:hover,&:active
+      >.icon
+        transform translate(0,-30px)
+      >.drawer
+        transform translate(0,10px)
 </style>

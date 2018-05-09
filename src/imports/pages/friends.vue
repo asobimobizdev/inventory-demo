@@ -42,10 +42,11 @@
     <el-table-column
       fixed="right"
       label=""
-      width="60"
-      align="center"
+      width="240"
+      align="right"
       >
-      <template slot-scope="scope" align="right">
+      <template slot-scope="scope" >
+        <el-button v-if="isGoodsAdmin" @click="sendCoinsToFriend(scope.$index)" type="warning" icon="el-icon-plus" round>100 ₳</el-button>
         <el-button v-if="isGoodsAdmin" @click="createGoodForFriendAt(scope.$index)" type="success" icon="el-icon-plus" circle></el-button>
         <el-button @click="deleteFriendAt(scope.$index)" type="danger" icon="el-icon-delete" circle></el-button>
       </template>
@@ -116,6 +117,10 @@ export default {
     deleteFriendAt(index) {
       const friend = this.$store.state.friends[index];
       this.$store.dispatch("deleteFriend", friend);
+    },
+    sendCoinsToFriend(index) {
+      const friend = this.$store.state.friends[index];
+      this.$store.dispatch("sendCoinsToFriend", { friend, ammount: 100 });
     },
   },
 };
