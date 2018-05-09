@@ -26,6 +26,7 @@ const createStore = () => {
     state: {
       dappInit: false,
       isGoodsAdmin: false,
+      isAsobiCoinAdmin: false,
       asobiCoinContract: null,
       escrowContract: null,
       goodsContract: null,
@@ -47,6 +48,9 @@ const createStore = () => {
       ["isGoodsAdmin"](state, isGoodsAdmin) {
         state.isGoodsAdmin = isGoodsAdmin;
       },
+      ["isAsobiCoinAdmin"](state, isAsobiCoinAdmin) {
+        state.isAsobiCoinAdmin = isAsobiCoinAdmin;
+      },
       ["goods"](state, goods) {
         goods.forEach(good => {
           const from = state.accountAddress;
@@ -65,7 +69,12 @@ const createStore = () => {
         state.goodsLoading = loading;
       },
       ["friends"](state, friends) {
-        state.friends = friends || [];
+        state.friends = friends || [
+          {
+            name: "Me",
+            id: state.accountAddress,
+          }
+        ];
         state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
       },
       ["friendsLoading"](state, loading) {
@@ -107,7 +116,7 @@ const createStore = () => {
       },
       ["escrowContract"](state, address) {
         state.escrowContract = dapp.getContractAt(
-          dapp.contracts.EscrowContract,
+          dapp.contracts.Escrow,
           address,
         );
       },
@@ -158,7 +167,8 @@ const createStore = () => {
       async getOwnGoods(context) {
         let goods = await dapp.getTokensForAddress(
           context.state.goodsContract,
-          dapp.defaultAccount,
+          context.state.escrowContract,
+          context.state.accountAddress,
         );
         goods.sort((a, b) => { return a.id > b.id; });
         if (!isEqual(context.state.goods, goods)) {
@@ -177,6 +187,7 @@ const createStore = () => {
         ].id;
         const goods = await dapp.getTokensForAddress(
           context.state.goodsContract,
+          context.state.escrowContract,
           address,
         );
 
@@ -247,7 +258,7 @@ const createStore = () => {
       async transferToken(context, { address, tokenID }) {
         await context.state.goodsContract.methods.approve(address, tokenID).send();
         await context.state.goodsContract.methods.transferFrom(
-          dapp.defaultAccount,
+          context.state.accountAddress,
           address,
           tokenID,
         ).send();
@@ -259,8 +270,15 @@ const createStore = () => {
       async checkGoodsAdmin(context) {
         const ownerAddress = await context.state.goodsContract.methods.owner(
         ).call();
-        const isOwner = ownerAddress == dapp.defaultAccount;
+        const isOwner = ownerAddress == context.state.accountAddress;
         context.commit("isGoodsAdmin", isOwner);
+      },
+
+      async checkAsobiCoinAdmin(context) {
+        const ownerAddress = await context.state.asobiCoinContract.methods.owner(
+        ).call();
+        const isOwner = ownerAddress === context.state.accountAddress;
+        context.commit("isAsobiCoinAdmin", isOwner);
       },
 
       async createGoodFor(context, address) {
@@ -268,17 +286,60 @@ const createStore = () => {
         await context.state.goodsContract.methods.mint(address, tokenID).send();
       },
 
-      async sendCoinsToFriend(context, { friend, ammount }) {
-        const address = friend.id;
-        console.log("sendCoinsToFriend", address, ammount);
-      },
-
       async setGoodForSale(context, { id, forSale }) {
-        console.log("setGoodForSale", id, forSale);
+        const price = "100";
+        if (!forSale) {
+          await context.state.goodsContract.methods.approve(
+            "0x0",
+            id,
+          ).send();
+          return;
+        }
+        await context.state.goodsContract.methods.approve(
+          context.state.escrowContract.options.address,
+          id,
+        ).send();
+        await context.state.escrowContract.methods.setPrice(
+          id,
+          dapp.web3.utils.toWei(price, 'ether'), // TODO Justus 2018-05-09
+        ).send();
       },
 
       async buyGood(context, { id }) {
-        console.log("buyGood", id);
+        const price = "100";
+        // Find out the seller ID
+        // XXX Feels redundant Justus 2018-05-09
+        const seller = await context.state.goodsContract.methods.ownerOf(
+          id,
+        ).call();
+        // Check whether we have already approved spending
+        const allowance = dapp.web3.utils.toBN(
+          await context.state.asobiCoinContract.methods.allowance(
+            context.state.accountAddress,
+            context.state.escrowContract.options.address,
+          ).call()
+        );
+
+        // Approve spending
+        if (allowance.lt(price)) {
+          await context.state.asobiCoinContract.methods.approve(
+            context.state.escrowContract.options.address,
+            dapp.web3.utils.toWei(price, 'ether'), // TODO Justus 2018-05-09
+          ).send();
+        }
+        await context.state.escrowContract.methods.swap(
+          seller,
+          id,
+        ).send();
+      },
+
+      async sendCoinsToFriend(context, { friend, amount }) {
+        const address = friend.id;
+        amount = dapp.web3.utils.toWei(amount, 'ether');
+        await context.state.asobiCoinContract.methods.mint(
+          address,
+          amount,
+        ).send();
       },
 
     },

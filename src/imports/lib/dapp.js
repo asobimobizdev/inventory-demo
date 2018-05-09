@@ -60,16 +60,20 @@ export default class Dapp {
     return await promise.send({ gas });
   }
 
-  async getTokensForAddress(token, address) {
+  async getTokensForAddress(token, escrow, address) {
     const balance = await token.methods.balanceOf(address).call();
     const items = [];
     for (let i = 0; i < balance; i += 1) {
+      const id = await token.methods.tokenOfOwnerByIndex(address, i).call();
+      const approved = await token.methods.getApproved(id).call();
       items.push(
         {
-          id: await token.methods.tokenOfOwnerByIndex(address, i).call(),
+          id: id,
           confirmed: true,
-          forSale: Math.random() > 0.1,
-          price: Math.round(Math.random() * 100 + 10)
+          price: await escrow.methods.getPrice(id),
+          // XXX there has to be a more intelligent way of checking
+          // for the null address Justus 2018-05-09
+          forSale: approved !== "0x0000000000000000000000000000000000000000",
         }
       );
     }

@@ -46,7 +46,7 @@
       align="right"
       >
       <template slot-scope="scope" >
-        <el-button v-if="isGoodsAdmin" @click="sendCoinsToFriend(scope.$index)" type="warning" icon="el-icon-plus" round>100 ₳</el-button>
+        <el-button v-if="isAsobiCoinAdmin" @click="sendCoinsToFriend(scope.$index)" type="warning" icon="el-icon-plus" round>100 ₳</el-button>
         <el-button v-if="isGoodsAdmin" @click="createGoodForFriendAt(scope.$index)" type="success" icon="el-icon-plus" circle></el-button>
         <el-button @click="deleteFriendAt(scope.$index)" type="danger" icon="el-icon-delete" circle></el-button>
       </template>
@@ -64,6 +64,7 @@ export default {
   mounted() {
     this.$store.dispatch("getFriends");
     this.$store.dispatch("checkGoodsAdmin");
+    this.$store.dispatch("checkAsobiCoinAdmin");
   },
   data() {
     return {
@@ -97,6 +98,9 @@ export default {
     isGoodsAdmin() {
       return this.$store.state.isGoodsAdmin;
     },
+    isAsobiCoinAdmin() {
+      return this.$store.state.isAsobiCoinAdmin;
+    },
   },
   methods: {
     submitForm(formName) {
@@ -120,7 +124,7 @@ export default {
     },
     sendCoinsToFriend(index) {
       const friend = this.$store.state.friends[index];
-      this.$store.dispatch("sendCoinsToFriend", { friend, ammount: 100 });
+      this.$store.dispatch("sendCoinsToFriend", { friend, amount: "100" });
     },
   },
 };
