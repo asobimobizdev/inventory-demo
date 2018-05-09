@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
-import "./AsobiCoin.sol";
-import "./Goods.sol";
+import "contracts/AsobiCoin.sol";
+import "contracts/Goods.sol";
 
 
 contract Escrow {

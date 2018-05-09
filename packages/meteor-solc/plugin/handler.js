@@ -5,15 +5,22 @@ const solc = Npm.require("solc");
 
 class SolidityCompiler {
   findImports(p) {
-    const fullPath = path.join("node_modules", p);
-    if (!fs.existsSync(fullPath)) {
-      return { error: "File not found" };
-    }
-    const contents = {
-      contents: fs.readFileSync(fullPath, "utf8"),
+    const read = (p) => {
+      return {
+        contents: fs.readFileSync(p, "utf8"),
+      };
     };
-
-    return contents;
+    if (fs.existsSync(p)) {
+      return read(p);
+    }
+    // Attempt 1, node_modules:
+    const fullPath = path.join("node_modules", p);
+    if (fs.existsSync(fullPath)) {
+      return read(fullPath);
+    }
+    return {
+      error: "File not found"
+    };
   }
 
   // WIP
