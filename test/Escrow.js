@@ -33,10 +33,12 @@ contract("Escrow", accounts => {
     it("won't let the owner set the price if not approved", async () => {
       await assertRejected(escrow.setPrice(goodID, price, sellerOptions));
     });
+
     describe("with approved transfer", () => {
       beforeEach(async () => {
         await goods.approve(escrow.address, goodID, sellerOptions);
       });
+
       it("will let the owner of a good set the price", async () => {
         await escrow.setPrice(goodID, price, sellerOptions);
         assert.equal(await escrow.getPrice(goodID), price);
@@ -60,7 +62,7 @@ contract("Escrow", accounts => {
 
     it("won't swap", async () => {
       await asobiCoin.approve(escrow.address, price - 1, buyerOptions);
-      await assertRejected(escrow.swap(seller, goodID, buyerOptions));
+      await assertRejected(escrow.swap(goodID, buyerOptions));
     });
 
     describe("with price", () => {
@@ -70,7 +72,7 @@ contract("Escrow", accounts => {
 
       it("swaps when the buyer initiates", async () => {
         await asobiCoin.approve(escrow.address, price, buyerOptions);
-        await escrow.swap(seller, goodID, buyerOptions);
+        await escrow.swap(goodID, buyerOptions);
 
         assert.equal(await goods.ownerOf(goodID), buyer);
         assert.equal(await asobiCoin.balanceOf(seller), price);
@@ -78,7 +80,7 @@ contract("Escrow", accounts => {
 
       it("won't swap if the buyer does not approve enough", async () => {
         await asobiCoin.approve(escrow.address, price - 1, buyerOptions);
-        await assertRejected(escrow.swap(seller, goodID, buyerOptions));
+        await assertRejected(escrow.swap(goodID, buyerOptions));
       });
     });
   });

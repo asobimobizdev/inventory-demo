@@ -14,6 +14,10 @@ contract Escrow {
         goods = _goods;
     }
 
+    function isListed(uint256 goodID) public view returns (bool) {
+        return goodPrices[goodID] > 0;
+    }
+
     function getPrice(uint256 goodID) public view returns (uint256) {
         return goodPrices[goodID];
     }
@@ -26,10 +30,11 @@ contract Escrow {
         goodPrices[goodID] = price;
     }
 
-    function swap(address seller, uint256 goodID) external {
+    function swap(uint256 goodID) external {
+        require(isListed(goodID));
         address buyer = msg.sender;
+        address seller = goods.ownerOf(goodID);
         uint256 price = getPrice(goodID);
-        require(price > 0);
 
         require(asobiCoin.transferFrom(buyer, seller, price));
         goods.transferFrom(seller, buyer, goodID);

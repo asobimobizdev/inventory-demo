@@ -8,7 +8,7 @@ const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
-const ESCROW_ADDRESS = "0x4d12dB4F577FC61c4b38112B2AA1AF7767EA1d7a";
+const ESCROW_ADDRESS = "0x1fB678e05751eED268c013e83A7c401F89D6c986";
 
 function isEqual(a, b) {
   if (a.length != b.length) {
@@ -354,12 +354,13 @@ const createStore = () => {
             context.state.escrowContract.options.address,
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
+        } else {
+          console.log("Current allowance for escrow contract", allowance);
         }
         console.log("Seller", seller, "ID", id);
-        await context.state.escrowContract.methods.swap(
-          seller,
-          id,
-        ).send();
+        let swap = context.state.escrowContract.methods.swap(id);
+        console.log("Swap transaction to be executed", swap);
+        await swap.send();
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
