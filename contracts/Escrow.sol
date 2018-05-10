@@ -20,6 +20,7 @@ contract Escrow {
 
     function setPrice(uint256 goodID, uint256 price) external {
         require(goods.ownerOf(goodID) == msg.sender);
+        require(goods.getApproved(goodID) == address(this));
         require(price > 0);
 
         goodPrices[goodID] = price;

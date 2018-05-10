@@ -8,7 +8,7 @@ const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
-const ESCROW_ADDRESS = "0xdDFa851595C76213b98e83dB0C8A287581BCE2d8";
+const ESCROW_ADDRESS = "0x4d12dB4F577FC61c4b38112B2AA1AF7767EA1d7a";
 
 function isEqual(a, b) {
   if (a.length != b.length) {
