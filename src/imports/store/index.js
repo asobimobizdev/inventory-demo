@@ -2,6 +2,7 @@ import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
+import seedParams from "../lib/seedParams";
 
 const localStorage = window.localStorage;
 
@@ -19,6 +20,15 @@ function isEqual(a, b) {
   }
 
   return true;
+}
+
+function growGoodFromId(id) {
+  good = {};
+  good.seed = seedParams.seedFromString(id);
+  good.hue = seedParams.hueFromSeed(good.seed);
+  good.name = seedParams.nameForSeedWithHSL(good.seed, good.hue + 35, 80, 70);
+
+  return good
 }
 
 const createStore = () => {
@@ -59,9 +69,15 @@ const createStore = () => {
           const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
-
-          good.isOwned = true;
         });
+
+        goods = goods.map(good => {
+          return {
+            ...good,
+            ...growGoodFromId(good.id),
+            isOwned: true
+          }
+        })
 
         state.goods = goods;
       },
@@ -86,8 +102,16 @@ const createStore = () => {
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
-          good.isOwned = false;
         });
+
+        goods = goods.map(good => {
+          return {
+            ...good,
+            ...growGoodFromId(good.id),
+            isOwned: false
+          }
+        })
+
         state.friendGoods = goods;
       },
       ["friendGoodsLoading"](state, loading) {

@@ -21,16 +21,15 @@ export default {
     confirmed: Boolean,
     forSale: Boolean,
     hasDrawer: { type: Boolean, default: false },
-    active: { type: Boolean, default: false }
+    active: { type: Boolean, default: false },
+    seed: { type: Number, default: 0 },
+    hue: { type: Number, default: 0 }
   },
   computed: {
-    seed() {
-      return this.stringToHashNumber(this.id);
-    },
     styleForBg() {
       let seed = this.seed;
       let angle = (seed * 1330.443445) % 120 - 60;
-      let colorH = (seed * 156.4223445) % 360;
+      let colorH = this.hue;
       let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
       let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
       return {
@@ -40,7 +39,7 @@ export default {
     styleForIcon() {
       let seed = this.seed;
       let angle = (seed * 130.43445) % 360;
-      let colorH = (seed * 156.4223445) % 360;
+      let colorH = this.hue;
       let startColor = `hsl(${colorH},     80%, 70%)`;
       let stopColor = `hsl(${colorH + 70}, 80%, 70%)`;
       let shadowColor = `hsla(${colorH + 80}, 100%, 40%,0.2)`;
@@ -90,17 +89,6 @@ export default {
         }deg, rgba(${colorStr},${ct.opacity /
           (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
       };
-    },
-    stringToHashNumber(str) {
-      str = String(str);
-      return str
-        .split("")
-        .map(it => {
-          return it.charCodeAt(0) * 0.12345678;
-        })
-        .reduce((a, b) => {
-          return (a * b) % (Number.MAX_VALUE - 1);
-        });
     }
   }
 };
