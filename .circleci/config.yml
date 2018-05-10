@@ -28,4 +28,4 @@ jobs:
           paths:
             - ~/asobicoin/node_modules
             - ~/.meteor
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "package.json" }}-{{ checksum ".meteor/packages" }}
