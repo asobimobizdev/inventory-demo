@@ -334,8 +334,13 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-        const price = "100";
         // Check whether we have already approved spending
+        const price = dapp.web3.utils.toBN(
+          await context.state.escrowContract.methods.getPrice(
+            id,
+          ).call()
+        );
+
         const allowance = dapp.web3.utils.toBN(
           await context.state.asobiCoinContract.methods.allowance(
             context.state.accountAddress,
@@ -350,10 +355,8 @@ const createStore = () => {
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         } else {
-          console.log("Current allowance for escrow contract", allowance);
         }
         let swap = context.state.escrowContract.methods.swap(id);
-        console.log("Swap transaction to be executed", swap);
         await swap.send();
       },
 
