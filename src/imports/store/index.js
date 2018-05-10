@@ -50,7 +50,7 @@ const createStore = () => {
       selectedFriendIndex: -1,
       unconfirmedTransactions: {},
       selectedGood: null,
-      balance: 3000,
+      balance: 0,
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -159,6 +159,9 @@ const createStore = () => {
       ["selectGood"](state, good) {
         state.selectedGood = good;
       },
+      ["balance"](state, balance) {
+        state.balance = dapp.web3.utils.fromWei(balance);
+      },
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -187,6 +190,15 @@ const createStore = () => {
         });
         context.commit("friends", friends);
         context.dispatch("saveFriends");
+      },
+
+      async getBalance(context) {
+        context.commit(
+          "balance",
+          await context.state.asobiCoinContract.methods.balanceOf(
+            context.state.accountAddress,
+          ).call(),
+        );
       },
 
       async getOwnGoods(context) {
