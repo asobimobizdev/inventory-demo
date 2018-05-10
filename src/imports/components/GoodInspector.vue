@@ -8,7 +8,7 @@
       <div class="infos">
         <h1>{{good.name}}</h1>
         <div v-if="good.isOwned">
-          <el-input-number v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
+          <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
           <el-switch
             v-model="good.forSale"
             active-text="For Sale"
@@ -34,15 +34,15 @@ import GoodItem from "./GoodItem.vue";
 
 export default {
   components: {
-    "good-item": GoodItem
+    "good-item": GoodItem,
   },
   props: {
-    good: Object
+    good: Object,
   },
   computed: {
     open() {
       return this.good != null;
-    }
+    },
   },
   methods: {
     close() {
@@ -55,9 +55,9 @@ export default {
       this.$store.dispatch("buyGood", good);
     },
     priceChanged() {
-      console.log("priceChanged", this.good.price);
-    }
-  }
+      // console.log("priceChanged", this.good.price);
+    },
+  },
 };
 </script>
 

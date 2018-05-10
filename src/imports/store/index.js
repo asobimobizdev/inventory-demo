@@ -23,12 +23,12 @@ function isEqual(a, b) {
 }
 
 function growGoodFromId(id) {
-  good = {};
+  let good = {};
   good.seed = seedParams.seedFromString(id);
   good.hue = seedParams.hueFromSeed(good.seed);
   good.name = seedParams.nameForSeedWithHSL(good.seed, good.hue + 35, 80, 70);
 
-  return good
+  return good;
 }
 
 const createStore = () => {
@@ -50,6 +50,7 @@ const createStore = () => {
       selectedFriendIndex: -1,
       unconfirmedTransactions: {},
       selectedGood: null,
+      balance: 3000,
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -75,9 +76,9 @@ const createStore = () => {
           return {
             ...good,
             ...growGoodFromId(good.id),
-            isOwned: true
-          }
-        })
+            isOwned: true,
+          };
+        });
 
         state.goods = goods;
       },
@@ -108,9 +109,9 @@ const createStore = () => {
           return {
             ...good,
             ...growGoodFromId(good.id),
-            isOwned: false
-          }
-        })
+            isOwned: false,
+          };
+        });
 
         state.friendGoods = goods;
       },
@@ -394,6 +395,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
+            ...growGoodFromId(transaction.goodID),
           });
         }
 
@@ -424,6 +426,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
+            ...growGoodFromId(transaction.goodID),
           });
         }
 

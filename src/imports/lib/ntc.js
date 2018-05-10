@@ -102,7 +102,7 @@ var ntc = {
     var r = rgb[0], g = rgb[1], b = rgb[2];
     var hsl = ntc.hsl(color);
     var h = hsl[0], s = hsl[1], l = hsl[2];
-    var ndf1 = 0; ndf2 = 0; ndf = 0;
+    var ndf1 = 0; var ndf2 = 0; var ndf = 0;
     var cl = -1, df = -1;
 
     for (var i = 0; i < ntc.names.length; i++) {
@@ -125,7 +125,7 @@ var ntc = {
   // http://acko.net/dev/farbtastic
   hsl: function (color) {
 
-    var rgb = [parseInt('0x' + color.substring(1, 3)) / 255, parseInt('0x' + color.substring(3, 5)) / 255, parseInt('0x' + color.substring(5, 7)) / 255];
+    var rgb = [parseInt("0x" + color.substring(1, 3)) / 255, parseInt("0x" + color.substring(3, 5)) / 255, parseInt("0x" + color.substring(5, 7)) / 255];
     var min, max, delta, h, s, l;
     var r = rgb[0], g = rgb[1], b = rgb[2];
 
@@ -151,7 +151,7 @@ var ntc = {
   // adopted from: Farbtastic 1.2
   // http://acko.net/dev/farbtastic
   rgb: function (color) {
-    return [parseInt('0x' + color.substring(1, 3)), parseInt('0x' + color.substring(3, 5)), parseInt('0x' + color.substring(5, 7))];
+    return [parseInt("0x" + color.substring(1, 3)), parseInt("0x" + color.substring(3, 5)), parseInt("0x" + color.substring(5, 7))];
   },
 
   names: [
@@ -1720,10 +1720,10 @@ var ntc = {
     ["FFFF99", "Pale Canary"],
     ["FFFFB4", "Portafino"],
     ["FFFFF0", "Ivory"],
-    ["FFFFFF", "White"]
-  ]
+    ["FFFFFF", "White"],
+  ],
 
-}
+};
 
 ntc.init();
 
