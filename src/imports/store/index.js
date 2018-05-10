@@ -313,8 +313,8 @@ const createStore = () => {
         await context.state.goodsContract.methods.mint(address, tokenID).send();
       },
 
-      async setGoodForSale(context, { id, forSale }) {
-        const price = "100";
+      async setGoodForSale(context, { id, forSale, price }) {
+        price = String(price);
         if (!forSale) {
           await context.state.goodsContract.methods.approve(
             "0x0",
