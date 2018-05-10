@@ -275,7 +275,10 @@ const createStore = () => {
 
         p2pManager.dispatchTransaction(context.state.accountAddress, address, good.id);
 
-        context.commit("addUnconfirmedTransaction", { from: context.state.accountAddress, to: address, goodID: good.id });
+        context.commit("addUnconfirmedTransaction", {
+          from: context.state.accountAddress,
+          to: address, goodID: good.id,
+        });
         context.dispatch("transferToken", { address, tokenID });
       },
 
@@ -351,6 +354,7 @@ const createStore = () => {
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         }
+        console.log("Seller", seller, "ID", id);
         await context.state.escrowContract.methods.swap(
           seller,
           id,
