@@ -8,6 +8,7 @@
   <div class="drawer" v-if="hasDrawer">
     <slot></slot>
   </div>
+  <div class="for-sale-ribbon" v-if="forSale">FOR SALE</div>
 </div>
 </template>
 
@@ -20,7 +21,7 @@ export default {
     confirmed: Boolean,
     forSale: Boolean,
     hasDrawer: { type: Boolean, default: false },
-    active: { type: Boolean, default: false },
+    active: { type: Boolean, default: false }
   },
   computed: {
     seed() {
@@ -33,7 +34,7 @@ export default {
       let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
       let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
       return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`
       };
     },
     styleForIcon() {
@@ -47,7 +48,7 @@ export default {
       let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
       return {
         background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`,
+        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
       };
     },
     characteristics() {
@@ -67,14 +68,14 @@ export default {
             opacity: this.random.floatBetween(0.1, 0.7),
             normCount: normNumItems,
             // color: this.random(100) > 0 ? "255" : "0"
-            color: "255",
+            color: "255"
           };
         });
       return items;
     },
     random() {
       return new randGen(this.seed);
-    },
+    }
   },
 
   methods: {
@@ -87,7 +88,7 @@ export default {
         background: `linear-gradient(${
           ct.deg
         }deg, rgba(${colorStr},${ct.opacity /
-          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`,
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
       };
     },
     stringToHashNumber(str) {
@@ -100,8 +101,8 @@ export default {
         .reduce((a, b) => {
           return (a * b) % (Number.MAX_VALUE - 1);
         });
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -119,6 +120,8 @@ export default {
   align-items center
   min-width 100px
   min-height 100px
+  position relative
+  overflow hidden
 
   >.icon
     background-color #f88
@@ -144,6 +147,30 @@ export default {
         left -10px
         width 100px
         height 100px
+
+  >.drawer
+    display none
+
+  >.for-sale-ribbon
+    fillColor = #f21;
+
+    position absolute
+    background alpha(fillColor,0.6);
+    top -20px
+    right -23px
+    height 20px
+    line-height 20px
+    padding 0 10px
+    transform-origin 0 100%
+    transform rotate(45deg)
+    width 80px
+    text-align center
+    color #fff
+    box-shadow 0px 1px 6px alpha(darken(fillColor, 40%),0.3)
+    font-size 8px
+    font-weight bold
+    letter-spacing 0.1em
+
 
   &.has-drawer
     >.drawer
