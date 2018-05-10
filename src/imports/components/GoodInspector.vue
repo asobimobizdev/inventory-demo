@@ -6,7 +6,7 @@
       <good-item class="good-item" v-bind="good" :active="true"/>
 
       <div class="infos">
-        <h1>{{good.name}}</h1>
+        <h1>{{good.name}} {{good.id}}</h1>
         <div v-if="good.isOwned">
           <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
           <el-switch
