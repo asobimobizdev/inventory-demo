@@ -27,5 +27,6 @@ jobs:
       - save_cache:
           paths:
             - ~/asobicoin/node_modules
+            - ~/asobicoin/.meteor/local
             - ~/.meteor
           key: v1-dependencies-{{ checksum "package.json" }}-{{ checksum ".meteor/packages" }}

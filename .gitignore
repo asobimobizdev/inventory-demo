@@ -1,3 +1,3 @@
 node_modules/
 build/
-**/.meteor/local/
+.meteor/local/
