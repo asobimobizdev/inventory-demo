@@ -35,12 +35,13 @@
     "zeppelin-solidity": "~1.8.0"
   },
   "devDependencies": {
+    "assert-rejected": "^1.1.1",
     "babel-eslint": "^8.2.1",
     "eslint": "^4.19.1",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-vue": "^4.0.0",
-    "assert-rejected": "^1.1.1",
+    "eth-gas-reporter": "^0.1.2",
     "solium": "^1.1.7",
     "truffle-test-helpers": "0.0.5",
     "web3-utils": "^1.0.0-beta.34"
