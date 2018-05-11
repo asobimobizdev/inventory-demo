@@ -7,7 +7,7 @@
           <h1>My Goods</h1>
         </div>
         <div class="collection grid">
-          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
+          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods', forceFallback:true }" :move="checkMove" @end="onDrop">
             <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
