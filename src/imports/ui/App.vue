@@ -1,10 +1,10 @@
 <template>
   <el-container class="host">
-    <el-header>
+    <el-header class="main-header">
       <el-menu
         :router="true"
         :default-active="activeLink"
-        class="el-menu-demo"
+        class="main-menu"
         mode="horizontal">
         <el-menu-item index="/">
           <router-link :to="{ name: 'home' }" exact>Inventory</router-link>
@@ -13,6 +13,7 @@
           <router-link :to="{ name: 'friends' }" exact>Friends</router-link>
         </el-menu-item>
       </el-menu>
+      <div class="balance"><span class="label">Balance</span> <span class="value">{{balance}}₳</span></div>
     </el-header>
 
     <router-view  class="content" />
@@ -29,6 +30,9 @@ export default {
   computed: {
     activeLink() {
       return this.$route.path;
+    },
+    balance() {
+      return this.$store.state.balance;
     },
   },
 };
@@ -56,6 +60,16 @@ html
   width 100vw
   height calc(100vh - 0px)
   overflow hidden
+
+.main-header
+
+  .main-menu
+    // background alpha(#f00,0.3)
+    float left
+
+  .balance
+    float right
+    line-height 60px
 
 </style>
 

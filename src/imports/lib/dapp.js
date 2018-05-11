@@ -3,11 +3,17 @@ import { Goods } from "../../../contracts/Goods.sol";
 import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 import { Escrow } from "../../../contracts/Escrow.sol";
 
+// const WEBSOCKET_NODE = "wss://geth-light.herokuapp.com/";
+const WEBSOCKET_NODE = "wss://rinkeby.infura.io/ws";
+// const WEBSOCKET_NODE = "ws://localhost:8546/";
 
 export default class Dapp {
   constructor() {
     if (typeof window.web3 !== "undefined") {
       this.web3 = new Web3(window.web3.currentProvider);
+      this.web3Event = new Web3(
+        new Web3.providers.WebsocketProvider(WEBSOCKET_NODE)
+      );
     }
 
     this.contracts = {
@@ -30,13 +36,14 @@ export default class Dapp {
     this.web3.eth.defaultAccount = this.defaultAccount;
   }
 
-  getContract(contract, address) {
+  getContract(contract, address, web3Instance) {
+    web3Instance = web3Instance || this.web3;
     const options = {
-      from: this.web3.eth.defaultAccount,
-      gasPrice: this.web3.utils.toWei("10", "gwei"),
+      from: web3Instance.eth.defaultAccount,
+      gasPrice: web3Instance.utils.toWei("10", "gwei"),
       data: contract.bytecode,
     };
-    const instance = new this.web3.eth.Contract(
+    const instance = new web3Instance.eth.Contract(
       contract.abi,
       address,
       options,
@@ -44,12 +51,12 @@ export default class Dapp {
     return instance;
   }
 
-  getContractAt(contract, address) {
-    const contractInstance = this.getContract(contract, address);
+  getContractAt(contract, address, web3Instance) {
+    const contractInstance = this.getContract(contract, address, web3Instance);
     return contractInstance;
   }
 
-  async deployContract(contract, args) {
+  async deployContract(contract, args, web3Instance) {
     const contractInstance = this.getContract(contract);
     const promise = contractInstance.deploy(
       {
@@ -65,10 +72,12 @@ export default class Dapp {
     const items = [];
     for (let i = 0; i < balance; i += 1) {
       const id = await token.methods.tokenOfOwnerByIndex(address, i).call();
-      const approved = await token.methods.getApproved(id).call();
-      const price = dapp.web3.utils.fromWei(
+      const approved = await token.methods.getApproved(
+        id
+      ).call() === escrow.options.address;
+      const price = approved ? dapp.web3.utils.fromWei(
         await escrow.methods.getPrice(id).call(),
-      )
+      ) : null;
       items.push(
         {
           id: id,
@@ -76,7 +85,7 @@ export default class Dapp {
           price: price,
           // XXX there has to be a more intelligent way of checking
           // for the null address Justus 2018-05-09
-          forSale: approved !== "0x0000000000000000000000000000000000000000",
+          forSale: approved,
         }
       );
     }

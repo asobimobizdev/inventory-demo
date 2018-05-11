@@ -2,12 +2,13 @@ import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
+import seedParams from "../lib/seedParams";
 
 const localStorage = window.localStorage;
 
-const GOODS_ADDRESS = "0x3E87ccbD9Fc564d1dB41CC10687B85d5C1cA715D";
-const ASOBI_COIN_ADDRESS = "0xc191e855c3EDeD11db42A3f78E5c6e1FC1c404bA";
-const ESCROW_ADDRESS = "0x4bb12794E70F29E12d287Dd0f9Ae57a6AbE15531";
+const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
+const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
+const ESCROW_ADDRESS = "0x1fB678e05751eED268c013e83A7c401F89D6c986";
 
 function isEqual(a, b) {
   if (a.length != b.length) {
@@ -21,6 +22,15 @@ function isEqual(a, b) {
   return true;
 }
 
+function growGoodFromId(id) {
+  let good = {};
+  good.seed = seedParams.seedFromString(id);
+  good.hue = seedParams.hueFromSeed(good.seed);
+  good.name = seedParams.nameForSeedWithHSL(good.seed, good.hue + 35, 80, 70);
+
+  return good;
+}
+
 const createStore = () => {
   return new Vuex.Store({
     state: {
@@ -28,6 +38,7 @@ const createStore = () => {
       isGoodsAdmin: false,
       isAsobiCoinAdmin: false,
       asobiCoinContract: null,
+      asobiCoinContractEvents: null,
       escrowContract: null,
       goodsContract: null,
       accountAddress: null,
@@ -40,6 +51,7 @@ const createStore = () => {
       selectedFriendIndex: -1,
       unconfirmedTransactions: {},
       selectedGood: null,
+      balance: 0,
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -59,8 +71,14 @@ const createStore = () => {
           const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+        });
 
-          good.isOwned = true;
+        goods = goods.map(good => {
+          return {
+            ...good,
+            ...growGoodFromId(good.id),
+            isOwned: true,
+          };
         });
 
         state.goods = goods;
@@ -86,8 +104,16 @@ const createStore = () => {
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
-          good.isOwned = false;
         });
+
+        goods = goods.map(good => {
+          return {
+            ...good,
+            ...growGoodFromId(good.id),
+            isOwned: false,
+          };
+        });
+
         state.friendGoods = goods;
       },
       ["friendGoodsLoading"](state, loading) {
@@ -107,11 +133,21 @@ const createStore = () => {
           dapp.contracts.AsobiCoin,
           address,
         );
+        state.asobiCoinContractEvents = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          address,
+          dapp.web3Event,
+        );
       },
       ["goodsContract"](state, address) {
         state.goodsContract = dapp.getContractAt(
           dapp.contracts.Goods,
           address,
+        );
+        state.goodsContractEvents = dapp.getContractAt(
+          dapp.contracts.Goods,
+          address,
+          dapp.web3Event,
         );
       },
       ["escrowContract"](state, address) {
@@ -133,6 +169,9 @@ const createStore = () => {
       },
       ["selectGood"](state, good) {
         state.selectedGood = good;
+      },
+      ["balance"](state, balance) {
+        state.balance = dapp.web3.utils.fromWei(balance);
       },
     },
     actions: {
@@ -162,6 +201,15 @@ const createStore = () => {
         });
         context.commit("friends", friends);
         context.dispatch("saveFriends");
+      },
+
+      async getBalance(context) {
+        context.commit(
+          "balance",
+          await context.state.asobiCoinContract.methods.balanceOf(
+            context.state.accountAddress,
+          ).call(),
+        );
       },
 
       async getOwnGoods(context) {
@@ -222,20 +270,25 @@ const createStore = () => {
       getGoodsContract(context) {
         context.commit("goodsContract", GOODS_ADDRESS);
 
-        // XXX hack Justus 2018-04-2"7",
-        window.setInterval(() => {
-          context.dispatch("getOwnGoods");
-          context.dispatch("getSelectedFriendGoods");
-          if (this.getOwnGoodsTimer) {
-            window.clearTimeout(this.getOwnGoodsTimer);
-          }
-        }, 1000);
+        context.state.goodsContractEvents.events.allEvents()
+          .on("data", (event) => {
+            console.log("Goods event", event);
+            context.dispatch("getOwnGoods");
+            context.dispatch("getSelectedFriendGoods");
+          })
+          .on("error", console.log);
 
         p2pManager.subscribe(context.state.accountAddress, context);
       },
 
       getAsobiCoinContract(context) {
         context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
+        context.state.asobiCoinContractEvents.events.Transfer()
+          .on("data", (event) => {
+            console.log("AsobiCoin Transfer event", event);
+            context.dispatch("getBalance");
+          })
+          .on("error", console.log);
       },
 
       getEscrowContract(context) {
@@ -251,7 +304,10 @@ const createStore = () => {
 
         p2pManager.dispatchTransaction(context.state.accountAddress, address, good.id);
 
-        context.commit("addUnconfirmedTransaction", { from: context.state.accountAddress, to: address, goodID: good.id });
+        context.commit("addUnconfirmedTransaction", {
+          from: context.state.accountAddress,
+          to: address, goodID: good.id,
+        });
         context.dispatch("transferToken", { address, tokenID });
       },
 
@@ -286,8 +342,8 @@ const createStore = () => {
         await context.state.goodsContract.methods.mint(address, tokenID).send();
       },
 
-      async setGoodForSale(context, { id, forSale }) {
-        const price = "100";
+      async setGoodForSale(context, { id, forSale, price }) {
+        price = String(price);
         if (!forSale) {
           await context.state.goodsContract.methods.approve(
             "0x0",
@@ -295,10 +351,18 @@ const createStore = () => {
           ).send();
           return;
         }
-        await context.state.goodsContract.methods.approve(
-          context.state.escrowContract.options.address,
+        const approved = await context.state.goodsContract.methods.getApproved(
           id,
-        ).send();
+        );
+        if (context.state.escrowContract.options.address !== approved) {
+          console.log("Escrow contract not yet approved");
+          await context.state.goodsContract.methods.approve(
+            context.state.escrowContract.options.address,
+            id,
+          ).send();
+        } else {
+          console.log("Escrow contract already approved");
+        }
         await context.state.escrowContract.methods.setPrice(
           id,
           dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
@@ -306,13 +370,13 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-        const price = "100";
-        // Find out the seller ID
-        // XXX Feels redundant Justus 2018-05-09
-        const seller = await context.state.goodsContract.methods.ownerOf(
-          id,
-        ).call();
         // Check whether we have already approved spending
+        const price = dapp.web3.utils.toBN(
+          await context.state.escrowContract.methods.getPrice(
+            id,
+          ).call()
+        );
+
         const allowance = dapp.web3.utils.toBN(
           await context.state.asobiCoinContract.methods.allowance(
             context.state.accountAddress,
@@ -326,11 +390,11 @@ const createStore = () => {
             context.state.escrowContract.options.address,
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
+        } else {
+          console.log("Allowance is suffcient");
         }
-        await context.state.escrowContract.methods.swap(
-          seller,
-          id,
-        ).send();
+        let swap = context.state.escrowContract.methods.swap(id);
+        await swap.send();
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
@@ -366,6 +430,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
+            ...growGoodFromId(transaction.goodID),
           });
         }
 
@@ -396,6 +461,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
+            ...growGoodFromId(transaction.goodID),
           });
         }
 

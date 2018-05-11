@@ -6,9 +6,9 @@
       <good-item class="good-item" v-bind="good" :active="true"/>
 
       <div class="infos">
-        <h1>Name{{good.name}}</h1>
+        <h1>{{good.name}} {{good.id}}</h1>
         <div v-if="good.isOwned">
-          <el-input-number v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
+          <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
           <el-switch
             v-model="good.forSale"
             active-text="For Sale"
@@ -55,7 +55,7 @@ export default {
       this.$store.dispatch("buyGood", good);
     },
     priceChanged() {
-      console.log("priceChanged", this.good.price);
+      // console.log("priceChanged", this.good.price);
     },
   },
 };
@@ -111,9 +111,12 @@ export default {
         >h1
           // background alpha(#fff,0.8)
           height 40px
-          line-height 40px
+          line-height 30px
           text-transform uppercase
-
+          font-weight bold
+          border-bottom solid 1px rgba(#000,0.1)
+          margin-bottom 16px
+          text-indent: 8px;
   &.closed
     >.drawer
       transform translate(0,100%)

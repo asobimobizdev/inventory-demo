@@ -21,26 +21,25 @@ export default {
     confirmed: Boolean,
     forSale: Boolean,
     hasDrawer: { type: Boolean, default: false },
-    active: { type: Boolean, default: false }
+    active: { type: Boolean, default: false },
+    seed: { type: Number, default: 0 },
+    hue: { type: Number, default: 0 },
   },
   computed: {
-    seed() {
-      return this.stringToHashNumber(this.id);
-    },
     styleForBg() {
       let seed = this.seed;
       let angle = (seed * 1330.443445) % 120 - 60;
-      let colorH = (seed * 156.4223445) % 360;
+      let colorH = this.hue;
       let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
       let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
       return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`
+        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
       };
     },
     styleForIcon() {
       let seed = this.seed;
       let angle = (seed * 130.43445) % 360;
-      let colorH = (seed * 156.4223445) % 360;
+      let colorH = this.hue;
       let startColor = `hsl(${colorH},     80%, 70%)`;
       let stopColor = `hsl(${colorH + 70}, 80%, 70%)`;
       let shadowColor = `hsla(${colorH + 80}, 100%, 40%,0.2)`;
@@ -48,7 +47,7 @@ export default {
       let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
       return {
         background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`
+        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`,
       };
     },
     characteristics() {
@@ -68,14 +67,14 @@ export default {
             opacity: this.random.floatBetween(0.1, 0.7),
             normCount: normNumItems,
             // color: this.random(100) > 0 ? "255" : "0"
-            color: "255"
+            color: "255",
           };
         });
       return items;
     },
     random() {
       return new randGen(this.seed);
-    }
+    },
   },
 
   methods: {
@@ -88,21 +87,10 @@ export default {
         background: `linear-gradient(${
           ct.deg
         }deg, rgba(${colorStr},${ct.opacity /
-          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`,
       };
     },
-    stringToHashNumber(str) {
-      str = String(str);
-      return str
-        .split("")
-        .map(it => {
-          return it.charCodeAt(0) * 0.12345678;
-        })
-        .reduce((a, b) => {
-          return (a * b) % (Number.MAX_VALUE - 1);
-        });
-    }
-  }
+  },
 };
 </script>
 
