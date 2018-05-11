@@ -74,7 +74,7 @@ export default class Dapp {
       const id = await token.methods.tokenOfOwnerByIndex(address, i).call();
       const approved = await escrow.methods.getPrice(
         id
-      ) > 0;
+      ).call() > 0;
       const price = approved ? dapp.web3.utils.fromWei(
         await escrow.methods.getPrice(id).call(),
       ) : null;
