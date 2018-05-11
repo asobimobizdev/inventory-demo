@@ -71,6 +71,7 @@ const createStore = () => {
           const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+          state.unconfirmedTransactions = { ...state.unconfirmedTransactions }
         });
 
         goods = goods.map(good => {
@@ -79,6 +80,13 @@ const createStore = () => {
             ...growGoodFromId(good.id),
             isOwned: true,
           };
+        });
+
+        //TODO: Change selectedGood => selectedGoodID + selectedGood getter
+        goods.forEach(good => {
+          if (state.selectedGood && state.selectedGood.id == good.id) {
+            state.selectedGood = good;
+          }
         });
 
         state.goods = goods;
@@ -104,6 +112,7 @@ const createStore = () => {
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+          state.unconfirmedTransactions = { ...state.unconfirmedTransactions }
         });
 
         goods = goods.map(good => {
@@ -112,6 +121,13 @@ const createStore = () => {
             ...growGoodFromId(good.id),
             isOwned: false,
           };
+        });
+
+        //TODO: Change selectedGood => selectedGoodID + selectedGood getter
+        goods.forEach(good => {
+          if (state.selectedGood && state.selectedGood.id == good.id) {
+            state.selectedGood = good;
+          }
         });
 
         state.friendGoods = goods;
