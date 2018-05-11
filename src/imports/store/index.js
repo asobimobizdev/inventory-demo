@@ -383,6 +383,7 @@ const createStore = () => {
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         } else {
+          console.log("Allowance is suffcient");
         }
         let swap = context.state.escrowContract.methods.swap(id);
         await swap.send();
