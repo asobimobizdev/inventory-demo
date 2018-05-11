@@ -3,11 +3,16 @@ import { Goods } from "../../../contracts/Goods.sol";
 import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 import { Escrow } from "../../../contracts/Escrow.sol";
 
+const WEBSOCKET_NODE = "wss://geth-light.herokuapp.com/";
+// const HTTP_NODE = "http://localhost:8545";
 
 export default class Dapp {
   constructor() {
     if (typeof window.web3 !== "undefined") {
       this.web3 = new Web3(window.web3.currentProvider);
+      this.web3Event = new Web3(
+        new Web3.providers.WebsocketProvider(WEBSOCKET_NODE)
+      );
     }
 
     this.contracts = {
@@ -30,13 +35,14 @@ export default class Dapp {
     this.web3.eth.defaultAccount = this.defaultAccount;
   }
 
-  getContract(contract, address) {
+  getContract(contract, address, web3Instance) {
+    web3Instance = web3Instance || this.web3;
     const options = {
-      from: this.web3.eth.defaultAccount,
-      gasPrice: this.web3.utils.toWei("10", "gwei"),
+      from: web3Instance.eth.defaultAccount,
+      gasPrice: web3Instance.utils.toWei("10", "gwei"),
       data: contract.bytecode,
     };
-    const instance = new this.web3.eth.Contract(
+    const instance = new web3Instance.eth.Contract(
       contract.abi,
       address,
       options,
@@ -44,12 +50,12 @@ export default class Dapp {
     return instance;
   }
 
-  getContractAt(contract, address) {
-    const contractInstance = this.getContract(contract, address);
+  getContractAt(contract, address, web3Instance) {
+    const contractInstance = this.getContract(contract, address, web3Instance);
     return contractInstance;
   }
 
-  async deployContract(contract, args) {
+  async deployContract(contract, args, web3Instance) {
     const contractInstance = this.getContract(contract);
     const promise = contractInstance.deploy(
       {

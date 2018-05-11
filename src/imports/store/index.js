@@ -38,6 +38,7 @@ const createStore = () => {
       isGoodsAdmin: false,
       isAsobiCoinAdmin: false,
       asobiCoinContract: null,
+      asobiCoinContractEvents: null,
       escrowContract: null,
       goodsContract: null,
       accountAddress: null,
@@ -131,6 +132,11 @@ const createStore = () => {
         state.asobiCoinContract = dapp.getContractAt(
           dapp.contracts.AsobiCoin,
           address,
+        );
+        state.asobiCoinContractEvents = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          address,
+          dapp.web3Event,
         );
       },
       ["goodsContract"](state, address) {
@@ -273,6 +279,16 @@ const createStore = () => {
 
       getAsobiCoinContract(context) {
         context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
+        context.state.asobiCoinContractEvents.events.Transfer(
+          console.log,
+        ).on(
+          console.log,
+        )
+        context.state.asobiCoinContractEvents.events.allEvents(
+          console.log,
+        ).on(
+          console.log,
+        )
       },
 
       getEscrowContract(context) {
