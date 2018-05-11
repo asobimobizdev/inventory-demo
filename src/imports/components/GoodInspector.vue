@@ -11,6 +11,7 @@
 
         <div class="main">
           <div v-if="good.isOwned">
+            <span class="label">Price:</span>
             <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
             <el-switch
               v-model="good.forSale"
@@ -18,9 +19,10 @@
               @change="onGoodForSaleChanged(good)"
               />
           </div>
-          <div class="buy" v-else-if="true">
-            <span class="price">3943499{{good.price}}</span>
-            <el-button @click="buyGood(good)" round>BUY</el-button>
+          <div class="buy" v-else-if="good.forSale">
+            <span class="label">Price:</span> <span class="price">{{good.price}}₳</span>
+            <el-button @click="buyGood(good)" type="primary" round>BUY</el-button>
+
           </div>
         </div>
 
@@ -138,15 +140,28 @@ export default {
         >.main
           flex 1 1 auto
           margin-left 8px
+
+          display flex
+          flex-direction column
+          flex-wrap nowrap
+          justify-content center
+          align-content stretch
+          align-items stretch
+
+          padding-bottom 16px
+
           >.buy
             >.price
-              margin-left 20px
+              margin-right 8px
+              font-weight bold
+              color darken(#409EFF, 10%)
+              font-size 18px
 
         >.footer
           height 16px
           line-height 16px
-          font-size 14px
-          color #555
+          font-size 12px
+          color #888
           white-space nowrap
           overflow hidden
           text-overflow ellipsis
