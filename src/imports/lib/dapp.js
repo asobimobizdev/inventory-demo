@@ -72,9 +72,9 @@ export default class Dapp {
     const items = [];
     for (let i = 0; i < balance; i += 1) {
       const id = await token.methods.tokenOfOwnerByIndex(address, i).call();
-      const approved = await token.methods.getApproved(
+      const approved = await escrow.methods.getPrice(
         id
-      ).call() === escrow.options.address;
+      ) > 0;
       const price = approved ? dapp.web3.utils.fromWei(
         await escrow.methods.getPrice(id).call(),
       ) : null;
@@ -83,8 +83,6 @@ export default class Dapp {
           id: id,
           confirmed: true,
           price: price,
-          // XXX there has to be a more intelligent way of checking
-          // for the null address Justus 2018-05-09
           forSale: approved,
         }
       );
