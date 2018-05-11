@@ -2,6 +2,6 @@ module.exports = {
   networks: {
   },
   mocha: {
-    reporter: 'eth-gas-reporter',
-  }
+    reporter: "eth-gas-reporter",
+  },
 };

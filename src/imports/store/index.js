@@ -271,12 +271,12 @@ const createStore = () => {
         context.commit("goodsContract", GOODS_ADDRESS);
 
         context.state.goodsContractEvents.events.allEvents()
-        .on('data', (event) => {
-          console.log("Goods event", event);
-          context.dispatch("getOwnGoods");
-          context.dispatch("getSelectedFriendGoods");
-        })
-        .on('error', console.log);
+          .on("data", (event) => {
+            console.log("Goods event", event);
+            context.dispatch("getOwnGoods");
+            context.dispatch("getSelectedFriendGoods");
+          })
+          .on("error", console.log);
 
         p2pManager.subscribe(context.state.accountAddress, context);
       },
@@ -284,11 +284,11 @@ const createStore = () => {
       getAsobiCoinContract(context) {
         context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
         context.state.asobiCoinContractEvents.events.Transfer()
-        .on('data', (event) => {
-          console.log("AsobiCoin Transfer event", event);
-          context.dispatch("getBalance");
-        })
-        .on('error', console.log);
+          .on("data", (event) => {
+            console.log("AsobiCoin Transfer event", event);
+            context.dispatch("getBalance");
+          })
+          .on("error", console.log);
       },
 
       getEscrowContract(context) {
@@ -351,10 +351,18 @@ const createStore = () => {
           ).send();
           return;
         }
-        await context.state.goodsContract.methods.approve(
-          context.state.escrowContract.options.address,
+        const approved = await context.state.goodsContract.methods.getApproved(
           id,
-        ).send();
+        );
+        if (context.state.escrowContract.options.address !== approved) {
+          console.log("Escrow contract not yet approved");
+          await context.state.goodsContract.methods.approve(
+            context.state.escrowContract.options.address,
+            id,
+          ).send();
+        } else {
+          console.log("Escrow contract already approved");
+        }
         await context.state.escrowContract.methods.setPrice(
           id,
           dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
