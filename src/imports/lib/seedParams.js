@@ -2,7 +2,7 @@ import ntc from "./ntc";
 
 import {BigNumber} from "bignumber.js";
 
-ADJECTIVES = [
+const ADJECTIVES = [
   "Agile",
   "Cheeky",
   "Cursed",
@@ -19,9 +19,9 @@ ADJECTIVES = [
   "Slow",
   "Successful",
   "Violent",
-]
+];
 
-ANIMALS = [
+const ANIMALS = [
   "Bonobo",
   "Cassowary",
   "Cheetah",
@@ -38,7 +38,7 @@ ANIMALS = [
   "Tamarin",
   "Tortoise",
   "Wolf",
-]
+];
 
 class SeedParams {
 

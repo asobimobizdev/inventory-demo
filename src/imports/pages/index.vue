@@ -59,7 +59,7 @@ export default {
   components: {
     draggable,
     "good-item": GoodItem,
-    "good-inspector": GoodInspector
+    "good-inspector": GoodInspector,
   },
   data() {
     return {};
@@ -77,23 +77,23 @@ export default {
       },
       set(value) {
         this.$store.dispatch("selectFriend", value);
-      }
+      },
     },
     goods: {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     friendGoods: {
       get() {
         return this.$store.getters.allFriendGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     selectedGood() {
       return this.$store.state.selectedGood;
-    }
+    },
   },
   methods: {
     checkMove(e) {
@@ -122,8 +122,8 @@ export default {
     isGoodSelected(good) {
       if (!this.$store.state.selectedGood || !good) return false;
       return good.id == this.$store.state.selectedGood.id;
-    }
-  }
+    },
+  },
 };
 </script>
 

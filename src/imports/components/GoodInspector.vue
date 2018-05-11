@@ -43,15 +43,15 @@ import GoodItem from "./GoodItem.vue";
 
 export default {
   components: {
-    "good-item": GoodItem
+    "good-item": GoodItem,
   },
   props: {
-    good: Object
+    good: Object,
   },
   computed: {
     open() {
       return this.good != null;
-    }
+    },
   },
   methods: {
     close() {
@@ -68,8 +68,8 @@ export default {
     },
     priceChanged() {
       // console.log("priceChanged", this.good.price);
-    }
-  }
+    },
+  },
 };
 </script>
 

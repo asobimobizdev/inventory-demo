@@ -33,8 +33,8 @@ export default {
     },
     balance() {
       return this.$store.state.balance;
-    }
-  }
+    },
+  },
 };
 </script>
 

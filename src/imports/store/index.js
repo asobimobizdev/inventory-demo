@@ -71,7 +71,7 @@ const createStore = () => {
           const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
-          state.unconfirmedTransactions = { ...state.unconfirmedTransactions }
+          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
         });
 
         goods = goods.map(good => {
@@ -112,7 +112,7 @@ const createStore = () => {
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
-          state.unconfirmedTransactions = { ...state.unconfirmedTransactions }
+          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
         });
 
         goods = goods.map(good => {
@@ -322,7 +322,7 @@ const createStore = () => {
         const transaction = {
           from: context.state.accountAddress,
           to: address, goodID: good.id,
-        }
+        };
 
         context.commit("addUnconfirmedTransaction", transaction);
         p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
