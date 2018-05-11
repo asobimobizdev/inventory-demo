@@ -1,9 +1,13 @@
 pragma solidity ^0.4.23;
+
 import "contracts/AsobiCoin.sol";
 import "contracts/Goods.sol";
 
 
 contract Escrow {
+
+    event Swapped(address buyer, address seller, uint256 goodID, uint256 price);
+
     AsobiCoin asobiCoin;
     Goods goods;
 
@@ -39,5 +43,7 @@ contract Escrow {
 
         require(asobiCoin.transferFrom(buyer, seller, price));
         goods.transferFrom(seller, buyer, goodID);
+
+        emit Swapped(buyer, seller, goodID, price);
     }
 }
