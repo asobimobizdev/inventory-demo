@@ -76,9 +76,9 @@ export default class Dapp {
       const approved = await goods.methods.getApproved(
         id,
       ).call() === escrow.options.address;
-      const price = approved ? dapp.web3.utils.fromWei(
+      const price = dapp.web3.utils.fromWei(
         await escrow.methods.getPrice(id).call(),
-      ) : null;
+      );
       items.push(
         {
           id: id,
