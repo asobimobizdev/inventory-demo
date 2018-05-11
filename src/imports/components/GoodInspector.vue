@@ -6,19 +6,27 @@
       <good-item class="good-item" v-bind="good" :active="true"/>
 
       <div class="infos">
-        <h1>{{good.name}} {{good.id}}</h1>
-        <div v-if="good.isOwned">
-          <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
-          <el-switch
-            v-model="good.forSale"
-            active-text="For Sale"
-            @change="onGoodForSaleChanged(good)"
-            />
+
+        <h1>{{good.name}}</h1>
+
+        <div class="main">
+          <div v-if="good.isOwned">
+            <span class="label">Price:</span>
+            <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
+            <el-switch
+              v-model="good.forSale"
+              active-text="For Sale"
+              @change="onGoodForSaleChanged(good)"
+              />
+          </div>
+          <div class="buy" v-else>
+            <span class="label" v-if="hasPrice" >Price:</span> <span v-if="hasPrice" class="price">{{good.price}}₳</span>
+            <el-button v-if="good.forSale" @click="buyGood(good)" type="primary" round>BUY</el-button>
+          </div>
         </div>
-        <div v-else-if="good.forSale">
-          <span class="price">{{good.price}}</span>
-          <el-button @click="buyGood(good)" round>BUY</el-button>
-        </div>
+
+        <div class="footer">{{good.id}}</div >
+
       </div>
 
       <el-button class="close-button" type="danger" icon="el-icon-close" circle @click="close()"></el-button>
@@ -43,17 +51,19 @@ export default {
     open() {
       return this.good != null;
     },
+    hasPrice() {
+      return this.good && this.good.price.toString() != "0";
+    },
   },
   methods: {
     close() {
       this.$store.commit("selectGood", null);
     },
     onGoodForSaleChanged(good) {
-      this.$store.dispatch("setGoodForSale", good)
-        .catch((error) => {
-          console.log("Set good for sale error", error);
-          good.forSale = false;
-        });
+      this.$store.dispatch("setGoodForSale", good).catch(error => {
+        console.log("Set good for sale error", error);
+        good.forSale = false;
+      });
     },
     buyGood(good) {
       this.$store.dispatch("buyGood", good);
@@ -112,6 +122,13 @@ export default {
         flex 1 1 auto
         margin-right 48px
 
+        display flex
+        flex-direction column
+        flex-wrap nowrap
+        justify-content flex-start
+        align-content stretch
+        align-items stretch
+
         >h1
           // background alpha(#fff,0.8)
           height 40px
@@ -120,7 +137,40 @@ export default {
           font-weight bold
           border-bottom solid 1px rgba(#000,0.1)
           margin-bottom 16px
-          text-indent: 8px;
+          text-indent: 8px
+
+        >.main
+          flex 1 1 auto
+          margin-left 8px
+
+          display flex
+          flex-direction column
+          flex-wrap nowrap
+          justify-content center
+          align-content stretch
+          align-items stretch
+
+          padding-bottom 16px
+
+          >.buy
+            >.price
+              margin-right 8px
+              font-weight bold
+              color darken(#409EFF, 10%)
+              font-size 18px
+
+        >.footer
+          height 20px
+          line-height 20px
+          font-size 12px
+          color #888
+          white-space nowrap
+          overflow hidden
+          text-overflow ellipsis
+          letter-spacing 0.1em
+          // background-color alpha(#fff,0.5)
+          border-top solid 1px rgba(#000,0.1)
+          padding-top 4px
   &.closed
     >.drawer
       transform translate(0,100%)

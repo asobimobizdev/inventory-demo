@@ -6,13 +6,25 @@ export default class P2PManager {
 
   subscribe(address, context) {
     addressStreamer.on(address, function (message) {
-      message.to = context.state.accountAddress;
-      context.commit("addUnconfirmedTransaction", message);
+      switch (message.action) {
+      case "addUnconfirmedTransaction":
+        message.to = context.state.accountAddress;
+        context.commit("addUnconfirmedTransaction", message);
+        break;
+      case "removeUnconfirmedTransaction":
+        message.to = context.state.accountAddress;
+        context.commit("removeUnconfirmedTransaction", message);
+        break;
+      }
     });
   }
 
-  dispatchTransaction(from, toAddress, goodID) {
-    addressStreamer.emit(toAddress, { action: "goodTransaction", from, goodID });
+  addUnconfirmedTransaction(from, toAddress, goodID) {
+    addressStreamer.emit(toAddress, { action: "addUnconfirmedTransaction", from, goodID });
+  }
+
+  removeUnconfirmedTransaction(from, toAddress, goodID) {
+    addressStreamer.emit(toAddress, { action: "removeUnconfirmedTransaction", from, goodID });
   }
 
 }

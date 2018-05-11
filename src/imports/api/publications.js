@@ -1,4 +1,5 @@
 import { Meteor } from "meteor/meteor";
+import { Wallets } from "./collections";
 
 Meteor.publish("userData", _ => {
 
@@ -8,4 +9,8 @@ Meteor.publish("userData", _ => {
     });
   }
 
+});
+
+Meteor.publish("friendsWallets", myAddress => {
+  return Wallets.find();
 });

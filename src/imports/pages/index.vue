@@ -7,15 +7,9 @@
           <h1>My Goods</h1>
         </div>
         <div class="collection grid">
-          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
+          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods', forceFallback:true }" :move="checkMove" @end="onDrop">
             <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
-                <!-- <el-switch
-                  v-model="good.forSale"
-                  active-text="For Sale"
-                  @change="onGoodForSaleChanged(good)"
-                  >
-                  </el-switch> -->
               </good-item>
             </div>
           </draggable>
@@ -59,7 +53,6 @@ export default {
   mixins: [dappMixin],
   mounted() {
     this.$store.dispatch("getOwnGoods");
-    this.$store.dispatch("getFriends");
     this.$store.dispatch("getSelectedFriendGoods");
   },
   components: {
@@ -72,7 +65,10 @@ export default {
   },
   computed: {
     friends() {
-      return this.$store.state.friends;
+      const friends = this.$store.state.friends.filter(friend => {
+        return friend.id !== this.$store.state.accountAddress;
+      });
+      return friends;
     },
     hasFriends() {
       return this.$store.state.friends.length > 0;

@@ -1,9 +1,13 @@
 pragma solidity ^0.4.23;
+
 import "contracts/AsobiCoin.sol";
 import "contracts/Goods.sol";
 
 
 contract Escrow {
+
+    event Swapped(address buyer, address seller, uint256 goodID, uint256 price);
+
     AsobiCoin asobiCoin;
     Goods goods;
 
@@ -15,7 +19,8 @@ contract Escrow {
     }
 
     function isListed(uint256 goodID) public view returns (bool) {
-        return goodPrices[goodID] > 0;
+        return goodPrices[goodID] > 0 &&
+            goods.getApproved(goodID) == address(this);
     }
 
     function getPrice(uint256 goodID) public view returns (uint256) {
@@ -24,7 +29,6 @@ contract Escrow {
 
     function setPrice(uint256 goodID, uint256 price) external {
         require(goods.ownerOf(goodID) == msg.sender);
-        require(goods.getApproved(goodID) == address(this));
         require(price > 0);
 
         goodPrices[goodID] = price;
@@ -32,11 +36,14 @@ contract Escrow {
 
     function swap(uint256 goodID) external {
         require(isListed(goodID));
+
         address buyer = msg.sender;
         address seller = goods.ownerOf(goodID);
         uint256 price = getPrice(goodID);
 
         require(asobiCoin.transferFrom(buyer, seller, price));
         goods.transferFrom(seller, buyer, goodID);
+
+        emit Swapped(buyer, seller, goodID, price);
     }
 }

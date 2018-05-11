@@ -7,7 +7,6 @@ const AsobiCoin = artifacts.require("contracts/AsobiCoin.sol");
 const Escrow = artifacts.require("contracts/Escrow.sol");
 
 contract("Escrow", accounts => {
-  const owner = accounts[0];
   const buyer = accounts[1];
   const seller = accounts[2];
   const buyerOptions = {from: buyer};
@@ -30,27 +29,33 @@ contract("Escrow", accounts => {
   });
 
   describe("pricing", () => {
-    it("won't let the owner set the price if not approved", async () => {
-      await assertRejected(escrow.setPrice(goodID, price, sellerOptions));
+    it("will let the owner of a good set the price", async () => {
+      await escrow.setPrice(goodID, price, sellerOptions);
+      assert.equal(await escrow.getPrice(goodID), price);
     });
 
-    describe("with approved transfer", () => {
-      beforeEach(async () => {
-        await goods.approve(escrow.address, goodID, sellerOptions);
-      });
+    it("won't let the owner set the price to 0", async () => {
+      await assertRejected(escrow.setPrice(goodID, 0, sellerOptions));
+    });
 
-      it("will let the owner of a good set the price", async () => {
-        await escrow.setPrice(goodID, price, sellerOptions);
-        assert.equal(await escrow.getPrice(goodID), price);
-      });
+    it("won't let someone else set the price", async () => {
+      await assertRejected(escrow.setPrice(goodID, price, buyerOptions));
+    });
+  });
 
-      it("won't let the owner set the price to 0", async () => {
-        await assertRejected(escrow.setPrice(goodID, 0, sellerOptions));
-      });
-
-      it("won't let someone else set the price", async () => {
-        await assertRejected(escrow.setPrice(goodID, price, buyerOptions));
-      });
+  describe("isListed", () => {
+    it("needs both price and approval", async () => {
+      await goods.approve(escrow.address, goodID, sellerOptions);
+      await escrow.setPrice(goodID, price, sellerOptions);
+      assert.isTrue(await escrow.isListed(goodID));
+    });
+    it("will not return true if only price is set", async () => {
+      await goods.approve(escrow.address, goodID, sellerOptions);
+      await escrow.setPrice(goodID, price, sellerOptions);
+      // Here we do something evil and remove the approval after setting
+      // the price
+      await goods.approve("0x0", goodID, sellerOptions);
+      assert.isFalse(await escrow.isListed(goodID));
     });
   });
 

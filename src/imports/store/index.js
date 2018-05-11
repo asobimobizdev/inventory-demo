@@ -3,12 +3,15 @@ import { dapp } from "../lib/dapp";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
+import { Wallets } from "./../api/collections";
+
+window.Wallets = Wallets;
 
 const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
-const ESCROW_ADDRESS = "0x1fB678e05751eED268c013e83A7c401F89D6c986";
+const ESCROW_ADDRESS = "0x364bD6F3Fe25eBB315Eedb83c2c0B4985d240F2b";
 
 function isEqual(a, b) {
   if (a.length != b.length) {
@@ -71,6 +74,7 @@ const createStore = () => {
           const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
         });
 
         goods = goods.map(good => {
@@ -79,6 +83,13 @@ const createStore = () => {
             ...growGoodFromId(good.id),
             isOwned: true,
           };
+        });
+
+        //TODO: Change selectedGood => selectedGoodID + selectedGood getter
+        goods.forEach(good => {
+          if (state.selectedGood && state.selectedGood.id == good.id) {
+            state.selectedGood = good;
+          }
         });
 
         state.goods = goods;
@@ -104,6 +115,7 @@ const createStore = () => {
           const to = state.friends[state.selectedFriendIndex].id;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
+          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
         });
 
         goods = goods.map(good => {
@@ -112,6 +124,13 @@ const createStore = () => {
             ...growGoodFromId(good.id),
             isOwned: false,
           };
+        });
+
+        //TODO: Change selectedGood => selectedGoodID + selectedGood getter
+        goods.forEach(good => {
+          if (state.selectedGood && state.selectedGood.id == good.id) {
+            state.selectedGood = good;
+          }
         });
 
         state.friendGoods = goods;
@@ -164,9 +183,9 @@ const createStore = () => {
         state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
       },
       ["removeUnconfirmedTransaction"](state, transaction) {
-        console.log(transaction);
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
+        state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
       },
       ["selectGood"](state, good) {
         state.selectedGood = good;
@@ -181,27 +200,36 @@ const createStore = () => {
         context.dispatch("getSelectedFriendGoods");
       },
 
-      getFriends(context) {
-        const friends = JSON.parse(localStorage.getItem("friends"));
-        context.commit("friends", friends);
-      },
+      // getFriends(context) {
+      //   const friends = JSON.parse(localStorage.getItem("friends"));
+      //   context.commit("friends", friends);
+      // },
 
-      saveFriends(context) {
-        localStorage.setItem("friends", JSON.stringify(context.state.friends));
+      // saveFriends(context) {
+      //   localStorage.setItem("friends", JSON.stringify(context.state.friends));
+      // },
+
+      subscribeToFriends(context) {
+        Meteor.subscribe("friendsWallets");
+
+        Meteor.autorun(_ => {
+          let friends = Wallets.find({}).fetch();
+          console.log("friends", friends);
+          // friends = friends.map(friend => {
+          //   delete friend._id;
+          //   return { ...friend };
+          // })
+          context.commit("friends", friends);
+        });
       },
 
       addFriend(context, friend) {
         const friends = [...context.state.friends, { ...friend }];
-        context.commit("friends", friends);
-        context.dispatch("saveFriends");
+        Wallets.insert(friend);
       },
 
       deleteFriend(context, friend) {
-        const friends = context.state.friends.filter(it => {
-          return !(it.id == friend.id);
-        });
-        context.commit("friends", friends);
-        context.dispatch("saveFriends");
+        Wallets.remove(friend._id);
       },
 
       async getBalance(context) {
@@ -303,19 +331,19 @@ const createStore = () => {
 
         const tokenID = good.id;
 
-        p2pManager.dispatchTransaction(context.state.accountAddress, address, good.id);
-
-        context.commit("addUnconfirmedTransaction", {
+        const transaction = {
           from: context.state.accountAddress,
           to: address, goodID: good.id,
-        });
+        };
+
+        context.commit("addUnconfirmedTransaction", transaction);
+        p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
+
         context.dispatch("transferToken", { address, tokenID }).catch((error) => {
-          console.log("Transfer token cancelled", error);
-          context.commit("removeUnconfirmedTransaction", {
-            from: context.state.accountAddress,
-            to: address, goodID: good.id,
-          });
+          context.commit("removeUnconfirmedTransaction", transaction);
+          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, good.id);
         });
+
       },
 
       async transferToken(context, { address, tokenID }) {
@@ -351,17 +379,20 @@ const createStore = () => {
 
       async setGoodForSale(context, { id, forSale, price }) {
         price = String(price);
-        if (!forSale) {
-          await context.state.goodsContract.methods.approve(
-            "0x0",
-            id,
-          ).send();
-          return;
-        }
         const approved = await context.state.goodsContract.methods.getApproved(
           id,
-        ).call();
-        if (context.state.escrowContract.options.address !== approved) {
+        ).call() === context.state.escrowContract.options.address;
+        if (!forSale) {
+          if (approved) {
+            console.log("Removing approval");
+            await context.state.goodsContract.methods.approve(
+              "0x0",
+              id,
+            ).send();
+          }
+          return;
+        }
+        if (!approved) {
           console.log("Escrow contract not yet approved", approved);
           await context.state.goodsContract.methods.approve(
             context.state.escrowContract.options.address,
@@ -398,7 +429,12 @@ const createStore = () => {
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         } else {
-          console.log("Allowance is suffcient");
+          console.log(
+            "Allowance",
+            allowance.toString(),
+            "sufficient for price",
+            price.toString(),
+          );
         }
         let swap = context.state.escrowContract.methods.swap(id);
         await swap.send();
@@ -412,6 +448,8 @@ const createStore = () => {
           amount,
         ).send();
       },
+
+
 
     },
     getters: {
@@ -447,8 +485,8 @@ const createStore = () => {
 
         return [...goods, ...unconfirmedGoods];
       },
-      allFriendGoods: state => {
 
+      allFriendGoods: state => {
         let transaction;
         const unconfirmedGoods = [];
         const goodsToRemove = {};
