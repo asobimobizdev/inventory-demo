@@ -65,7 +65,10 @@ export default {
   },
   computed: {
     friends() {
-      return this.$store.state.friends;
+      const friends = this.$store.state.friends.filter(friend => {
+        return friend.id !== this.$store.state.accountAddress;
+      });
+      return friends;
     },
     hasFriends() {
       return this.$store.state.friends.length > 0;
