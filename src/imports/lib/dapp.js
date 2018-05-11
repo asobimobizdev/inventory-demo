@@ -67,14 +67,15 @@ export default class Dapp {
     return await promise.send({ gas });
   }
 
-  async getTokensForAddress(token, escrow, address) {
-    const balance = await token.methods.balanceOf(address).call();
+  async getTokensForAddress(goods, escrow, address) {
+    const balance = await goods.methods.balanceOf(address).call();
     const items = [];
     for (let i = 0; i < balance; i += 1) {
-      const id = await token.methods.tokenOfOwnerByIndex(address, i).call();
-      const approved = await escrow.methods.getPrice(
-        id
-      ).call() > 0;
+      const id = await goods.methods.tokenOfOwnerByIndex(address, i).call();
+      // check whether good can be spent by looking at approval
+      const approved = await goods.methods.getApproved(
+        id,
+      ).call() === escrow.options.address;
       const price = approved ? dapp.web3.utils.fromWei(
         await escrow.methods.getPrice(id).call(),
       ) : null;
