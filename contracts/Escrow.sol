@@ -15,7 +15,8 @@ contract Escrow {
     }
 
     function isListed(uint256 goodID) public view returns (bool) {
-        return goodPrices[goodID] > 0;
+        return goodPrices[goodID] > 0 &&
+            goods.getApproved(goodID) == address(this);
     }
 
     function getPrice(uint256 goodID) public view returns (uint256) {

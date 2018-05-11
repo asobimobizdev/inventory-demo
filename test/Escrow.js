@@ -54,6 +54,22 @@ contract("Escrow", accounts => {
     });
   });
 
+  describe("isListed", () => {
+    it("needs both price and approval", async () => {
+      await goods.approve(escrow.address, goodID, sellerOptions);
+      await escrow.setPrice(goodID, price, sellerOptions);
+      assert.isTrue(await escrow.isListed(goodID));
+    });
+    it("will not return true if only price is set", async () => {
+      await goods.approve(escrow.address, goodID, sellerOptions);
+      await escrow.setPrice(goodID, price, sellerOptions);
+      // Here we do something evil and remove the approval after setting
+      // the price
+      await goods.approve("0x0", goodID, sellerOptions);
+      assert.isFalse(await escrow.isListed(goodID));
+    });
+  });
+
   describe("swap", () => {
     beforeEach(async () => {
       // approve the escrow to transfer the good
