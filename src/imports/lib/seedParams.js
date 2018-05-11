@@ -1,6 +1,44 @@
 import ntc from "./ntc";
 
-console.log("ntc", ntc);
+import {BigNumber} from "bignumber.js";
+
+ADJECTIVES = [
+  "Agile",
+  "Cheeky",
+  "Cursed",
+  "Decentralized",
+  "Deceptive",
+  "Distributed",
+  "Docile",
+  "Gentle",
+  "Graceful",
+  "Humble",
+  "Nimble",
+  "Quick",
+  "Raging",
+  "Slow",
+  "Successful",
+  "Violent",
+]
+
+ANIMALS = [
+  "Bonobo",
+  "Cassowary",
+  "Cheetah",
+  "Crocodile",
+  "Elephant",
+  "Frog",
+  "Gorilla",
+  "Hippopotamus",
+  "Leopard",
+  "Orang-utan",
+  "Panda",
+  "Penguin",
+  "Rhinoceros",
+  "Tamarin",
+  "Tortoise",
+  "Wolf",
+]
 
 class SeedParams {
 
@@ -9,23 +47,20 @@ class SeedParams {
   }
 
   nameForSeedWithHSL(seed, h, s, l) {
-    return ntc.nameFromHSL(h, s, l)[1];
+    const lowestByte = seed & 0xFF;
+    const nibble1 = lowestByte & 0xF;
+    const nibble2 = lowestByte >> 4;
+    const adjective = ADJECTIVES[nibble1];
+    const color = ntc.nameFromHSL(h, s, l)[1];
+    const animal = ANIMALS[nibble1];
+    return `${adjective} ${color} ${animal}`;
   }
 
-  seedFromString(str) {
-    const num = parseFloat(str);
-    if (!Number.isNaN(num)) return num;
-    str = String(str);
-    return str
-      .split("")
-      .map(it => {
-        return it.charCodeAt(0) * 0.12345678;
-      })
-      .reduce((a, b) => {
-        return (a * b) % (Number.MAX_VALUE - 1);
-      });
+  seedFromString(seed) {
+    const number = new BigNumber(seed);
+    const result = number.mod(2 ^ 16).toNumber();
+    return result;
   }
-
 }
 
 export default new SeedParams();
