@@ -164,9 +164,9 @@ const createStore = () => {
         state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
       },
       ["removeUnconfirmedTransaction"](state, transaction) {
-        console.log(transaction);
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
+        state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
       },
       ["selectGood"](state, good) {
         state.selectedGood = good;
@@ -305,16 +305,13 @@ const createStore = () => {
 
         p2pManager.dispatchTransaction(context.state.accountAddress, address, good.id);
 
-        context.commit("addUnconfirmedTransaction", {
+        const transaction = {
           from: context.state.accountAddress,
           to: address, goodID: good.id,
-        });
+        }
+        context.commit("addUnconfirmedTransaction", transaction);
         context.dispatch("transferToken", { address, tokenID }).catch((error) => {
-          console.log("Transfer token cancelled", error);
-          context.commit("removeUnconfirmedTransaction", {
-            from: context.state.accountAddress,
-            to: address, goodID: good.id,
-          });
+          context.commit("removeUnconfirmedTransaction", transaction);
         });
       },
 
@@ -455,8 +452,8 @@ const createStore = () => {
 
         return [...goods, ...unconfirmedGoods];
       },
-      allFriendGoods: state => {
 
+      allFriendGoods: state => {
         let transaction;
         const unconfirmedGoods = [];
         const goodsToRemove = {};
