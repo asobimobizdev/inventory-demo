@@ -357,16 +357,11 @@ const createStore = () => {
         if (!forSale) {
           if (approved) {
             console.log("Removing approval");
-            await context.state.goodscontract.methods.approve(
+            await context.state.goodsContract.methods.approve(
               "0x0",
               id,
             ).send();
           }
-          console.log("Setting price to 0");
-          await context.state.escrowContract.methods.setPrice(
-            id,
-            "0",
-          ).send();
           return;
         }
         if (!approved) {
