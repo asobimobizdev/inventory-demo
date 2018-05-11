@@ -8,9 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}-{{ checksum ".meteor/packages" }}
-      - run:
-          command: curl https://install.meteor.com | /bin/sh
+          - v1-dependencies-{{ checksum "package.json" }}
       - run:
           command: npm install
           working_directory: ~/asobicoin
@@ -22,11 +20,7 @@ jobs:
       - run:
           command: npm run truffle-test
           working_directory: ~/asobicoin
-      - run:
-          command: meteor lint
       - save_cache:
           paths:
             - ~/asobicoin/node_modules
-            - ~/asobicoin/.meteor/local
-            - ~/.meteor
-          key: v1-dependencies-{{ checksum "package.json" }}-{{ checksum ".meteor/packages" }}
+          key: v1-dependencies-{{ checksum "package.json" }}
