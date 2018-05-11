@@ -10,12 +10,6 @@
           <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods'}" :move="checkMove" @end="onDrop">
             <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
-                <!-- <el-switch
-                  v-model="good.forSale"
-                  active-text="For Sale"
-                  @change="onGoodForSaleChanged(good)"
-                  >
-                  </el-switch> -->
               </good-item>
             </div>
           </draggable>
@@ -65,7 +59,7 @@ export default {
   components: {
     draggable,
     "good-item": GoodItem,
-    "good-inspector": GoodInspector,
+    "good-inspector": GoodInspector
   },
   data() {
     return {};
@@ -83,23 +77,23 @@ export default {
       },
       set(value) {
         this.$store.dispatch("selectFriend", value);
-      },
+      }
     },
     goods: {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {},
+      set(value) {}
     },
     friendGoods: {
       get() {
         return this.$store.getters.allFriendGoods;
       },
-      set(value) {},
+      set(value) {}
     },
     selectedGood() {
       return this.$store.state.selectedGood;
-    },
+    }
   },
   methods: {
     checkMove(e) {
@@ -128,8 +122,8 @@ export default {
     isGoodSelected(good) {
       if (!this.$store.state.selectedGood || !good) return false;
       return good.id == this.$store.state.selectedGood.id;
-    },
-  },
+    }
+  }
 };
 </script>
 

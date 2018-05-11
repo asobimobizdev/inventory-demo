@@ -13,7 +13,7 @@
           <router-link :to="{ name: 'friends' }" exact>Friends</router-link>
         </el-menu-item>
       </el-menu>
-      <div class="balance"><span class="label">Balance</span> <span class="value">{{balance}}₳</span></div>
+      <div class="balance"><span class="label">Balance:</span> <span class="value">{{balance}}₳</span></div>
     </el-header>
 
     <router-view  class="content" />
@@ -33,8 +33,8 @@ export default {
     },
     balance() {
       return this.$store.state.balance;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -68,8 +68,14 @@ html
     float left
 
   .balance
+    font-size 18px
     float right
     line-height 60px
+    .label
+      color #aaa
+    .value
+      font-weight bold
+      color darken(#409EFF, 10%)
 
 </style>
 

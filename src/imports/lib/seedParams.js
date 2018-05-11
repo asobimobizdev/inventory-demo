@@ -13,6 +13,8 @@ class SeedParams {
   }
 
   seedFromString(str) {
+    const num = parseFloat(str);
+    if (!Number.isNaN(num)) return num;
     str = String(str);
     return str
       .split("")
