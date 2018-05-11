@@ -30,27 +30,17 @@ contract("Escrow", accounts => {
   });
 
   describe("pricing", () => {
-    it("won't let the owner set the price if not approved", async () => {
-      await assertRejected(escrow.setPrice(goodID, price, sellerOptions));
+    it("will let the owner of a good set the price", async () => {
+      await escrow.setPrice(goodID, price, sellerOptions);
+      assert.equal(await escrow.getPrice(goodID), price);
     });
 
-    describe("with approved transfer", () => {
-      beforeEach(async () => {
-        await goods.approve(escrow.address, goodID, sellerOptions);
-      });
+    it("won't let the owner set the price to 0", async () => {
+      await assertRejected(escrow.setPrice(goodID, 0, sellerOptions));
+    });
 
-      it("will let the owner of a good set the price", async () => {
-        await escrow.setPrice(goodID, price, sellerOptions);
-        assert.equal(await escrow.getPrice(goodID), price);
-      });
-
-      it("won't let the owner set the price to 0", async () => {
-        await assertRejected(escrow.setPrice(goodID, 0, sellerOptions));
-      });
-
-      it("won't let someone else set the price", async () => {
-        await assertRejected(escrow.setPrice(goodID, price, buyerOptions));
-      });
+    it("won't let someone else set the price", async () => {
+      await assertRejected(escrow.setPrice(goodID, price, buyerOptions));
     });
   });
 
