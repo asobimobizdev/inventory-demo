@@ -50,10 +50,10 @@ export default {
     },
     onGoodForSaleChanged(good) {
       this.$store.dispatch("setGoodForSale", good)
-      .catch((error) => {
-        console.log("Set good for sale error", error);
-        good.forSale = false;
-      });
+        .catch((error) => {
+          console.log("Set good for sale error", error);
+          good.forSale = false;
+        });
     },
     buyGood(good) {
       this.$store.dispatch("buyGood", good);
