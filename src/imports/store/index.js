@@ -401,7 +401,12 @@ const createStore = () => {
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         } else {
-          console.log("Allowance", allowance, "sufficient for price", price);
+          console.log(
+            "Allowance",
+            allowance.toString(),
+            "sufficient for price",
+            price.toString(),
+          );
         }
         let swap = context.state.escrowContract.methods.swap(id);
         await swap.send();
