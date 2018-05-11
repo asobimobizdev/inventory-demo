@@ -19,10 +19,9 @@
               @change="onGoodForSaleChanged(good)"
               />
           </div>
-          <div class="buy" v-else-if="good.forSale">
-            <span class="label">Price:</span> <span class="price">{{good.price}}₳</span>
-            <el-button @click="buyGood(good)" type="primary" round>BUY</el-button>
-
+          <div class="buy" v-else>
+            <span class="label" v-if="hasPrice" >Price:</span> <span v-if="hasPrice" class="price">{{good.price}}₳</span>
+            <el-button v-if="good.forSale" @click="buyGood(good)" type="primary" round>BUY</el-button>
           </div>
         </div>
 
@@ -43,15 +42,18 @@ import GoodItem from "./GoodItem.vue";
 
 export default {
   components: {
-    "good-item": GoodItem,
+    "good-item": GoodItem
   },
   props: {
-    good: Object,
+    good: Object
   },
   computed: {
     open() {
       return this.good != null;
     },
+    hasPrice() {
+      return this.good && this.good.price.toString() != "0";
+    }
   },
   methods: {
     close() {
@@ -68,8 +70,8 @@ export default {
     },
     priceChanged() {
       // console.log("priceChanged", this.good.price);
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -158,16 +160,17 @@ export default {
               font-size 18px
 
         >.footer
-          height 16px
-          line-height 16px
+          height 20px
+          line-height 20px
           font-size 12px
           color #888
           white-space nowrap
           overflow hidden
           text-overflow ellipsis
           letter-spacing 0.1em
-          background-color alpha(#fff,0.5)
-
+          // background-color alpha(#fff,0.5)
+          border-top solid 1px rgba(#000,0.1)
+          padding-top 4px
   &.closed
     >.drawer
       transform translate(0,100%)
