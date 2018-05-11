@@ -1,9 +1,30 @@
 import { Mongo } from "meteor/mongo";
 import { Meteor } from "meteor/meteor";
 
-// export const Rigs = new Mongo.Collection('rigs')
+export const Wallets = new Mongo.Collection("wallets");
 
-// export const PeerConnection = new Mongo.Collection('peerConnection', { connection: null })
+
+Wallets.allow({
+  insert(userId, doc) {
+    // The user must be logged in and the document must be owned by the user.
+    // return userId && doc.owner === userId;
+    return true;
+  },
+
+  update(userId, doc, fields, modifier) {
+    // Can only change your own documents.
+    // return doc.owner === userId;
+    return true;
+  },
+
+  remove(userId, doc) {
+    // Can only remove your own documents.
+    // return doc.owner === userId;
+    return true;
+  },
+
+  // fetch: ['all']
+});
 
 if (Meteor.isServer) {
 

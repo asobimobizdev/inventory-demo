@@ -3,6 +3,9 @@ import { dapp } from "../lib/dapp";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
+import { Wallets } from "./../api/collections";
+
+window.Wallets = Wallets;
 
 const localStorage = window.localStorage;
 
@@ -197,27 +200,36 @@ const createStore = () => {
         context.dispatch("getSelectedFriendGoods");
       },
 
-      getFriends(context) {
-        const friends = JSON.parse(localStorage.getItem("friends"));
-        context.commit("friends", friends);
-      },
+      // getFriends(context) {
+      //   const friends = JSON.parse(localStorage.getItem("friends"));
+      //   context.commit("friends", friends);
+      // },
 
-      saveFriends(context) {
-        localStorage.setItem("friends", JSON.stringify(context.state.friends));
+      // saveFriends(context) {
+      //   localStorage.setItem("friends", JSON.stringify(context.state.friends));
+      // },
+
+      subscribeToFriends(context) {
+        Meteor.subscribe("friendsWallets");
+
+        Meteor.autorun(_ => {
+          let friends = Wallets.find({}).fetch();
+          console.log("friends", friends);
+          // friends = friends.map(friend => {
+          //   delete friend._id;
+          //   return { ...friend };
+          // })
+          context.commit("friends", friends);
+        });
       },
 
       addFriend(context, friend) {
         const friends = [...context.state.friends, { ...friend }];
-        context.commit("friends", friends);
-        context.dispatch("saveFriends");
+        Wallets.insert(friend);
       },
 
       deleteFriend(context, friend) {
-        const friends = context.state.friends.filter(it => {
-          return !(it.id == friend.id);
-        });
-        context.commit("friends", friends);
-        context.dispatch("saveFriends");
+        Wallets.remove(friend._id);
       },
 
       async getBalance(context) {
@@ -436,6 +448,8 @@ const createStore = () => {
           amount,
         ).send();
       },
+
+
 
     },
     getters: {

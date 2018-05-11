@@ -62,7 +62,6 @@ import dappMixin from "./../mixins/dapp";
 export default {
   mixins: [dappMixin],
   mounted() {
-    this.$store.dispatch("getFriends");
     this.$store.dispatch("checkGoodsAdmin");
     this.$store.dispatch("checkAsobiCoinAdmin");
   },

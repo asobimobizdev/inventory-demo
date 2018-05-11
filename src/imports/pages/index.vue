@@ -53,7 +53,6 @@ export default {
   mixins: [dappMixin],
   mounted() {
     this.$store.dispatch("getOwnGoods");
-    this.$store.dispatch("getFriends");
     this.$store.dispatch("getSelectedFriendGoods");
   },
   components: {

@@ -42,10 +42,10 @@ import GoodItem from "./GoodItem.vue";
 
 export default {
   components: {
-    "good-item": GoodItem
+    "good-item": GoodItem,
   },
   props: {
-    good: Object
+    good: Object,
   },
   computed: {
     open() {
@@ -53,7 +53,7 @@ export default {
     },
     hasPrice() {
       return this.good && this.good.price.toString() != "0";
-    }
+    },
   },
   methods: {
     close() {
@@ -70,8 +70,8 @@ export default {
     },
     priceChanged() {
       // console.log("priceChanged", this.good.price);
-    }
-  }
+    },
+  },
 };
 </script>
 
