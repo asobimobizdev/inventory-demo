@@ -43,7 +43,8 @@ const ANIMALS = [
 class SeedParams {
 
   hueFromSeed(seed) {
-    return (seed * 156.4223445) % 360;
+    const calculated = (seed) % 360;
+    return calculated;
   }
 
   nameForSeedWithHSL(seed, h, s, l) {
@@ -58,7 +59,7 @@ class SeedParams {
 
   seedFromString(seed) {
     const number = new BigNumber(seed);
-    const result = number.mod(2 ^ 16).toNumber();
+    const result = number.mod(4096).toNumber();
     return result;
   }
 }
