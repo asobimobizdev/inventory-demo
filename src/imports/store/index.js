@@ -351,17 +351,25 @@ const createStore = () => {
 
       async setGoodForSale(context, { id, forSale, price }) {
         price = String(price);
+        const approved = await context.state.goodsContract.methods.getApproved(
+          id,
+        ).call() === context.state.escrowContract.options.address;
         if (!forSale) {
-          await context.state.goodsContract.methods.approve(
-            "0x0",
+          if (approved) {
+            console.log("Removing approval");
+            await context.state.goodscontract.methods.approve(
+              "0x0",
+              id,
+            ).send();
+          }
+          console.log("Setting price to 0");
+          await context.state.escrowContract.methods.setPrice(
             id,
+            "0",
           ).send();
           return;
         }
-        const approved = await context.state.goodsContract.methods.getApproved(
-          id,
-        ).call();
-        if (context.state.escrowContract.options.address !== approved) {
+        if (!approved) {
           console.log("Escrow contract not yet approved", approved);
           await context.state.goodsContract.methods.approve(
             context.state.escrowContract.options.address,
@@ -398,7 +406,7 @@ const createStore = () => {
             dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
         } else {
-          console.log("Allowance is suffcient");
+          console.log("Allowance", allowance, "sufficient for price", price);
         }
         let swap = context.state.escrowContract.methods.swap(id);
         await swap.send();
