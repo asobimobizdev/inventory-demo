@@ -144,6 +144,11 @@ const createStore = () => {
           dapp.contracts.Goods,
           address,
         );
+        state.goodsContractEvents = dapp.getContractAt(
+          dapp.contracts.Goods,
+          address,
+          dapp.web3Event,
+        );
       },
       ["escrowContract"](state, address) {
         state.escrowContract = dapp.getContractAt(
@@ -265,14 +270,13 @@ const createStore = () => {
       getGoodsContract(context) {
         context.commit("goodsContract", GOODS_ADDRESS);
 
-        // XXX hack Justus 2018-04-2"7",
-        window.setInterval(() => {
+        context.state.goodsContractEvents.events.allEvents()
+        .on('data', (event) => {
+          console.log("Goods event", event);
           context.dispatch("getOwnGoods");
           context.dispatch("getSelectedFriendGoods");
-          if (this.getOwnGoodsTimer) {
-            window.clearTimeout(this.getOwnGoodsTimer);
-          }
-        }, 1000);
+        })
+        .on('error', console.log);
 
         p2pManager.subscribe(context.state.accountAddress, context);
       },

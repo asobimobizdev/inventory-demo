@@ -3,8 +3,9 @@ import { Goods } from "../../../contracts/Goods.sol";
 import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 import { Escrow } from "../../../contracts/Escrow.sol";
 
-const WEBSOCKET_NODE = "wss://geth-light.herokuapp.com/";
-// const HTTP_NODE = "http://localhost:8545";
+// const WEBSOCKET_NODE = "wss://geth-light.herokuapp.com/";
+const WEBSOCKET_NODE = "wss://rinkeby.infura.io/ws";
+// const WEBSOCKET_NODE = "ws://localhost:8546/";
 
 export default class Dapp {
   constructor() {
