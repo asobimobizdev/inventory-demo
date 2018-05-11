@@ -1,6 +1,7 @@
 <template>
   <el-container class="host">
     <el-header class="main-header">
+      <div class="logo"></div>
       <el-menu
         :router="true"
         :default-active="activeLink"
@@ -33,8 +34,8 @@ export default {
     },
     balance() {
       return this.$store.state.balance;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -62,6 +63,15 @@ html
   overflow hidden
 
 .main-header
+  .logo
+    //
+    float left
+    background url("AsobiCoin.svg")
+    background-repeat no-repeat
+    background-position center center
+    width 60px
+    height 60px
+    margin-right 8px
 
   .main-menu
     // background alpha(#f00,0.3)
