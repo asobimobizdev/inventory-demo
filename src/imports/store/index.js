@@ -164,6 +164,7 @@ const createStore = () => {
         state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
       },
       ["removeUnconfirmedTransaction"](state, transaction) {
+        console.log(transaction);
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
       },
@@ -308,7 +309,13 @@ const createStore = () => {
           from: context.state.accountAddress,
           to: address, goodID: good.id,
         });
-        context.dispatch("transferToken", { address, tokenID });
+        context.dispatch("transferToken", { address, tokenID }).catch((error) => {
+          console.log("Transfer token cancelled", error);
+          context.commit("removeUnconfirmedTransaction", {
+            from: context.state.accountAddress,
+            to: address, goodID: good.id,
+          });
+        });
       },
 
       async transferToken(context, { address, tokenID }) {
@@ -353,9 +360,9 @@ const createStore = () => {
         }
         const approved = await context.state.goodsContract.methods.getApproved(
           id,
-        );
+        ).call();
         if (context.state.escrowContract.options.address !== approved) {
-          console.log("Escrow contract not yet approved");
+          console.log("Escrow contract not yet approved", approved);
           await context.state.goodsContract.methods.approve(
             context.state.escrowContract.options.address,
             id,
