@@ -14,9 +14,8 @@
             <span class="label">Price:</span>
             <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
             <el-switch
-              v-model="good.forSale"
+              v-model="goodForSale"
               active-text="For Sale"
-              @change="onGoodForSaleChanged(good)"
               />
           </div>
           <div class="buy" v-else>
@@ -54,17 +53,22 @@ export default {
     hasPrice() {
       return this.good && this.good.price && this.good.price.toString() != "0";
     },
+    goodForSale:{
+      set(forSale){
+        this.$store.dispatch("setGoodForSale", {id:this.good.id, forSale, price:this.good.price});
+      },
+      get(){
+        return this.good.forSale;
+      },
+    },
   },
   methods: {
     close() {
       this.$store.commit("selectGood", null);
     },
-    onGoodForSaleChanged(good) {
-      this.$store.dispatch("setGoodForSale", good).catch(error => {
-        console.log("Set good for sale error", error);
-        good.forSale = false;
-      });
-    },
+    // onGoodForSaleChanged(good) {
+
+    // },
     buyGood(good) {
       this.$store.dispatch("buyGood", good);
     },
