@@ -104,7 +104,11 @@ const createStore = () => {
             id: state.accountAddress,
           },
         ];
-        state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
+        if (state.selectedFriendIndex < 0) {
+          state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
+        } else if (state.friends.length < 1) {
+          state.selectedFriendIndex = -1;
+        }
       },
       ["friendsLoading"](state, loading) {
         state.friendsLoading = loading;
@@ -193,6 +197,7 @@ const createStore = () => {
       ["balance"](state, balance) {
         state.balance = dapp.web3.utils.fromWei(balance);
       },
+
     },
     actions: {
       selectFriend(context, friendIndex) {
@@ -200,26 +205,17 @@ const createStore = () => {
         context.dispatch("getSelectedFriendGoods");
       },
 
-      // getFriends(context) {
-      //   const friends = JSON.parse(localStorage.getItem("friends"));
-      //   context.commit("friends", friends);
-      // },
-
-      // saveFriends(context) {
-      //   localStorage.setItem("friends", JSON.stringify(context.state.friends));
-      // },
-
       subscribeToFriends(context) {
-        Meteor.subscribe("friendsWallets");
+        const handle = Meteor.subscribe("friendsWallets");
 
         Meteor.autorun(_ => {
+          if (!handle.ready()) return;
           let friends = Wallets.find({}).fetch();
           console.log("friends", friends);
-          // friends = friends.map(friend => {
-          //   delete friend._id;
-          //   return { ...friend };
-          // })
           context.commit("friends", friends);
+          if (friends.length > 0) {
+            context.dispatch("getSelectedFriendGoods");
+          }
         });
       },
 
@@ -242,37 +238,34 @@ const createStore = () => {
       },
 
       async getOwnGoods(context) {
+        context.commit("goodsLoading", true);
         let goods = await dapp.getTokensForAddress(
           context.state.goodsContract,
           context.state.escrowContract,
           context.state.accountAddress,
         );
-        goods.sort((a, b) => { return a.id > b.id; });
-        if (!isEqual(context.state.goods, goods)) {
-          context.commit("goods", goods);
-          context.commit("goodsLoading", false);
-        }
+        context.commit("goods", goods);
+        context.commit("goodsLoading", false);
       },
 
       async getSelectedFriendGoods(context) {
-        // context.commit("friendGoodsLoading", true);
         if (context.state.selectedFriendIndex == -1) {
           return;
         }
+
         let address = context.state.friends[
           context.state.selectedFriendIndex
         ].id;
+
+        context.commit("friendGoodsLoading", true);
         const goods = await dapp.getTokensForAddress(
           context.state.goodsContract,
           context.state.escrowContract,
           address,
         );
 
-        goods.sort((a, b) => { return a.id > b.id; });
-        if (!isEqual(context.state.friendGoods, goods)) {
-          context.commit("friendGoods", goods);
-          context.commit("friendGoodsLoading", false);
-        }
+        context.commit("friendGoods", goods);
+        context.commit("friendGoodsLoading", false);
       },
 
       async createAsobiCoinContract(context) {
