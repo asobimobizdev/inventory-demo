@@ -162,7 +162,6 @@ export default {
       left inMargin * -1
       right inMargin * -1
       height 216px
-      z-index 100
 
 .goods, .friend-goods
   display flex
@@ -266,7 +265,6 @@ export default {
   >.collection
     .item
       height 120px
-
 
 .friend-goods
   width 300px
