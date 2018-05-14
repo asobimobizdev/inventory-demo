@@ -108,7 +108,7 @@ export default {
       return this.$store.state.friendGoodsLoading;
     },
     selectedGood() {
-      return this.$store.state.selectedGood;
+      return this.$store.getters.selectedGood;
     },
   },
   watch: {
@@ -142,7 +142,7 @@ export default {
       this.$store.dispatch("transferGoodToSelectedFriend", good);
     },
     selectGood(good) {
-      this.$store.commit("selectGood", good);
+      this.$store.commit("selectedGoodId", good.id);
     },
     isGoodSelected(good) {
       if (!this.$store.state.selectedGood || !good) return false;

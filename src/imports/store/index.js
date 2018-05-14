@@ -41,7 +41,7 @@ const createStore = () => {
       friendGoodsLoading: false,
       selectedFriendId: null,
       unconfirmedTransactions: {},
-      selectedGood: null,
+      selectedGoodId: null,
       balance: 0,
     },
     mutations: {
@@ -73,11 +73,11 @@ const createStore = () => {
         });
 
         //TODO: Change selectedGood => selectedGoodID + selectedGood getter
-        goods.forEach(good => {
-          if (state.selectedGood && state.selectedGood.id == good.id) {
-            state.selectedGood = good;
-          }
-        });
+        // goods.forEach(good => {
+        //   if (state.selectedGood && state.selectedGood.id == good.id) {
+        //     state.selectedGood = good;
+        //   }
+        // });
 
         state.goods = goods;
       },
@@ -113,11 +113,11 @@ const createStore = () => {
         });
 
         //TODO: Change selectedGood => selectedGoodID + selectedGood getter
-        goods.forEach(good => {
-          if (state.selectedGood && state.selectedGood.id == good.id) {
-            state.selectedGood = good;
-          }
-        });
+        // goods.forEach(good => {
+        //   if (state.selectedGood && state.selectedGood.id == good.id) {
+        //     state.selectedGood = good;
+        //   }
+        // });
 
         state.friendGoods = goods;
       },
@@ -178,8 +178,8 @@ const createStore = () => {
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
       },
-      ["selectGood"](state, good) {
-        state.selectedGood = good;
+      ["selectedGoodId"](state, id) {
+        state.selectedGoodId = id;
       },
       ["balance"](state, balance) {
         state.balance = dapp.web3.utils.fromWei(balance);
@@ -442,12 +442,25 @@ const createStore = () => {
         });
         return friend;
       },
+      selectedGood: (state,getters) =>{
+        if(!state.selectedGoodId) return null;
+        let selectedGood = getters.allGoods.find(good =>{
+          return good.id == state.selectedGoodId;
+        });
+
+        if(!selectedGood){
+          selectedGood = getters.allFriendGoods.find(good =>{
+            return good.id == state.selectedGoodId;
+          });
+        }
+
+        return selectedGood;
+      },
       allGoods: state => {
         let transaction;
         const unconfirmedGoods = [];
         const goodsToRemove = {};
 
-        // state.unconfirmedTransactions.forEach(transaction => {
         for (let tID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[tID];
 
@@ -480,7 +493,6 @@ const createStore = () => {
         });
         if (!friend) return;
 
-        // state.unconfirmedTransactions.forEach(transaction => {
         for (let tID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[tID];
           if (transaction.from == friend.id) {

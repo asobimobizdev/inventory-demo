@@ -3,7 +3,7 @@
   <div class="drawer">
     <transition>
     <div class="content" v-if="good">
-      <good-item class="good-item" v-bind="good" :active="true"/>
+      <good-item class="good-item" v-bind="good" :active="true" v-loading="!good.confirmed"/>
 
       <div class="infos">
 
@@ -52,7 +52,7 @@ export default {
       return this.good != null;
     },
     hasPrice() {
-      return this.good && this.good.price.toString() != "0";
+      return this.good && this.good.price && this.good.price.toString() != "0";
     },
   },
   methods: {
