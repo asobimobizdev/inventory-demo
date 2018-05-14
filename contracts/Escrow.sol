@@ -34,7 +34,6 @@ contract Escrow {
         require(price > 0);
 
         goodPrices[goodID] = price;
-
         emit PriceSet(seller, goodID, price);
     }
 
