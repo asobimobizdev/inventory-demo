@@ -75,10 +75,18 @@ export default {
     },
     selectedFriendIndex: {
       get() {
-        return this.$store.state.selectedFriendIndex;
+        const id = this.$store.state.selectedFriendId;
+        const friendIndex = this.friends.findIndex(friend => {
+          return friend.id == id;
+        });
+        return friendIndex;
       },
       set(value) {
-        this.$store.dispatch("selectFriend", value);
+        const friend = this.friends.find((friend, index) => {
+          return index == value;
+        });
+
+        this.$store.dispatch("selectFriend", friend.id);
       },
     },
     goods: {

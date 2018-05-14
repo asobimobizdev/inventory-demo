@@ -51,7 +51,7 @@ const createStore = () => {
       friendsLoading: false,
       friendGoods: [],
       friendGoodsLoading: false,
-      selectedFriendIndex: -1,
+      selectedFriendId: null,
       unconfirmedTransactions: {},
       selectedGood: null,
       balance: 0,
@@ -68,10 +68,9 @@ const createStore = () => {
       },
       ["goods"](state, goods) {
         goods.forEach(good => {
+          if (!state.selectedFriendId) return;
+          const to = state.selectedFriendId;
           const from = state.accountAddress;
-          const selectedFriend = state.friends[state.selectedFriendIndex];
-          if (!selectedFriend) return;
-          const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
           state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
@@ -104,10 +103,10 @@ const createStore = () => {
             id: state.accountAddress,
           },
         ];
-        if (state.selectedFriendIndex < 0) {
-          state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
+        if (state.selectedFriendId == null) {
+          state.selectedFriendId = state.friends.length > 0 ? state.friends[0].id : null;
         } else if (state.friends.length < 1) {
-          state.selectedFriendIndex = -1;
+          state.selectedFriendId = null;
         }
       },
       ["friendsLoading"](state, loading) {
@@ -116,7 +115,7 @@ const createStore = () => {
       ["friendGoods"](state, goods) {
         goods.forEach(good => {
           const from = state.accountAddress;
-          const to = state.friends[state.selectedFriendIndex].id;
+          const to = state.selectedFriendId;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
           state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
@@ -148,8 +147,8 @@ const createStore = () => {
         );
         state.goods[index].confirmed = true;
       },
-      ["setSelectedFriendIndex"](state, index) {
-        state.selectedFriendIndex = index;
+      ["selectedFriendId"](state, id) {
+        state.selectedFriendId = id;
       },
       ["asobiCoinContract"](state, address) {
         state.asobiCoinContract = dapp.getContractAt(
@@ -200,8 +199,8 @@ const createStore = () => {
 
     },
     actions: {
-      selectFriend(context, friendIndex) {
-        context.commit("setSelectedFriendIndex", friendIndex);
+      selectFriend(context, id) {
+        context.commit("selectedFriendId", id);
         context.dispatch("getSelectedFriendGoods");
       },
 
@@ -249,13 +248,11 @@ const createStore = () => {
       },
 
       async getSelectedFriendGoods(context) {
-        if (context.state.selectedFriendIndex == -1) {
+        if (!context.state.selectedFriendId) {
           return;
         }
 
-        let address = context.state.friends[
-          context.state.selectedFriendIndex
-        ].id;
+        let address = context.state.selectedFriendId;
 
         context.commit("friendGoodsLoading", true);
         const goods = await dapp.getTokensForAddress(
@@ -318,9 +315,7 @@ const createStore = () => {
       },
 
       transferGoodToSelectedFriend(context, good) {
-        let address = context.state.friends[
-          context.state.selectedFriendIndex
-        ].id;
+        let address = context.state.selectedFriendId;
 
         const tokenID = good.id;
 
@@ -447,8 +442,9 @@ const createStore = () => {
     },
     getters: {
       selectFriend: state => {
-        const index = state.selectedFriendIndex;
-        const friend = state.friends[index];
+        const friend = state.friends.find(friend => {
+          return friend.id == state.selectedFriendId;
+        });
         return friend;
       },
       allGoods: state => {
@@ -484,7 +480,9 @@ const createStore = () => {
         const unconfirmedGoods = [];
         const goodsToRemove = {};
 
-        const friend = state.friends[state.selectedFriendIndex];
+        const friend = state.friends.find(friend => {
+          return friend.id == state.selectedFriendId;
+        });
         if (!friend) return;
 
         // state.unconfirmedTransactions.forEach(transaction => {
