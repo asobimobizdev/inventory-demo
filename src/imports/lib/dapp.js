@@ -73,9 +73,7 @@ export default class Dapp {
     for (let i = 0; i < balance; i += 1) {
       const id = await goods.methods.tokenOfOwnerByIndex(address, i).call();
       // check whether good can be spent by looking at approval
-      const approved = await goods.methods.getApproved(
-        id,
-      ).call() === escrow.options.address;
+      const approved = await escrow.methods.isListed(id).call();
       const price = this.web3.utils.fromWei(
         await escrow.methods.getPrice(id).call(),
       );
