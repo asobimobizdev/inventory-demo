@@ -11,7 +11,7 @@ const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
-const ESCROW_ADDRESS = "0x364bD6F3Fe25eBB315Eedb83c2c0B4985d240F2b";
+const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
 
 function isEqual(a, b) {
   if (a.length != b.length) {
@@ -177,6 +177,11 @@ const createStore = () => {
           dapp.contracts.Escrow,
           address,
         );
+        state.escrowContractEvents = dapp.getContractAt(
+          dapp.contracts.Escrow,
+          address,
+          dapp.web3Event,
+        );
       },
       ["accountAddress"](state, address) {
         state.accountAddress = address;
@@ -312,6 +317,13 @@ const createStore = () => {
 
       getEscrowContract(context) {
         context.commit("escrowContract", ESCROW_ADDRESS);
+        context.state.escrowContractEvents.events.PriceSet()
+          .on("data", (event) => {
+            console.log("Escrow PriceSet event", event);
+            context.dispatch("getOwnGoods");
+            context.dispatch("getSelectedFriendGoods");
+          })
+          .on("error", console.log);
       },
 
       transferGoodToSelectedFriend(context, good) {
