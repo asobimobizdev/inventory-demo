@@ -80,6 +80,7 @@ export default {
   background alpha(#f00,0.0)
   position relative
   pointer-events none
+  overflow hidden
   >.drawer
     pointer-events initial
     background alpha(#f0f0f0,0.9)

@@ -131,6 +131,10 @@ export default {
 
 
 <style lang="stylus" scoped>
+.host
+  min-height 804px
+  min-width 900px
+
 .add-box
   width 100%
 
