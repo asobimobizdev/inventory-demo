@@ -1,7 +1,9 @@
 <template>
   <el-container class="host">
     <el-header class="main-header">
-      <div class="logo"></div>
+      <router-link :to="{ name: 'home' }" exact>
+        <div class="logo"></div>
+      </router-link>
       <el-menu
         :router="true"
         :default-active="activeLink"
@@ -64,7 +66,6 @@ html
 
 .main-header
   .logo
-    //
     float left
     background url("AsobiCoin.svg")
     background-repeat no-repeat
