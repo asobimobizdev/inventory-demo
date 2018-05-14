@@ -91,11 +91,6 @@ const createStore = () => {
             id: state.accountAddress,
           },
         ];
-        if (state.selectedFriendId == null) {
-          state.selectedFriendId = state.friends.length > 0 ? state.friends[0].id : null;
-        } else if (state.friends.length < 1) {
-          state.selectedFriendId = null;
-        }
       },
       ["friendsLoading"](state, loading) {
         state.friendsLoading = loading;

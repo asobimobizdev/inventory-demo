@@ -111,6 +111,15 @@ export default {
       return this.$store.state.selectedGood;
     },
   },
+  watch: {
+    friends(friends) {
+      if (friends.length < 0) return;
+      if (!this.$store.state.selectedFriendId) {
+        const selectedFriendId = friends.length > 0 ? friends[0].id : null;
+        this.$store.dispatch("selectFriend", selectedFriendId);
+      }
+    },
+  },
   methods: {
     checkMove(e) {
       return true;
