@@ -7,6 +7,7 @@ import "contracts/Goods.sol";
 contract Escrow {
 
     event Swapped(address buyer, address seller, uint256 goodID, uint256 price);
+    event PriceSet(address seller, uint256 goodID, uint256 price);
 
     AsobiCoin asobiCoin;
     Goods goods;
@@ -28,10 +29,13 @@ contract Escrow {
     }
 
     function setPrice(uint256 goodID, uint256 price) external {
-        require(goods.ownerOf(goodID) == msg.sender);
+        address seller = msg.sender;
+        require(goods.ownerOf(goodID) == seller);
         require(price > 0);
 
         goodPrices[goodID] = price;
+
+        emit PriceSet(seller, goodID, price);
     }
 
     function swap(uint256 goodID) external {

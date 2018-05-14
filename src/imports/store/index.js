@@ -11,19 +11,7 @@ const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
-const ESCROW_ADDRESS = "0x364bD6F3Fe25eBB315Eedb83c2c0B4985d240F2b";
-
-function isEqual(a, b) {
-  if (a.length != b.length) {
-    return false;
-  }
-
-  for (let i = 0; i < a.length; i++) {
-    if (!b[i] || a[i].id != b[i].id) return false;
-  }
-
-  return true;
-}
+const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
 
 function growGoodFromId(id) {
   let good = {};
@@ -51,7 +39,7 @@ const createStore = () => {
       friendsLoading: false,
       friendGoods: [],
       friendGoodsLoading: false,
-      selectedFriendIndex: -1,
+      selectedFriendId: null,
       unconfirmedTransactions: {},
       selectedGood: null,
       balance: 0,
@@ -68,10 +56,9 @@ const createStore = () => {
       },
       ["goods"](state, goods) {
         goods.forEach(good => {
+          if (!state.selectedFriendId) return;
+          const to = state.selectedFriendId;
           const from = state.accountAddress;
-          const selectedFriend = state.friends[state.selectedFriendIndex];
-          if (!selectedFriend) return;
-          const to = selectedFriend.id;
           const tID = `${to}-${from}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
           state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
@@ -104,7 +91,11 @@ const createStore = () => {
             id: state.accountAddress,
           },
         ];
-        state.selectedFriendIndex = state.friends.length > 0 ? 0 : -1;
+        if (state.selectedFriendId == null) {
+          state.selectedFriendId = state.friends.length > 0 ? state.friends[0].id : null;
+        } else if (state.friends.length < 1) {
+          state.selectedFriendId = null;
+        }
       },
       ["friendsLoading"](state, loading) {
         state.friendsLoading = loading;
@@ -112,7 +103,7 @@ const createStore = () => {
       ["friendGoods"](state, goods) {
         goods.forEach(good => {
           const from = state.accountAddress;
-          const to = state.friends[state.selectedFriendIndex].id;
+          const to = state.selectedFriendId;
           const tID = `${from}-${to}-${good.id}`;
           delete state.unconfirmedTransactions[tID];
           state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
@@ -144,8 +135,8 @@ const createStore = () => {
         );
         state.goods[index].confirmed = true;
       },
-      ["setSelectedFriendIndex"](state, index) {
-        state.selectedFriendIndex = index;
+      ["selectedFriendId"](state, id) {
+        state.selectedFriendId = id;
       },
       ["asobiCoinContract"](state, address) {
         state.asobiCoinContract = dapp.getContractAt(
@@ -174,6 +165,11 @@ const createStore = () => {
           dapp.contracts.Escrow,
           address,
         );
+        state.escrowContractEvents = dapp.getContractAt(
+          dapp.contracts.Escrow,
+          address,
+          dapp.web3Event,
+        );
       },
       ["accountAddress"](state, address) {
         state.accountAddress = address;
@@ -193,33 +189,25 @@ const createStore = () => {
       ["balance"](state, balance) {
         state.balance = dapp.web3.utils.fromWei(balance);
       },
+
     },
     actions: {
-      selectFriend(context, friendIndex) {
-        context.commit("setSelectedFriendIndex", friendIndex);
+      selectFriend(context, id) {
+        context.commit("selectedFriendId", id);
         context.dispatch("getSelectedFriendGoods");
       },
 
-      // getFriends(context) {
-      //   const friends = JSON.parse(localStorage.getItem("friends"));
-      //   context.commit("friends", friends);
-      // },
-
-      // saveFriends(context) {
-      //   localStorage.setItem("friends", JSON.stringify(context.state.friends));
-      // },
-
       subscribeToFriends(context) {
-        Meteor.subscribe("friendsWallets");
+        const handle = Meteor.subscribe("friendsWallets");
 
         Meteor.autorun(_ => {
+          if (!handle.ready()) return;
           let friends = Wallets.find({}).fetch();
           console.log("friends", friends);
-          // friends = friends.map(friend => {
-          //   delete friend._id;
-          //   return { ...friend };
-          // })
           context.commit("friends", friends);
+          if (friends.length > 0) {
+            context.dispatch("getSelectedFriendGoods");
+          }
         });
       },
 
@@ -242,37 +230,32 @@ const createStore = () => {
       },
 
       async getOwnGoods(context) {
+        context.commit("goodsLoading", true);
         let goods = await dapp.getTokensForAddress(
           context.state.goodsContract,
           context.state.escrowContract,
           context.state.accountAddress,
         );
-        goods.sort((a, b) => { return a.id > b.id; });
-        if (!isEqual(context.state.goods, goods)) {
-          context.commit("goods", goods);
-          context.commit("goodsLoading", false);
-        }
+        context.commit("goods", goods);
+        context.commit("goodsLoading", false);
       },
 
       async getSelectedFriendGoods(context) {
-        // context.commit("friendGoodsLoading", true);
-        if (context.state.selectedFriendIndex == -1) {
+        if (!context.state.selectedFriendId) {
           return;
         }
-        let address = context.state.friends[
-          context.state.selectedFriendIndex
-        ].id;
+
+        let address = context.state.selectedFriendId;
+
+        context.commit("friendGoodsLoading", true);
         const goods = await dapp.getTokensForAddress(
           context.state.goodsContract,
           context.state.escrowContract,
           address,
         );
 
-        goods.sort((a, b) => { return a.id > b.id; });
-        if (!isEqual(context.state.friendGoods, goods)) {
-          context.commit("friendGoods", goods);
-          context.commit("friendGoodsLoading", false);
-        }
+        context.commit("friendGoods", goods);
+        context.commit("friendGoodsLoading", false);
       },
 
       async createAsobiCoinContract(context) {
@@ -322,12 +305,17 @@ const createStore = () => {
 
       getEscrowContract(context) {
         context.commit("escrowContract", ESCROW_ADDRESS);
+        context.state.escrowContractEvents.events.PriceSet()
+          .on("data", (event) => {
+            console.log("Escrow PriceSet event", event);
+            context.dispatch("getOwnGoods");
+            context.dispatch("getSelectedFriendGoods");
+          })
+          .on("error", console.log);
       },
 
       transferGoodToSelectedFriend(context, good) {
-        let address = context.state.friends[
-          context.state.selectedFriendIndex
-        ].id;
+        let address = context.state.selectedFriendId;
 
         const tokenID = good.id;
 
@@ -454,8 +442,9 @@ const createStore = () => {
     },
     getters: {
       selectFriend: state => {
-        const index = state.selectedFriendIndex;
-        const friend = state.friends[index];
+        const friend = state.friends.find(friend => {
+          return friend.id == state.selectedFriendId;
+        });
         return friend;
       },
       allGoods: state => {
@@ -491,7 +480,9 @@ const createStore = () => {
         const unconfirmedGoods = [];
         const goodsToRemove = {};
 
-        const friend = state.friends[state.selectedFriendIndex];
+        const friend = state.friends.find(friend => {
+          return friend.id == state.selectedFriendId;
+        });
         if (!friend) return;
 
         // state.unconfirmedTransactions.forEach(transaction => {
