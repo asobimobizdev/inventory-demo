@@ -28,6 +28,10 @@ class Repository {
     }
     return items;
   }
+
+  generateTokenID() {
+    return this.web3.utils.randomHex(32);
+  }
 }
 
 export default new Repository(dapp);

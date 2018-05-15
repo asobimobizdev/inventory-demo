@@ -66,10 +66,6 @@ export default class Dapp {
     const gas = await promise.estimateGas();
     return await promise.send({ gas });
   }
-
-  generateTokenID() {
-    return this.web3.utils.randomHex(32);
-  }
 }
 
 export const dapp = new Dapp();

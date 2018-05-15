@@ -351,7 +351,7 @@ const createStore = () => {
       },
 
       async createGoodFor(context, address) {
-        const tokenID = dapp.generateTokenID();
+        const tokenID = repository.generateTokenID();
         await context.state.goodsContract.methods.mint(address, tokenID).send();
       },
 
