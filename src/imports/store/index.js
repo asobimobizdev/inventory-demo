@@ -308,7 +308,7 @@ const createStore = () => {
       transferGoodToSelectedFriend(context, good) {
         let address = context.state.selectedFriendId;
 
-        const tokenID = good.id;
+        const goodID = good.id;
 
         const transaction = {
           from: context.state.accountAddress,
@@ -318,16 +318,16 @@ const createStore = () => {
         context.commit("addUnconfirmedTransaction", transaction);
         p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
 
-        context.dispatch("transferGood", { address, tokenID }).catch((error) => {
+        context.dispatch("transferGood", { address, goodID }).catch((error) => {
           context.commit("removeUnconfirmedTransaction", transaction);
           p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, good.id);
         });
 
       },
 
-      async transferGood(context, { address, tokenID }) {
+      async transferGood(context, { address, goodID }) {
         await repository.transferGood(
-          tokenID,
+          goodID,
           context.state.accountAddress,
           address,
           context.state.goodsContract,
@@ -352,8 +352,8 @@ const createStore = () => {
       },
 
       async createGoodFor(context, address) {
-        const tokenID = repository.generateTokenID();
-        await context.state.goodsContract.methods.mint(address, tokenID).send();
+        const goodID = repository.generateTokenID();
+        await context.state.goodsContract.methods.mint(address, goodID).send();
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
