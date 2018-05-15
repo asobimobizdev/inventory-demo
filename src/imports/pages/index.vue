@@ -145,8 +145,8 @@ export default {
       this.$store.commit("selectedGoodId", good.id);
     },
     isGoodSelected(good) {
-      if (!this.$store.state.selectedGood || !good) return false;
-      return good.id == this.$store.state.selectedGood.id;
+      if (!this.$store.state.selectedGoodId || !good) return false;
+      return good.id == this.$store.state.selectedGoodId;
     },
   },
 };
