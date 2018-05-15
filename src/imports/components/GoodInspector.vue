@@ -64,11 +64,8 @@ export default {
   },
   methods: {
     close() {
-      this.$store.commit("selectGood", null);
+      this.$store.commit("selectedGoodId", null);
     },
-    // onGoodForSaleChanged(good) {
-
-    // },
     buyGood(good) {
       this.$store.dispatch("buyGood", good);
     },

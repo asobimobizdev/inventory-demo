@@ -2,12 +2,12 @@
   <section class="host">
     <div class="content">
 
-      <div class="goods">
+      <div class="goods" v-loading="goodsLoading">
         <div class="head">
           <h1>My Goods</h1>
         </div>
-        <div class="collection grid" v-loading="goodsLoading">
-          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: false, forceFallback:true }" :move="checkMove" @end="onDrop">
+        <div class="collection grid" >
+          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMove" @end="onDrop">
             <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="friend-goods" v-if="hasFriends">
+      <div class="friend-goods" v-if="hasFriends" v-loading="friendGoodsLoading">
         <div class="head">
           <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
             <el-option
@@ -27,8 +27,8 @@
             </el-option>
           </el-select>
         </div>
-        <div class="collection list" v-loading="friendGoodsLoading">
-          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: false, forceFallback:true }" :move="checkMoveFromFriendGoods">
+        <div class="collection list" >
+          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveFromFriendGoods">
             <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
@@ -186,6 +186,9 @@ export default {
   align-content stretch
   align-items stretch
 
+  &.el-loading-parent--relative >.el-loading-mask
+    top 60px !important
+
   .head
     background-color #fff
     height 60px
@@ -290,5 +293,13 @@ export default {
   >.collection
     .item
       height 120px
+
+</style>
+
+<style lang="stylus">
+
+.goods, .friend-goods
+  &.el-loading-parent--relative >.el-loading-mask
+    top 60px !important
 
 </style>
