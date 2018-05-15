@@ -1,5 +1,6 @@
 import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
+import repository from "../lib/repository";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
@@ -221,7 +222,7 @@ const createStore = () => {
 
       async getOwnGoods(context) {
         context.commit("goodsLoading", true);
-        let goods = await dapp.getTokensForAddress(
+        let goods = await repository.getTokensForAddress(
           context.state.goodsContract,
           context.state.escrowContract,
           context.state.accountAddress,
@@ -238,7 +239,7 @@ const createStore = () => {
         let address = context.state.selectedFriendId;
 
         context.commit("friendGoodsLoading", true);
-        const goods = await dapp.getTokensForAddress(
+        const goods = await repository.getTokensForAddress(
           context.state.goodsContract,
           context.state.escrowContract,
           address,
