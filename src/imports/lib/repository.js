@@ -37,6 +37,35 @@ class Repository {
     ).send();
   }
 
+  async setGoodForSale(goodID, price, forSale, good, escrow) {
+    const approved = await good.methods.getApproved(
+      goodID,
+    ).call() === escrow.options.address;
+    if (!forSale) {
+      if (approved) {
+        console.log("Removing approval");
+        await good.methods.approve(
+          "0x0",
+          goodID,
+        ).send();
+      }
+      return;
+    }
+    if (!approved) {
+      console.log("Escrow contract not yet approved", approved);
+      await good.methods.approve(
+        escrow.options.address,
+        goodID,
+      ).send();
+    } else {
+      console.log("Escrow contract already approved");
+    }
+    await escrow.methods.setPrice(
+      goodID,
+      this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
+    ).send();
+  }
+
   generateGoodID() {
     return this.web3.utils.randomHex(32);
   }

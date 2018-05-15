@@ -357,43 +357,20 @@ const createStore = () => {
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
-
         const oldGoodState = {...context.state.goods.find((good)=>{
           return good.id == id;
         })};
         context.commit("setGoodForSale", { id, forSale, price, confirmed:false });
-        try{
+        try {
           price = String(price);
-          const approved = await context.state.goodsContract.methods.getApproved(
-            id,
-          ).call() === context.state.escrowContract.options.address;
-          if (!forSale) {
-            if (approved) {
-              console.log("Removing approval");
-              await context.state.goodsContract.methods.approve(
-                "0x0",
-                id,
-              ).send();
-            }
-            return;
-          }
-          if (!approved) {
-            console.log("Escrow contract not yet approved", approved);
-            await context.state.goodsContract.methods.approve(
-              context.state.escrowContract.options.address,
-              id,
-            ).send();
-          } else {
-            console.log("Escrow contract already approved");
-          }
-          await context.state.escrowContract.methods.setPrice(
-            id,
-            dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
-          ).send();
-        }catch(e){
+          await repository.setGoodForSale(
+            id, price, forSale,
+            context.state.goodsContract,
+            context.state.escrowContract,
+          );
+        } catch(e) {
           context.commit("setGoodForSale", oldGoodState);
         }
-
       },
 
       async buyGood(context, { id }) {
