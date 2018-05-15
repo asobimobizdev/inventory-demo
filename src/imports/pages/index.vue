@@ -45,12 +45,10 @@
 
 <script>
 import draggable from "vuedraggable";
-import dappMixin from "./../mixins/dapp";
 import GoodItem from "./../components/GoodItem.vue";
 import GoodInspector from "./../components/GoodInspector.vue";
 
 export default {
-  mixins: [dappMixin],
   mounted() {
     this.$store.dispatch("getOwnGoods");
     this.$store.dispatch("getSelectedFriendGoods");
