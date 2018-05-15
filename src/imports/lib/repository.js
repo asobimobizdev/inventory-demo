@@ -1,4 +1,4 @@
-import { dapp } from './dapp.js';
+import { dapp } from "./dapp.js";
 
 
 class Repository {
@@ -27,6 +27,14 @@ class Repository {
       );
     }
     return items;
+  }
+
+  async transferToken(tokenID, from, to, good) {
+    await good.methods.transferFrom(
+      from,
+      to,
+      tokenID,
+    ).send();
   }
 
   generateTokenID() {

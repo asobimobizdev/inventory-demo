@@ -326,11 +326,12 @@ const createStore = () => {
       },
 
       async transferToken(context, { address, tokenID }) {
-        await context.state.goodsContract.methods.transferFrom(
+        await repository.transferToken(
+          tokenID,
           context.state.accountAddress,
           address,
-          tokenID,
-        ).send();
+          context.state.goodsContract,
+        );
         // mark token as confirmed!
         context.dispatch("getOwnGoods");
         context.dispatch("getSelectedFriendGoods");
