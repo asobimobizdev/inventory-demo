@@ -318,15 +318,15 @@ const createStore = () => {
         context.commit("addUnconfirmedTransaction", transaction);
         p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
 
-        context.dispatch("transferToken", { address, tokenID }).catch((error) => {
+        context.dispatch("transferGood", { address, tokenID }).catch((error) => {
           context.commit("removeUnconfirmedTransaction", transaction);
           p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, good.id);
         });
 
       },
 
-      async transferToken(context, { address, tokenID }) {
-        await repository.transferToken(
+      async transferGood(context, { address, tokenID }) {
+        await repository.transferGood(
           tokenID,
           context.state.accountAddress,
           address,

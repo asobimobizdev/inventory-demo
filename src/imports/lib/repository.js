@@ -29,7 +29,7 @@ class Repository {
     return items;
   }
 
-  async transferToken(tokenID, from, to, good) {
+  async transferGood(tokenID, from, to, good) {
     await good.methods.transferFrom(
       from,
       to,
