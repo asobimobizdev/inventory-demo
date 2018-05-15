@@ -352,7 +352,7 @@ const createStore = () => {
       },
 
       async createGoodFor(context, address) {
-        const goodID = repository.generateTokenID();
+        const goodID = repository.generateGoodID();
         await context.state.goodsContract.methods.mint(address, goodID).send();
       },
 

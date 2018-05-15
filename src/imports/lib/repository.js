@@ -37,7 +37,7 @@ class Repository {
     ).send();
   }
 
-  generateTokenID() {
+  generateGoodID() {
     return this.web3.utils.randomHex(32);
   }
 }
