@@ -222,7 +222,7 @@ const createStore = () => {
 
       async getOwnGoods(context) {
         context.commit("goodsLoading", true);
-        let goods = await repository.getTokensForAddress(
+        let goods = await repository.getGoodsForAddress(
           context.state.accountAddress,
           context.state.goodsContract,
           context.state.escrowContract,
@@ -239,7 +239,7 @@ const createStore = () => {
         let address = context.state.selectedFriendId;
 
         context.commit("friendGoodsLoading", true);
-        const goods = await repository.getTokensForAddress(
+        const goods = await repository.getGoodsForAddress(
           address,
           context.state.goodsContract,
           context.state.escrowContract,
