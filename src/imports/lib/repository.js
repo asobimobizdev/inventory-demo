@@ -7,7 +7,7 @@ class Repository {
     this.web3 = dapp.web3;
   }
 
-  async getTokensForAddress(goods, escrow, address) {
+  async getTokensForAddress(address, goods, escrow) {
     const balance = await goods.methods.balanceOf(address).call();
     const items = [];
     for (let i = 0; i < balance; i += 1) {

@@ -223,9 +223,9 @@ const createStore = () => {
       async getOwnGoods(context) {
         context.commit("goodsLoading", true);
         let goods = await repository.getTokensForAddress(
+          context.state.accountAddress,
           context.state.goodsContract,
           context.state.escrowContract,
-          context.state.accountAddress,
         );
         context.commit("goods", goods);
         context.commit("goodsLoading", false);
@@ -240,9 +240,9 @@ const createStore = () => {
 
         context.commit("friendGoodsLoading", true);
         const goods = await repository.getTokensForAddress(
+          address,
           context.state.goodsContract,
           context.state.escrowContract,
-          address,
         );
 
         context.commit("friendGoods", goods);
