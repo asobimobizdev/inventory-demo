@@ -325,7 +325,6 @@ const createStore = () => {
       },
 
       async transferToken(context, { address, tokenID }) {
-        await context.state.goodsContract.methods.approve(address, tokenID).send();
         await context.state.goodsContract.methods.transferFrom(
           context.state.accountAddress,
           address,
