@@ -41,7 +41,7 @@ const createStore = () => {
       friendGoodsLoading: false,
       selectedFriendId: null,
       unconfirmedTransactions: {},
-      selectedGood: null,
+      selectedGoodId: null,
       balance: 0,
     },
     mutations: {
@@ -72,13 +72,6 @@ const createStore = () => {
           };
         });
 
-        //TODO: Change selectedGood => selectedGoodID + selectedGood getter
-        goods.forEach(good => {
-          if (state.selectedGood && state.selectedGood.id == good.id) {
-            state.selectedGood = good;
-          }
-        });
-
         state.goods = goods;
       },
       ["goodsLoading"](state, loading) {
@@ -91,11 +84,6 @@ const createStore = () => {
             id: state.accountAddress,
           },
         ];
-        if (state.selectedFriendId == null) {
-          state.selectedFriendId = state.friends.length > 0 ? state.friends[0].id : null;
-        } else if (state.friends.length < 1) {
-          state.selectedFriendId = null;
-        }
       },
       ["friendsLoading"](state, loading) {
         state.friendsLoading = loading;
@@ -115,13 +103,6 @@ const createStore = () => {
             ...growGoodFromId(good.id),
             isOwned: false,
           };
-        });
-
-        //TODO: Change selectedGood => selectedGoodID + selectedGood getter
-        goods.forEach(good => {
-          if (state.selectedGood && state.selectedGood.id == good.id) {
-            state.selectedGood = good;
-          }
         });
 
         state.friendGoods = goods;
@@ -183,13 +164,23 @@ const createStore = () => {
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
       },
-      ["selectGood"](state, good) {
-        state.selectedGood = good;
+      ["selectedGoodId"](state, id) {
+        state.selectedGoodId = id;
       },
       ["balance"](state, balance) {
         state.balance = dapp.web3.utils.fromWei(balance);
       },
-
+      ["setGoodForSale"](state, { id, forSale, price, confirmed } ){
+        state.goods = state.goods.map(good => {
+          if(good.id == id){
+            good.forSale = forSale;
+            good.price = price;
+            good.confirmed = confirmed;
+            good ={...good};
+          }
+          return good;
+        });
+      },
     },
     actions: {
       selectFriend(context, id) {
@@ -212,7 +203,6 @@ const createStore = () => {
       },
 
       addFriend(context, friend) {
-        const friends = [...context.state.friends, { ...friend }];
         Wallets.insert(friend);
       },
 
@@ -366,33 +356,43 @@ const createStore = () => {
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
-        price = String(price);
-        const approved = await context.state.goodsContract.methods.getApproved(
-          id,
-        ).call() === context.state.escrowContract.options.address;
-        if (!forSale) {
-          if (approved) {
-            console.log("Removing approval");
+
+        const oldGoodState = {...context.state.goods.find((good)=>{
+          return good.id == id;
+        })};
+        context.commit("setGoodForSale", { id, forSale, price, confirmed:false });
+        try{
+          price = String(price);
+          const approved = await context.state.goodsContract.methods.getApproved(
+            id,
+          ).call() === context.state.escrowContract.options.address;
+          if (!forSale) {
+            if (approved) {
+              console.log("Removing approval");
+              await context.state.goodsContract.methods.approve(
+                "0x0",
+                id,
+              ).send();
+            }
+            return;
+          }
+          if (!approved) {
+            console.log("Escrow contract not yet approved", approved);
             await context.state.goodsContract.methods.approve(
-              "0x0",
+              context.state.escrowContract.options.address,
               id,
             ).send();
+          } else {
+            console.log("Escrow contract already approved");
           }
-          return;
-        }
-        if (!approved) {
-          console.log("Escrow contract not yet approved", approved);
-          await context.state.goodsContract.methods.approve(
-            context.state.escrowContract.options.address,
+          await context.state.escrowContract.methods.setPrice(
             id,
+            dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
           ).send();
-        } else {
-          console.log("Escrow contract already approved");
+        }catch(e){
+          context.commit("setGoodForSale", oldGoodState);
         }
-        await context.state.escrowContract.methods.setPrice(
-          id,
-          dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
-        ).send();
+
       },
 
       async buyGood(context, { id }) {
@@ -447,12 +447,25 @@ const createStore = () => {
         });
         return friend;
       },
+      selectedGood: (state,getters) =>{
+        if(!state.selectedGoodId) return null;
+        let selectedGood = getters.allGoods.find(good =>{
+          return good.id == state.selectedGoodId;
+        });
+
+        if(!selectedGood){
+          selectedGood = getters.allFriendGoods.find(good =>{
+            return good.id == state.selectedGoodId;
+          });
+        }
+
+        return selectedGood;
+      },
       allGoods: state => {
         let transaction;
         const unconfirmedGoods = [];
         const goodsToRemove = {};
 
-        // state.unconfirmedTransactions.forEach(transaction => {
         for (let tID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[tID];
 
@@ -485,7 +498,6 @@ const createStore = () => {
         });
         if (!friend) return;
 
-        // state.unconfirmedTransactions.forEach(transaction => {
         for (let tID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[tID];
           if (transaction.from == friend.id) {

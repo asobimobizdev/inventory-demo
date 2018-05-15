@@ -62,7 +62,7 @@ html
 .host
   width 100vw
   height calc(100vh - 0px)
-  overflow hidden
+  overflow auto
 
 .main-header
   .logo

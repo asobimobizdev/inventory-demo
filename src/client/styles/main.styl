@@ -10,10 +10,6 @@
   flex 1 1 auto
 
 .collection
-  display flex
-  flex-direction: column
-  justify-content: flex-start
-
   overflow-x hidden
   overflow-y scroll
 
@@ -21,6 +17,10 @@
 
   >.container
     min-height 120px
+    &:after
+      content ""
+      height 204px
+      width 100%
 
     >.item
       background-color: alpha(#000, 0.0)
@@ -31,8 +31,8 @@
       align-content: center;
       align-items: center;
 
-      &:last-child
-        margin-bottom: 216px
+      // &:last-child
+      //   margin-bottom: 216px
 
   &.list
     background-color alpha(#fff,1)
@@ -49,9 +49,9 @@
       grid-gap 4px
       grid-template-columns repeat(auto-fit, minmax(180px,1fr));
 
-.item.el-loading-parent--relative
+.item.el-loading-parent--relative, .good-item.el-loading-parent--relative
   >div.el-loading-mask
-    background-color alpha(#fff,0.3) !important
+    background-color alpha(#000,0.3) !important
     >.el-loading-spinner
       top: calc(50% - 0px) !important
       circle

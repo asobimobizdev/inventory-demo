@@ -58,9 +58,7 @@
 </template>
 
 <script>
-import dappMixin from "./../mixins/dapp";
 export default {
-  mixins: [dappMixin],
   mounted() {
     this.$store.dispatch("checkGoodsAdmin");
     this.$store.dispatch("checkAsobiCoinAdmin");
@@ -131,6 +129,10 @@ export default {
 
 
 <style lang="stylus" scoped>
+.host
+  min-height 804px
+  min-width 900px
+
 .add-box
   width 100%
 

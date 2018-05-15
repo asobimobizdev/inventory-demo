@@ -2,12 +2,12 @@
   <section class="host">
     <div class="content">
 
-      <div class="goods">
+      <div class="goods" v-loading="goodsLoading">
         <div class="head">
           <h1>My Goods</h1>
         </div>
-        <div class="collection grid" v-loading="goodsLoading">
-          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true }" :move="checkMove" @end="onDrop">
+        <div class="collection grid" >
+          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMove" @end="onDrop">
             <div class="item" v-for="(good) in goods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="friend-goods" v-if="hasFriends">
+      <div class="friend-goods" v-if="hasFriends" v-loading="friendGoodsLoading">
         <div class="head">
           <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
             <el-option
@@ -27,8 +27,8 @@
             </el-option>
           </el-select>
         </div>
-        <div class="collection list" v-loading="friendGoodsLoading">
-          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true, forceFallback:true }" :move="checkMoveFromFriendGoods">
+        <div class="collection list" >
+          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveFromFriendGoods">
             <div class="item" v-for="(good) in friendGoods" :key="good.id" v-loading="!good.confirmed" @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
@@ -45,12 +45,10 @@
 
 <script>
 import draggable from "vuedraggable";
-import dappMixin from "./../mixins/dapp";
 import GoodItem from "./../components/GoodItem.vue";
 import GoodInspector from "./../components/GoodInspector.vue";
 
 export default {
-  mixins: [dappMixin],
   mounted() {
     this.$store.dispatch("getOwnGoods");
     this.$store.dispatch("getSelectedFriendGoods");
@@ -108,7 +106,16 @@ export default {
       return this.$store.state.friendGoodsLoading;
     },
     selectedGood() {
-      return this.$store.state.selectedGood;
+      return this.$store.getters.selectedGood;
+    },
+  },
+  watch: {
+    friends(friends) {
+      if (friends.length < 0) return;
+      if (!this.$store.state.selectedFriendId) {
+        const selectedFriendId = friends.length > 0 ? friends[0].id : null;
+        this.$store.dispatch("selectFriend", selectedFriendId);
+      }
     },
   },
   methods: {
@@ -133,11 +140,11 @@ export default {
       this.$store.dispatch("transferGoodToSelectedFriend", good);
     },
     selectGood(good) {
-      this.$store.commit("selectGood", good);
+      this.$store.commit("selectedGoodId", good.id);
     },
     isGoodSelected(good) {
-      if (!this.$store.state.selectedGood || !good) return false;
-      return good.id == this.$store.state.selectedGood.id;
+      if (!this.$store.state.selectedGoodId || !good) return false;
+      return good.id == this.$store.state.selectedGoodId;
     },
   },
 };
@@ -178,6 +185,9 @@ export default {
   justify-content flex-start
   align-content stretch
   align-items stretch
+
+  &.el-loading-parent--relative >.el-loading-mask
+    top 60px !important
 
   .head
     background-color #fff
@@ -283,5 +293,13 @@ export default {
   >.collection
     .item
       height 120px
+
+</style>
+
+<style lang="stylus">
+
+.goods, .friend-goods
+  &.el-loading-parent--relative >.el-loading-mask
+    top 60px !important
 
 </style>

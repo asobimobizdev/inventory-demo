@@ -1,4 +1,3 @@
-import signalhub from "signalhub";
 import { addressStreamer } from "./../api/streams";
 
 export default class P2PManager {
@@ -8,11 +7,11 @@ export default class P2PManager {
     addressStreamer.on(address, function (message) {
       switch (message.action) {
       case "addUnconfirmedTransaction":
-        message.to = context.state.accountAddress;
+        message.to = address;
         context.commit("addUnconfirmedTransaction", message);
         break;
       case "removeUnconfirmedTransaction":
-        message.to = context.state.accountAddress;
+        message.to = address;
         context.commit("removeUnconfirmedTransaction", message);
         break;
       }
