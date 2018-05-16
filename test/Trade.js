@@ -72,6 +72,12 @@ contract("Trade", accounts => {
         await assertRejected(trade.withdraw(traderAOptions));
         await assertRejected(trade.withdraw(traderBOptions));
       });
+
+      it("won't let traders remove items", async () => {
+        await goods.mint(traderA, item1);
+        await goods.approve(trade.address, item1, traderAOptions);
+        await assertRejected(trade.removeGood(traderAOptions));
+      });
     })
   });
 
@@ -98,6 +104,7 @@ contract("Trade", accounts => {
     it("checks ownership", async () => {
       await assertRejected(trade.addGood(item1, traderBOptions));
     });
+
 
     describe("with one good added", () => {
       beforeEach(async () => {
@@ -138,6 +145,29 @@ contract("Trade", accounts => {
         await trade.removeGood(item3, traderBOptions);
         assert.equal((await trade.numTraderGoods(traderB)).toNumber(), 0);
         assert.equal((await trade.numGoods()).toNumber(), 1);
+      });
+
+      it("won't allow exchanging before finalization", async () => {
+        await assertRejected(trade.exchange(traderBOptions));
+      });
+
+      describe("and finalized", () => {
+        beforeEach(async () => {
+          await trade.accept(traderAOptions);
+          await trade.accept(traderBOptions);
+        });
+
+        it("lets traders exchange the items", async () => {
+          await trade.exchange();
+          assert.equal(await goods.ownerOf(item1), traderB);
+          assert.equal(await goods.ownerOf(item2), traderA);
+          assert.equal(await goods.ownerOf(item3), traderA);
+        });
+
+        it("will fail if item approvals are taken away", async () => {
+          await goods.approve("0x0", item1, traderAOptions);
+          await assertRejected(trade.exchange());
+        });
       });
     });
   });

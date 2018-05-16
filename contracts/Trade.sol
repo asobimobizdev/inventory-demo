@@ -7,6 +7,10 @@ contract Trade {
 
     event GoodAdded(address _trader, uint256 goodID);
     event GoodRemoved(address _trader, uint256 goodID);
+    event GoodExchanged(address _from, address _to, uint256 goodID);
+    event TradeAccepted(address _trader);
+    event TradeWithdrawn(address _trader);
+    event TradeFinalized();
 
     address[2] public traders;
     bool[2] public traderAccepted;
@@ -30,9 +34,8 @@ contract Trade {
         return traders.length;
     }
 
-    function numTraderGoods(address trader)
-    onlyTrader(trader) external view returns (uint256) {
-        return traderGoods[_traderIndex(trader)].length;
+    function numTraderGoods(address trader) external view returns (uint256) {
+        return _numTraderGoods(_traderIndex(trader));
     }
 
     function numTradersAccepted() external view returns (uint256) {
@@ -73,6 +76,8 @@ contract Trade {
         require(traderAccepted[traderIndex] == false);
 
         traderAccepted[traderIndex] = true;
+
+        emit TradeAccepted(msg.sender);
     }
 
     function withdraw() onlyTrader(msg.sender) external {
@@ -81,6 +86,7 @@ contract Trade {
         require(!isFinal());
 
         traderAccepted[traderIndex] = false;
+        emit TradeWithdrawn(msg.sender);
     }
 
     function addGood(uint256 goodID) onlyTrader(msg.sender) external {
@@ -109,8 +115,28 @@ contract Trade {
         emit GoodRemoved(trader, goodID);
     }
 
+    function exchange() external {
+        require(isFinal());
 
-    function _traderIndex(address trader) onlyTrader(trader) internal view returns (uint256) {
+        for(uint256 ownerIndex = 0; ownerIndex < traders.length; ownerIndex++) {
+            address owner = traders[ownerIndex];
+            uint256 receiverIndex = (traders.length - 1) - ownerIndex;
+            address receiver = traders[receiverIndex];
+            uint256 numGoods = _numTraderGoods(ownerIndex);
+            for(uint256 goodIndex = 0; goodIndex < numGoods; goodIndex++) {
+                uint256 goodID = traderGoods[ownerIndex][goodIndex];
+                goods.transferFrom(owner, receiver, goodID);
+                emit GoodExchanged(owner, receiver, goodID);
+            }
+        }
+    }
+
+    function _numTraderGoods(uint256 _index) internal view returns (uint256) {
+        return traderGoods[_index].length;
+    }
+
+    function _traderIndex(address trader)
+    onlyTrader(trader) internal view returns (uint256) {
         if (trader == traders[0]) {
             return 0;
         } else {
