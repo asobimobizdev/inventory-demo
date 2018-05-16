@@ -22,9 +22,10 @@ export default class P2PManager {
     addressStreamer.emit(toAddress, { action: "addUnconfirmedTransaction", from, goodID });
   }
 
-  removeUnconfirmedTransaction(from, toAddress, goodID) {
-    addressStreamer.emit(toAddress, { action: "removeUnconfirmedTransaction", from, goodID });
+  removeUnconfirmedTransaction(from, toAddress, goodID, confirmed=false) {
+    addressStreamer.emit(toAddress, { action: "removeUnconfirmedTransaction", from, goodID, confirmed });
   }
+
 
 }
 

@@ -54,14 +54,14 @@ const createStore = () => {
         state.isAsobiCoinAdmin = isAsobiCoinAdmin;
       },
       ["goods"](state, goods) {
-        goods.forEach(good => {
-          if (!state.selectedFriendId) return;
-          const to = state.selectedFriendId;
-          const from = state.accountAddress;
-          const tID = `${to}-${from}-${good.id}`;
-          delete state.unconfirmedTransactions[tID];
-          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-        });
+        // goods.forEach(good => {
+        //   if (!state.selectedFriendId) return;
+        //   const to = state.selectedFriendId;
+        //   const from = state.accountAddress;
+        //   const tID = `${to}-${from}-${good.id}`;
+        //   delete state.unconfirmedTransactions[tID];
+        //   state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+        // });
 
         goods = goods.map(good => {
           return {
@@ -88,13 +88,13 @@ const createStore = () => {
         state.friendsLoading = loading;
       },
       ["friendGoods"](state, goods) {
-        goods.forEach(good => {
-          const from = state.accountAddress;
-          const to = state.selectedFriendId;
-          const tID = `${from}-${to}-${good.id}`;
-          delete state.unconfirmedTransactions[tID];
-          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-        });
+        // goods.forEach(good => {
+        //   const from = state.accountAddress;
+        //   const to = state.selectedFriendId;
+        //   const tID = `${from}-${to}-${good.id}`;
+        //   delete state.unconfirmedTransactions[tID];
+        //   state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+        // });
 
         goods = goods.map(good => {
           return {
@@ -129,6 +129,19 @@ const createStore = () => {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+
+        if(transaction.confirmed){
+          const goodID = transaction.goodID;
+          if(transaction.to == state.accountAddress){
+            const good = state.friendGoods.find(good => good.id == goodID );
+            state.friendGoods = state.friendGoods.filter( good => good.id != goodID );
+            state.goods = [...state.goods, ...[good]];
+          }else{
+            const good = state.goods.find(good => good.id == goodID );
+            state.goods = state.goods.filter( good => good.id != goodID );
+            state.friendGoods = [...state.friendGoods, ...[good]];
+          }
+        }
       },
       ["selectedGoodId"](state, id) {
         state.selectedGoodId = id;
@@ -142,11 +155,12 @@ const createStore = () => {
             good.forSale = forSale;
             good.price = price;
             good.confirmed = confirmed;
-            good ={...good};
+            good = {...good};
           }
           return good;
         });
       },
+
     },
     actions: {
       selectFriend(context, id) {
@@ -160,7 +174,6 @@ const createStore = () => {
         Meteor.autorun(_ => {
           if (!handle.ready()) return;
           let friends = Wallets.find({}).fetch();
-          console.log("friends", friends);
           context.commit("friends", friends);
           if (friends.length > 0) {
             context.dispatch("getSelectedFriendGoods");
@@ -250,8 +263,6 @@ const createStore = () => {
         repository.c.goodsContractEvents.events.allEvents()
           .on("data", (event) => {
             console.log("Goods event", event);
-            context.dispatch("getOwnGoods");
-            context.dispatch("getSelectedFriendGoods");
           })
           .on("error", console.log);
 
@@ -295,7 +306,7 @@ const createStore = () => {
           .on("error", console.log);
       },
 
-      transferGoodToSelectedFriend(context, good) {
+      async transferGoodToSelectedFriend(context, good) {
         let address = context.state.selectedFriendId;
 
         const goodID = good.id;
@@ -306,25 +317,26 @@ const createStore = () => {
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
-        p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
+        p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
 
-        context.dispatch("transferGood", { address, goodID }).catch((error) => {
+        try{
+
+          await repository.transferGood(
+            goodID,
+            context.state.accountAddress,
+            address,
+            repository.c.goodsContract,
+          );
+          transaction.confirmed = true;
           context.commit("removeUnconfirmedTransaction", transaction);
-          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, good.id);
-        });
+          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, true);
 
-      },
+        }catch(e){
+          transaction.confirmed = false;
+          context.commit("removeUnconfirmedTransaction", transaction);
+          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, false);
+        }
 
-      async transferGood(context, { address, goodID }) {
-        await repository.transferGood(
-          goodID,
-          context.state.accountAddress,
-          address,
-          repository.c.goodsContract,
-        );
-        // mark token as confirmed!
-        context.dispatch("getOwnGoods");
-        context.dispatch("getSelectedFriendGoods");
       },
 
       async checkGoodsAdmin(context) {
