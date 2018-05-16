@@ -8,7 +8,7 @@ import { Wallets } from "./../api/collections";
 
 window.Wallets = Wallets;
 
-const localStorage = window.localStorage;
+// const localStorage = window.localStorage;
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
@@ -114,23 +114,6 @@ const createStore = () => {
         if(!state.unconfirmedTransactions[tID]) return;
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-
-        if(transaction.confirmed){
-          const goodID = transaction.goodID;
-          if(transaction.to == state.accountAddress){
-            const good = state.friendGoods.find(good => good.id == goodID );
-            good.forSale = false;
-            good.isOwned = true;
-            state.friendGoods = state.friendGoods.filter( good => good.id != goodID );
-            state.goods = [...state.goods, ...[good]];
-          }else{
-            const good = state.goods.find(good => good.id == goodID );
-            good.forSale = false;
-            good.isOwned = false;
-            state.goods = state.goods.filter( good => good.id != goodID );
-            state.friendGoods = [...state.friendGoods, ...[good]];
-          }
-        }
       },
       ["selectedGoodId"](state, id) {
         state.selectedGoodId = id;
@@ -250,7 +233,7 @@ const createStore = () => {
         );
 
         repository.c.goodsContractEvents.events.Transfer()
-          .on("data", (data) => {
+          .on("data", async (data) => {
 
             const transaction = {
               from:data.returnValues._from,
@@ -260,6 +243,12 @@ const createStore = () => {
             };
 
             console.log("Good Transaction", transaction);
+
+            await Promise.all([
+              context.dispatch("getOwnGoods"),
+              context.dispatch("getSelectedFriendGoods"),
+            ]);
+
             context.commit("removeUnconfirmedTransaction", transaction);
           })
           .on("error", console.log);
@@ -319,17 +308,12 @@ const createStore = () => {
         p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
 
         try{
-
           await repository.transferGood(
             goodID,
             context.state.accountAddress,
             address,
             repository.c.goodsContract,
           );
-          transaction.confirmed = true;
-          context.commit("removeUnconfirmedTransaction", transaction);
-          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, true);
-
         }catch(e){
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
@@ -386,17 +370,10 @@ const createStore = () => {
 
         try{
           await repository.buyGood(id, context.state.accountAddress);
-
-          transaction.confirmed = true;
-          context.commit("removeUnconfirmedTransaction", transaction);
-          p2pManager.removeUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID, true);
-
         }catch(e){
-
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
           p2pManager.removeUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID, false);
-
         }
       },
 
