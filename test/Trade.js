@@ -21,5 +21,6 @@ contract("Trade", accounts => {
   });
 
   it("can be created", async () => {
+    assert.equal(await trade.playerA(), playerA);
   });
 });

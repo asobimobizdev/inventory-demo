@@ -5,9 +5,10 @@ import "contracts/Goods.sol";
 
 contract Trade {
 
+    address public playerA;
+    address public playerB;
+
     Goods goods;
-    address playerA;
-    address playerB;
 
     constructor(Goods _goods, address _playerA, address _playerB) public {
         goods = _goods;
