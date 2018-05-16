@@ -158,6 +158,8 @@ const createStore = () => {
       selectFriend(context, id) {
         context.commit("selectedFriendId", id);
         context.dispatch("getSelectedFriendGoods");
+
+        p2pManager.subscribe(id,context);
       },
 
       subscribeToFriends(context) {
@@ -309,7 +311,8 @@ const createStore = () => {
 
         const transaction = {
           from: context.state.accountAddress,
-          to: address, goodID: good.id,
+          to: address,
+          goodID: good.id,
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
@@ -371,7 +374,30 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-        await repository.buyGood(id, context.state.accountAddress);
+
+        const transaction = {
+          from: context.state.selectedFriendId,
+          to: context.state.accountAddress,
+          goodID: id,
+        };
+
+        context.commit("addUnconfirmedTransaction", transaction);
+        p2pManager.addUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID);
+
+        try{
+          await repository.buyGood(id, context.state.accountAddress);
+
+          transaction.confirmed = true;
+          context.commit("removeUnconfirmedTransaction", transaction);
+          p2pManager.removeUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID, true);
+
+        }catch(e){
+
+          transaction.confirmed = false;
+          context.commit("removeUnconfirmedTransaction", transaction);
+          p2pManager.removeUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID, false);
+
+        }
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
