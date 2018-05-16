@@ -31,10 +31,6 @@ const createStore = () => {
       dappInit: false,
       isGoodsAdmin: false,
       isAsobiCoinAdmin: false,
-      asobiCoinContract: null,
-      asobiCoinContractEvents: null,
-      escrowContract: null,
-      goodsContract: null,
       accountAddress: null,
       goods: [],
       goodsLoading: false,
@@ -122,39 +118,6 @@ const createStore = () => {
       ["selectedFriendId"](state, id) {
         state.selectedFriendId = id;
       },
-      ["asobiCoinContract"](state, address) {
-        state.asobiCoinContract = dapp.getContractAt(
-          dapp.contracts.AsobiCoin,
-          address,
-        );
-        state.asobiCoinContractEvents = dapp.getContractAt(
-          dapp.contracts.AsobiCoin,
-          address,
-          dapp.web3Event,
-        );
-      },
-      ["goodsContract"](state, address) {
-        state.goodsContract = dapp.getContractAt(
-          dapp.contracts.Goods,
-          address,
-        );
-        state.goodsContractEvents = dapp.getContractAt(
-          dapp.contracts.Goods,
-          address,
-          dapp.web3Event,
-        );
-      },
-      ["escrowContract"](state, address) {
-        state.escrowContract = dapp.getContractAt(
-          dapp.contracts.Escrow,
-          address,
-        );
-        state.escrowContractEvents = dapp.getContractAt(
-          dapp.contracts.Escrow,
-          address,
-          dapp.web3Event,
-        );
-      },
       ["accountAddress"](state, address) {
         state.accountAddress = address;
       },
@@ -218,7 +181,7 @@ const createStore = () => {
           "balance",
           await repository.getAsobiCoinBalance(
             context.state.accountAddress,
-            context.state.asobiCoinContract,
+            repository.c.asobiCoinContract,
           ),
         );
       },
@@ -227,8 +190,8 @@ const createStore = () => {
         context.commit("goodsLoading", true);
         let goods = await repository.getGoodsForAddress(
           context.state.accountAddress,
-          context.state.goodsContract,
-          context.state.escrowContract,
+          repository.c.goodsContract,
+          repository.c.escrowContract,
         );
         context.commit("goods", goods);
         context.commit("goodsLoading", false);
@@ -244,8 +207,8 @@ const createStore = () => {
         context.commit("friendGoodsLoading", true);
         const goods = await repository.getGoodsForAddress(
           address,
-          context.state.goodsContract,
-          context.state.escrowContract,
+          repository.c.goodsContract,
+          repository.c.escrowContract,
         );
 
         context.commit("friendGoods", goods);
@@ -267,16 +230,24 @@ const createStore = () => {
       async createEscrowContract(context) {
         const contract = await dapp.deployContract(
           dapp.contracts.Escrow, [
-            context.state.asobiCoinContract.options.address,
-            context.state.goodsContract.options.address,
+            repository.c.asobiCoinContract.options.address,
+            repository.c.goodsContract.options.address,
           ]
         );
       },
 
       getGoodsContract(context) {
-        context.commit("goodsContract", GOODS_ADDRESS);
+        repository.c.goodsContract = dapp.getContractAt(
+          dapp.contracts.Goods,
+          GOODS_ADDRESS,
+        );
+        repository.c.goodsContractEvents = dapp.getContractAt(
+          dapp.contracts.Goods,
+          GOODS_ADDRESS,
+          dapp.web3Event,
+        );
 
-        context.state.goodsContractEvents.events.allEvents()
+        repository.c.goodsContractEvents.events.allEvents()
           .on("data", (event) => {
             console.log("Goods event", event);
             context.dispatch("getOwnGoods");
@@ -288,8 +259,16 @@ const createStore = () => {
       },
 
       getAsobiCoinContract(context) {
-        context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
-        context.state.asobiCoinContractEvents.events.Transfer()
+        repository.c.asobiCoinContract = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          ASOBI_COIN_ADDRESS,
+        );
+        repository.c.asobiCoinContractEvents = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          ASOBI_COIN_ADDRESS,
+          dapp.web3Event,
+        );
+        repository.c.asobiCoinContractEvents.events.Transfer()
           .on("data", (event) => {
             console.log("AsobiCoin Transfer event", event);
             context.dispatch("getBalance");
@@ -298,8 +277,16 @@ const createStore = () => {
       },
 
       getEscrowContract(context) {
-        context.commit("escrowContract", ESCROW_ADDRESS);
-        context.state.escrowContractEvents.events.PriceSet()
+        repository.c.escrowContract = dapp.getContractAt(
+          dapp.contracts.Escrow,
+          ESCROW_ADDRESS,
+        );
+        repository.c.escrowContractEvents = dapp.getContractAt(
+          dapp.contracts.Escrow,
+          ESCROW_ADDRESS,
+          dapp.web3Event,
+        );
+        repository.c.escrowContractEvents.events.PriceSet()
           .on("data", (event) => {
             console.log("Escrow PriceSet event", event);
             context.dispatch("getOwnGoods");
@@ -333,7 +320,7 @@ const createStore = () => {
           goodID,
           context.state.accountAddress,
           address,
-          context.state.goodsContract,
+          repository.c.goodsContract,
         );
         // mark token as confirmed!
         context.dispatch("getOwnGoods");
@@ -343,7 +330,7 @@ const createStore = () => {
       async checkGoodsAdmin(context) {
         const isOwner = await repository.isGoodsAdmin(
           context.state.accountAddress,
-          context.state.goodsContract,
+          repository.c.goodsContract,
         );
         context.commit("isGoodsAdmin", isOwner);
       },
@@ -351,7 +338,7 @@ const createStore = () => {
       async checkAsobiCoinAdmin(context) {
         const isOwner = await repository.isAsobiCoinAdmin(
           context.state.accountAddress,
-          context.state.asobiCoinContract,
+          repository.c.asobiCoinContract,
         );
         context.commit("isAsobiCoinAdmin", isOwner);
       },
@@ -359,7 +346,7 @@ const createStore = () => {
       async createGoodFor(context, address) {
         await repository.createGood(
           address,
-          context.state.goodsContract,
+          repository.c.goodsContract,
         );
       },
 
@@ -372,8 +359,8 @@ const createStore = () => {
           price = String(price);
           await repository.setGoodForSale(
             id, price, forSale,
-            context.state.goodsContract,
-            context.state.escrowContract,
+            repository.c.goodsContract,
+            repository.c.escrowContract,
           );
         } catch(e) {
           context.commit("setGoodForSale", oldGoodState);
@@ -384,9 +371,9 @@ const createStore = () => {
         await repository.buyGood(
           id,
           context.state.accountAddress,
-          context.state.goodsContract,
-          context.state.asobiCoinContract,
-          context.state.escrowContract,
+          repository.c.goodsContract,
+          repository.c.asobiCoinContract,
+          repository.c.escrowContract,
         );
       },
 
@@ -394,7 +381,7 @@ const createStore = () => {
         await repository.createCoin(
           friend.id,
           dapp.web3.utils.toWei(amount, "ether"),
-          context.state.asobiCoinContract,
+          repository.c.asobiCoinContract,
         );
       },
     },
