@@ -1,6 +1,6 @@
 import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
-import repository from "../lib/repository";
+import Repository from "../lib/repository";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
@@ -23,16 +23,14 @@ function growGoodFromId(id) {
   return good;
 }
 
+const repository = new Repository(dapp);
+
 const createStore = () => {
   return new Vuex.Store({
     state: {
       dappInit: false,
       isGoodsAdmin: false,
       isAsobiCoinAdmin: false,
-      asobiCoinContract: null,
-      asobiCoinContractEvents: null,
-      escrowContract: null,
-      goodsContract: null,
       accountAddress: null,
       goods: [],
       goodsLoading: false,
@@ -56,14 +54,14 @@ const createStore = () => {
         state.isAsobiCoinAdmin = isAsobiCoinAdmin;
       },
       ["goods"](state, goods) {
-        goods.forEach(good => {
-          if (!state.selectedFriendId) return;
-          const to = state.selectedFriendId;
-          const from = state.accountAddress;
-          const tID = `${to}-${from}-${good.id}`;
-          delete state.unconfirmedTransactions[tID];
-          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-        });
+        // goods.forEach(good => {
+        //   if (!state.selectedFriendId) return;
+        //   const to = state.selectedFriendId;
+        //   const from = state.accountAddress;
+        //   const tID = `${to}-${from}-${good.id}`;
+        //   delete state.unconfirmedTransactions[tID];
+        //   state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+        // });
 
         goods = goods.map(good => {
           return {
@@ -90,13 +88,13 @@ const createStore = () => {
         state.friendsLoading = loading;
       },
       ["friendGoods"](state, goods) {
-        goods.forEach(good => {
-          const from = state.accountAddress;
-          const to = state.selectedFriendId;
-          const tID = `${from}-${to}-${good.id}`;
-          delete state.unconfirmedTransactions[tID];
-          state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-        });
+        // goods.forEach(good => {
+        //   const from = state.accountAddress;
+        //   const to = state.selectedFriendId;
+        //   const tID = `${from}-${to}-${good.id}`;
+        //   delete state.unconfirmedTransactions[tID];
+        //   state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+        // });
 
         goods = goods.map(good => {
           return {
@@ -120,39 +118,6 @@ const createStore = () => {
       ["selectedFriendId"](state, id) {
         state.selectedFriendId = id;
       },
-      ["asobiCoinContract"](state, address) {
-        state.asobiCoinContract = dapp.getContractAt(
-          dapp.contracts.AsobiCoin,
-          address,
-        );
-        state.asobiCoinContractEvents = dapp.getContractAt(
-          dapp.contracts.AsobiCoin,
-          address,
-          dapp.web3Event,
-        );
-      },
-      ["goodsContract"](state, address) {
-        state.goodsContract = dapp.getContractAt(
-          dapp.contracts.Goods,
-          address,
-        );
-        state.goodsContractEvents = dapp.getContractAt(
-          dapp.contracts.Goods,
-          address,
-          dapp.web3Event,
-        );
-      },
-      ["escrowContract"](state, address) {
-        state.escrowContract = dapp.getContractAt(
-          dapp.contracts.Escrow,
-          address,
-        );
-        state.escrowContractEvents = dapp.getContractAt(
-          dapp.contracts.Escrow,
-          address,
-          dapp.web3Event,
-        );
-      },
       ["accountAddress"](state, address) {
         state.accountAddress = address;
       },
@@ -164,6 +129,19 @@ const createStore = () => {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+
+        if(transaction.confirmed){
+          const goodID = transaction.goodID;
+          if(transaction.to == state.accountAddress){
+            const good = state.friendGoods.find(good => good.id == goodID );
+            state.friendGoods = state.friendGoods.filter( good => good.id != goodID );
+            state.goods = [...state.goods, ...[good]];
+          }else{
+            const good = state.goods.find(good => good.id == goodID );
+            state.goods = state.goods.filter( good => good.id != goodID );
+            state.friendGoods = [...state.friendGoods, ...[good]];
+          }
+        }
       },
       ["selectedGoodId"](state, id) {
         state.selectedGoodId = id;
@@ -177,11 +155,12 @@ const createStore = () => {
             good.forSale = forSale;
             good.price = price;
             good.confirmed = confirmed;
-            good ={...good};
+            good = {...good};
           }
           return good;
         });
       },
+
     },
     actions: {
       selectFriend(context, id) {
@@ -195,7 +174,6 @@ const createStore = () => {
         Meteor.autorun(_ => {
           if (!handle.ready()) return;
           let friends = Wallets.find({}).fetch();
-          console.log("friends", friends);
           context.commit("friends", friends);
           if (friends.length > 0) {
             context.dispatch("getSelectedFriendGoods");
@@ -216,7 +194,7 @@ const createStore = () => {
           "balance",
           await repository.getAsobiCoinBalance(
             context.state.accountAddress,
-            context.state.asobiCoinContract,
+            repository.c.asobiCoinContract,
           ),
         );
       },
@@ -225,8 +203,8 @@ const createStore = () => {
         context.commit("goodsLoading", true);
         let goods = await repository.getGoodsForAddress(
           context.state.accountAddress,
-          context.state.goodsContract,
-          context.state.escrowContract,
+          repository.c.goodsContract,
+          repository.c.escrowContract,
         );
         context.commit("goods", goods);
         context.commit("goodsLoading", false);
@@ -242,8 +220,8 @@ const createStore = () => {
         context.commit("friendGoodsLoading", true);
         const goods = await repository.getGoodsForAddress(
           address,
-          context.state.goodsContract,
-          context.state.escrowContract,
+          repository.c.goodsContract,
+          repository.c.escrowContract,
         );
 
         context.commit("friendGoods", goods);
@@ -265,20 +243,26 @@ const createStore = () => {
       async createEscrowContract(context) {
         const contract = await dapp.deployContract(
           dapp.contracts.Escrow, [
-            context.state.asobiCoinContract.options.address,
-            context.state.goodsContract.options.address,
+            repository.c.asobiCoinContract.options.address,
+            repository.c.goodsContract.options.address,
           ]
         );
       },
 
       getGoodsContract(context) {
-        context.commit("goodsContract", GOODS_ADDRESS);
+        repository.c.goodsContract = dapp.getContractAt(
+          dapp.contracts.Goods,
+          GOODS_ADDRESS,
+        );
+        repository.c.goodsContractEvents = dapp.getContractAt(
+          dapp.contracts.Goods,
+          GOODS_ADDRESS,
+          dapp.web3Event,
+        );
 
-        context.state.goodsContractEvents.events.allEvents()
+        repository.c.goodsContractEvents.events.allEvents()
           .on("data", (event) => {
             console.log("Goods event", event);
-            context.dispatch("getOwnGoods");
-            context.dispatch("getSelectedFriendGoods");
           })
           .on("error", console.log);
 
@@ -286,8 +270,16 @@ const createStore = () => {
       },
 
       getAsobiCoinContract(context) {
-        context.commit("asobiCoinContract", ASOBI_COIN_ADDRESS);
-        context.state.asobiCoinContractEvents.events.Transfer()
+        repository.c.asobiCoinContract = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          ASOBI_COIN_ADDRESS,
+        );
+        repository.c.asobiCoinContractEvents = dapp.getContractAt(
+          dapp.contracts.AsobiCoin,
+          ASOBI_COIN_ADDRESS,
+          dapp.web3Event,
+        );
+        repository.c.asobiCoinContractEvents.events.Transfer()
           .on("data", (event) => {
             console.log("AsobiCoin Transfer event", event);
             context.dispatch("getBalance");
@@ -296,8 +288,16 @@ const createStore = () => {
       },
 
       getEscrowContract(context) {
-        context.commit("escrowContract", ESCROW_ADDRESS);
-        context.state.escrowContractEvents.events.PriceSet()
+        repository.c.escrowContract = dapp.getContractAt(
+          dapp.contracts.Escrow,
+          ESCROW_ADDRESS,
+        );
+        repository.c.escrowContractEvents = dapp.getContractAt(
+          dapp.contracts.Escrow,
+          ESCROW_ADDRESS,
+          dapp.web3Event,
+        );
+        repository.c.escrowContractEvents.events.PriceSet()
           .on("data", (event) => {
             console.log("Escrow PriceSet event", event);
             context.dispatch("getOwnGoods");
@@ -306,7 +306,7 @@ const createStore = () => {
           .on("error", console.log);
       },
 
-      transferGoodToSelectedFriend(context, good) {
+      async transferGoodToSelectedFriend(context, good) {
         let address = context.state.selectedFriendId;
 
         const goodID = good.id;
@@ -317,31 +317,32 @@ const createStore = () => {
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
-        p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
+        p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
 
-        context.dispatch("transferGood", { address, goodID }).catch((error) => {
+        try{
+
+          await repository.transferGood(
+            goodID,
+            context.state.accountAddress,
+            address,
+            repository.c.goodsContract,
+          );
+          transaction.confirmed = true;
           context.commit("removeUnconfirmedTransaction", transaction);
-          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, good.id);
-        });
+          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, true);
 
-      },
+        }catch(e){
+          transaction.confirmed = false;
+          context.commit("removeUnconfirmedTransaction", transaction);
+          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, false);
+        }
 
-      async transferGood(context, { address, goodID }) {
-        await repository.transferGood(
-          goodID,
-          context.state.accountAddress,
-          address,
-          context.state.goodsContract,
-        );
-        // mark token as confirmed!
-        context.dispatch("getOwnGoods");
-        context.dispatch("getSelectedFriendGoods");
       },
 
       async checkGoodsAdmin(context) {
         const isOwner = await repository.isGoodsAdmin(
           context.state.accountAddress,
-          context.state.goodsContract,
+          repository.c.goodsContract,
         );
         context.commit("isGoodsAdmin", isOwner);
       },
@@ -349,7 +350,7 @@ const createStore = () => {
       async checkAsobiCoinAdmin(context) {
         const isOwner = await repository.isAsobiCoinAdmin(
           context.state.accountAddress,
-          context.state.asobiCoinContract,
+          repository.c.asobiCoinContract,
         );
         context.commit("isAsobiCoinAdmin", isOwner);
       },
@@ -357,7 +358,7 @@ const createStore = () => {
       async createGoodFor(context, address) {
         await repository.createGood(
           address,
-          context.state.goodsContract,
+          repository.c.goodsContract,
         );
       },
 
@@ -370,8 +371,8 @@ const createStore = () => {
           price = String(price);
           await repository.setGoodForSale(
             id, price, forSale,
-            context.state.goodsContract,
-            context.state.escrowContract,
+            repository.c.goodsContract,
+            repository.c.escrowContract,
           );
         } catch(e) {
           context.commit("setGoodForSale", oldGoodState);
@@ -382,9 +383,9 @@ const createStore = () => {
         await repository.buyGood(
           id,
           context.state.accountAddress,
-          context.state.goodsContract,
-          context.state.asobiCoinContract,
-          context.state.escrowContract,
+          repository.c.goodsContract,
+          repository.c.asobiCoinContract,
+          repository.c.escrowContract,
         );
       },
 
@@ -392,7 +393,7 @@ const createStore = () => {
         await repository.createCoin(
           friend.id,
           dapp.web3.utils.toWei(amount, "ether"),
-          context.state.asobiCoinContract,
+          repository.c.asobiCoinContract,
         );
       },
     },
