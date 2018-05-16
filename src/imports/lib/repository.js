@@ -90,7 +90,7 @@ class Repository {
         price.toString(),
       );
     }
-    await escrow.methods.swap(id).send;
+    await escrow.methods.swap(goodID).send;
   }
 
   async isAdmin(address, contract) {
