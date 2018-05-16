@@ -66,6 +66,33 @@ class Repository {
     ).send();
   }
 
+  async buyGood(goodID, buyer, good, coin, escrow) {
+    // Check whether we have already approved spending
+    const price = this.dapp.web3.utils.toBN(
+      await escrow.methods.getPrice(goodID).call()
+    );
+
+    const allowance = this.dapp.web3.utils.toBN(
+      await coin.methods.allowance(buyer, escrow.options.address).call()
+    );
+
+    // Approve spending
+    if (allowance.lt(price)) {
+      await coin.methods.approve(
+        escrow.options.address,
+        this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
+      ).send();
+    } else {
+      console.log(
+        "Allowance",
+        allowance.toString(),
+        "sufficient for price",
+        price.toString(),
+      );
+    }
+    await escrow.methods.swap(id).send;
+  }
+
   async isAdmin(address, contract) {
     const result = await contract.methods.owner().call();
     return result === address;

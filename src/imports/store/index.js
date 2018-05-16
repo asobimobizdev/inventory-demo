@@ -376,36 +376,13 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-        // Check whether we have already approved spending
-        const price = dapp.web3.utils.toBN(
-          await context.state.escrowContract.methods.getPrice(
-            id,
-          ).call()
+        await repository.buyGood(
+          id,
+          context.state.accountAddress,
+          context.state.goodsContract,
+          context.state.asobiCoinContract,
+          context.state.escrowContract,
         );
-
-        const allowance = dapp.web3.utils.toBN(
-          await context.state.asobiCoinContract.methods.allowance(
-            context.state.accountAddress,
-            context.state.escrowContract.options.address,
-          ).call()
-        );
-
-        // Approve spending
-        if (allowance.lt(price)) {
-          await context.state.asobiCoinContract.methods.approve(
-            context.state.escrowContract.options.address,
-            dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
-          ).send();
-        } else {
-          console.log(
-            "Allowance",
-            allowance.toString(),
-            "sufficient for price",
-            price.toString(),
-          );
-        }
-        let swap = context.state.escrowContract.methods.swap(id);
-        await swap.send();
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
