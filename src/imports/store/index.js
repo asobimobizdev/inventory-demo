@@ -138,10 +138,9 @@ const createStore = () => {
       },
     },
     actions: {
-      selectFriend(context, id) {
+      selectedFriendId(context, id) {
         context.commit("selectedFriendId", id);
         context.dispatch("getSelectedFriendGoods",true);
-
         p2pManager.subscribe(id,context);
       },
 

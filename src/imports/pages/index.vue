@@ -51,6 +51,10 @@ import GoodInspector from "./../components/GoodInspector.vue";
 export default {
   mounted() {
     this.$store.dispatch("getOwnGoods",true);
+
+    if(this.friends.length > 0){
+      this.checkSelectedFriend(this.friends);
+    }
   },
   components: {
     draggable,
@@ -83,7 +87,7 @@ export default {
           return index == value;
         });
 
-        this.$store.dispatch("selectFriend", friend.id);
+        this.$store.dispatch("selectedFriendId", friend.id);
       },
     },
     goods: {
@@ -110,14 +114,18 @@ export default {
   },
   watch: {
     friends(friends) {
-      if (friends.length < 0) return;
-      if (!this.$store.state.selectedFriendId) {
-        const selectedFriendId = friends.length > 0 ? friends[0].id : null;
-        this.$store.dispatch("selectFriend", selectedFriendId);
-      }
+      this.checkSelectedFriend(friends);
     },
   },
   methods: {
+    checkSelectedFriend(friends){
+      console.log("checkSelectedFriend");
+      if (friends.length < 0) return;
+      if (!this.$store.state.selectedFriendId) {
+        const selectedFriendId = friends.length > 0 ? friends[0].id : null;
+        this.$store.dispatch("selectedFriendId", selectedFriendId);
+      }
+    },
     checkMove(e) {
       return true;
     },
