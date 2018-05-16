@@ -421,7 +421,7 @@ const createStore = () => {
         for (let tID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[tID];
 
-          if (transaction.from == state.accountAddress) {
+          if (transaction.from == state.accountAddress || transaction.to != state.accountAddress) {
             goodsToRemove[transaction.goodID] = transaction.goodID;
             continue;
           }
