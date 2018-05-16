@@ -1,6 +1,6 @@
 import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
-import repository from "../lib/repository";
+import Repository from "../lib/repository";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
@@ -22,6 +22,8 @@ function growGoodFromId(id) {
 
   return good;
 }
+
+const repository = new Repository(dapp);
 
 const createStore = () => {
   return new Vuex.Store({

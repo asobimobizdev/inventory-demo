@@ -1,10 +1,11 @@
 import { dapp } from "./dapp.js";
 
 
-class Repository {
+export default class Repository {
   constructor(dapp) {
     this.dapp = dapp;
     this.web3 = dapp.web3;
+    this.c = {};
   }
 
   async getGoodsForAddress(address, goods, escrow) {
@@ -137,5 +138,3 @@ class Repository {
     return this.web3.utils.randomHex(32);
   }
 }
-
-export default new Repository(dapp);
