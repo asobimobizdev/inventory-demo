@@ -9,27 +9,25 @@ export default class Repository {
   }
 
   async getGoodsForAddress(address) {
-    const balance = await this.getGoodsBalance(address, this.c.goodsContract);
-    const items = [];
-    for (let i = 0; i < balance; i += 1) {
+    const getGood = async (index) => {
       const id = await this.c.goodsContract.methods.tokenOfOwnerByIndex(
         address,
-        i,
+        index,
       ).call();
-      // check whether good can be spent by looking at approval
-      const approved = await this.c.escrowContract.methods.isListed(id).call();
-      const price = this.web3.utils.fromWei(
-        await this.c.escrowContract.methods.getPrice(id).call(),
-      );
-      items.push(
-        {
-          id: id,
-          confirmed: true,
-          price: price,
-          forSale: approved,
-        }
-      );
+      const [forSale, price] = await Promise.all([
+        this.c.escrowContract.methods.isListed(id).call(),
+        this.c.escrowContract.methods.getPrice(id).call(),
+      ]);
+      return {
+        id: id,
+        confirmed: true,
+        price: this.web3.utils.fromWei(price),
+        forSale: forSale,
+      };
     }
+    const balance = await this.getGoodsBalance(address, this.c.goodsContract);
+    const indices = Array.from({length: balance}, (value, key) => key);
+    const items = await Promise.all(indices.map(getGood));
     return items;
   }
 
