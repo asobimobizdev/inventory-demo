@@ -24,7 +24,7 @@ export default class Repository {
         price: this.web3.utils.fromWei(price),
         forSale: forSale,
       };
-    }
+    };
     const balance = await this.getGoodsBalance(address, this.c.goodsContract);
     const indices = Array.from({length: balance}, (value, key) => key);
     const items = await Promise.all(indices.map(getGood));
