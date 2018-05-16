@@ -8,15 +8,18 @@ export default class Repository {
     this.c = {};
   }
 
-  async getGoodsForAddress(address, goods, escrow) {
-    const balance = await this.getGoodsBalance(address, goods);
+  async getGoodsForAddress(address) {
+    const balance = await this.getGoodsBalance(address, this.c.goodsContract);
     const items = [];
     for (let i = 0; i < balance; i += 1) {
-      const id = await goods.methods.tokenOfOwnerByIndex(address, i).call();
+      const id = await this.c.goodsContract.methods.tokenOfOwnerByIndex(
+        address,
+        i,
+      ).call();
       // check whether good can be spent by looking at approval
-      const approved = await escrow.methods.isListed(id).call();
+      const approved = await this.c.escrowContract.methods.isListed(id).call();
       const price = this.web3.utils.fromWei(
-        await escrow.methods.getPrice(id).call(),
+        await this.c.escrowContract.methods.getPrice(id).call(),
       );
       items.push(
         {
@@ -30,22 +33,22 @@ export default class Repository {
     return items;
   }
 
-  async transferGood(goodID, from, to, good) {
-    await good.methods.transferFrom(
+  async transferGood(goodID, from, to) {
+    await this.c.goodsContract.methods.transferFrom(
       from,
       to,
       goodID,
     ).send();
   }
 
-  async setGoodForSale(goodID, price, forSale, good, escrow) {
-    const approved = await good.methods.getApproved(
+  async setGoodForSale(goodID, price, forSale) {
+    const approved = await this.c.goodsContract.methods.getApproved(
       goodID,
-    ).call() === escrow.options.address;
+    ).call() === this.c.escrowContract.options.address;
     if (!forSale) {
       if (approved) {
         console.log("Removing approval");
-        await good.methods.approve(
+        await this.c.goodsContract.methods.approve(
           "0x0",
           goodID,
         ).send();
@@ -54,33 +57,36 @@ export default class Repository {
     }
     if (!approved) {
       console.log("Escrow contract not yet approved", approved);
-      await good.methods.approve(
-        escrow.options.address,
+      await this.c.goodsContract.methods.approve(
+        this.c.escrowContract.options.address,
         goodID,
       ).send();
     } else {
       console.log("Escrow contract already approved");
     }
-    await escrow.methods.setPrice(
+    await this.c.escrowContract.methods.setPrice(
       goodID,
       this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
     ).send();
   }
 
-  async buyGood(goodID, buyer, good, coin, escrow) {
+  async buyGood(goodID, buyer) {
     // Check whether we have already approved spending
     const price = this.dapp.web3.utils.toBN(
-      await escrow.methods.getPrice(goodID).call()
+      await this.c.escrowContract.methods.getPrice(goodID).call()
     );
 
     const allowance = this.dapp.web3.utils.toBN(
-      await coin.methods.allowance(buyer, escrow.options.address).call()
+      await this.c.asobiCoinContract.methods.allowance(
+        buyer,
+        this.c.escrowContract.options.address,
+      ).call()
     );
 
     // Approve spending
     if (allowance.lt(price)) {
-      await coin.methods.approve(
-        escrow.options.address,
+      await this.c.asobiCoinContract.methods.approve(
+        this.c.escrowContract.options.address,
         this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
       ).send();
     } else {
@@ -91,7 +97,7 @@ export default class Repository {
         price.toString(),
       );
     }
-    await escrow.methods.swap(goodID).send;
+    await this.c.escrowContract.methods.swap(goodID).send;
   }
 
   async isAdmin(address, contract) {
@@ -99,39 +105,36 @@ export default class Repository {
     return result === address;
   }
 
-  async isAsobiCoinAdmin(address, coin) {
-    return await this.isAdmin(address, coin);
+  async isAsobiCoinAdmin(address) {
+    return await this.isAdmin(address, this.c.asobiCoinContract);
   }
 
-  async isGoodsAdmin(address, goods) {
-    return await this.isAdmin(address, goods);
+  async isGoodsAdmin(address) {
+    return await this.isAdmin(address, this.c.goodsContract);
   }
 
   async getBalance(address, contract) {
     return await contract.methods.balanceOf(address).call();
   }
 
-  async getGoodsBalance(address, goods) {
-    return await this.getBalance(address, goods);
+  async getGoodsBalance(address) {
+    return await this.getBalance(address, this.c.goodsContract);
   }
 
-  async getAsobiCoinBalance(address, coin) {
-    return await this.getBalance(address, coin);
+  async getAsobiCoinBalance(address) {
+    return await this.getBalance(address, this.c.asobiCoinContract);
   }
 
   async mint(receiver, value, contract) {
     return await contract.methods.mint(receiver, value).send();
   }
 
-  async createGood(receiver, good) {
-    await this.mint(receiver, this.generateGoodID(), good);
+  async createGood(receiver) {
+    await this.mint(receiver, this.generateGoodID(), this.c.goodsContract);
   }
 
-  async createCoin(receiver, amount, coin) {
-    await coin.methods.mint(
-      receiver,
-      amount,
-    ).send();
+  async createCoin(receiver, amount) {
+    await this.asobiCoinContract.methods.mint(receiver, amount).send();
   }
 
   generateGoodID() {
