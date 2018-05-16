@@ -12,7 +12,7 @@
         <div class="main">
           <div v-if="good.isOwned">
             <span class="label">Price:</span>
-            <el-input-number :disabled="good.forSale" v-model="good.price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
+            <el-input-number :disabled="good.forSale" v-model="price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
             <el-switch
               v-model="goodForSale"
               active-text="For Sale"
@@ -59,6 +59,14 @@ export default {
       },
       get(){
         return this.good.forSale;
+      },
+    },
+    price:{
+      set(price){
+        this.$store.commit("setGoodPrice", {goodID: this.good.id, price});
+      },
+      get(){
+        return this.good.price;
       },
     },
   },

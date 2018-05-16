@@ -27,6 +27,7 @@ const repository = new Repository(dapp);
 
 const createStore = () => {
   return new Vuex.Store({
+    strict: process.env.NODE_ENV !== "production",
     state: {
       dappInit: false,
       isGoodsAdmin: false,
@@ -54,15 +55,6 @@ const createStore = () => {
         state.isAsobiCoinAdmin = isAsobiCoinAdmin;
       },
       ["goods"](state, goods) {
-        // goods.forEach(good => {
-        //   if (!state.selectedFriendId) return;
-        //   const to = state.selectedFriendId;
-        //   const from = state.accountAddress;
-        //   const tID = `${to}-${from}-${good.id}`;
-        //   delete state.unconfirmedTransactions[tID];
-        //   state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-        // });
-
         goods = goods.map(good => {
           return {
             ...good,
@@ -88,14 +80,6 @@ const createStore = () => {
         state.friendsLoading = loading;
       },
       ["friendGoods"](state, goods) {
-        // goods.forEach(good => {
-        //   const from = state.accountAddress;
-        //   const to = state.selectedFriendId;
-        //   const tID = `${from}-${to}-${good.id}`;
-        //   delete state.unconfirmedTransactions[tID];
-        //   state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
-        // });
-
         goods = goods.map(good => {
           return {
             ...good,
@@ -127,6 +111,7 @@ const createStore = () => {
       },
       ["removeUnconfirmedTransaction"](state, transaction) {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
+        if(!state.unconfirmedTransactions[tID]) return;
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
 
@@ -134,10 +119,14 @@ const createStore = () => {
           const goodID = transaction.goodID;
           if(transaction.to == state.accountAddress){
             const good = state.friendGoods.find(good => good.id == goodID );
+            good.forSale = false;
+            good.isOwned = true;
             state.friendGoods = state.friendGoods.filter( good => good.id != goodID );
             state.goods = [...state.goods, ...[good]];
           }else{
             const good = state.goods.find(good => good.id == goodID );
+            good.forSale = false;
+            good.isOwned = false;
             state.goods = state.goods.filter( good => good.id != goodID );
             state.friendGoods = [...state.friendGoods, ...[good]];
           }
@@ -160,7 +149,10 @@ const createStore = () => {
           return good;
         });
       },
-
+      ["setGoodPrice"](state, {goodID, price}){
+        const good = state.goods.find(good => good.id == goodID);
+        good.price = price;
+      },
     },
     actions: {
       selectFriend(context, id) {
@@ -255,9 +247,18 @@ const createStore = () => {
           dapp.web3Event,
         );
 
-        repository.c.goodsContractEvents.events.allEvents()
-          .on("data", (event) => {
-            console.log("Goods event", event);
+        repository.c.goodsContractEvents.events.Transfer()
+          .on("data", (data) => {
+
+            const transaction = {
+              from:data.returnValues._from,
+              to:data.returnValues._to,
+              goodID:data.returnValues._tokenId,
+              confirmed:true,
+            };
+
+            console.log("Good Transaction", transaction);
+            context.commit("removeUnconfirmedTransaction", transaction);
           })
           .on("error", console.log);
 
