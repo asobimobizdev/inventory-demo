@@ -88,7 +88,7 @@ export default class Repository {
         price.toString(),
       );
     }
-    await this.c.escrowContract.methods.swap(goodID).send;
+    await this.c.escrowContract.methods.swap(goodID).send();
   }
 
   async isAdmin(address, contract) {
