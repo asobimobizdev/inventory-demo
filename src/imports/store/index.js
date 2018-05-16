@@ -355,8 +355,10 @@ const createStore = () => {
       },
 
       async createGoodFor(context, address) {
-        const goodID = repository.generateGoodID();
-        await context.state.goodsContract.methods.mint(address, goodID).send();
+        await repository.createGood(
+          address,
+          context.state.goodsContract,
+        )
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
@@ -387,12 +389,11 @@ const createStore = () => {
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
-        const address = friend.id;
-        amount = dapp.web3.utils.toWei(amount, "ether");
-        await context.state.asobiCoinContract.methods.mint(
-          address,
-          amount,
-        ).send();
+        await repository.createCoin(
+            friend.id,
+            dapp.web3.utils.toWei(amount, "ether"),
+            context.state.asobiCoinContract,
+        );
       },
     },
     getters: {

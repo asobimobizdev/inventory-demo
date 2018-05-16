@@ -118,6 +118,21 @@ class Repository {
     return await this.getBalance(address, coin);
   }
 
+  async mint(receiver, value, contract) {
+    return await contract.methods.mint(receiver, value).send();
+  }
+
+  async createGood(receiver, good) {
+    await this.mint(receiver, this.generateGoodID(), good);
+  }
+
+  async createCoin(receiver, amount, coin) {
+    await coin.methods.mint(
+      receiver,
+      amount,
+    ).send();
+  }
+
   generateGoodID() {
     return this.web3.utils.randomHex(32);
   }
