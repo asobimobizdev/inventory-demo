@@ -1,5 +1,6 @@
 import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
+import repository from "../lib/repository";
 import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
@@ -213,18 +214,19 @@ const createStore = () => {
       async getBalance(context) {
         context.commit(
           "balance",
-          await context.state.asobiCoinContract.methods.balanceOf(
+          await repository.getAsobiCoinBalance(
             context.state.accountAddress,
-          ).call(),
+            context.state.asobiCoinContract,
+          ),
         );
       },
 
       async getOwnGoods(context) {
         context.commit("goodsLoading", true);
-        let goods = await dapp.getTokensForAddress(
+        let goods = await repository.getGoodsForAddress(
+          context.state.accountAddress,
           context.state.goodsContract,
           context.state.escrowContract,
-          context.state.accountAddress,
         );
         context.commit("goods", goods);
         context.commit("goodsLoading", false);
@@ -238,10 +240,10 @@ const createStore = () => {
         let address = context.state.selectedFriendId;
 
         context.commit("friendGoodsLoading", true);
-        const goods = await dapp.getTokensForAddress(
+        const goods = await repository.getGoodsForAddress(
+          address,
           context.state.goodsContract,
           context.state.escrowContract,
-          address,
         );
 
         context.commit("friendGoods", goods);
@@ -307,7 +309,7 @@ const createStore = () => {
       transferGoodToSelectedFriend(context, good) {
         let address = context.state.selectedFriendId;
 
-        const tokenID = good.id;
+        const goodID = good.id;
 
         const transaction = {
           from: context.state.accountAddress,
@@ -317,127 +319,82 @@ const createStore = () => {
         context.commit("addUnconfirmedTransaction", transaction);
         p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, good.id);
 
-        context.dispatch("transferToken", { address, tokenID }).catch((error) => {
+        context.dispatch("transferGood", { address, goodID }).catch((error) => {
           context.commit("removeUnconfirmedTransaction", transaction);
           p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, good.id);
         });
 
       },
 
-      async transferToken(context, { address, tokenID }) {
-        await context.state.goodsContract.methods.transferFrom(
+      async transferGood(context, { address, goodID }) {
+        await repository.transferGood(
+          goodID,
           context.state.accountAddress,
           address,
-          tokenID,
-        ).send();
+          context.state.goodsContract,
+        );
         // mark token as confirmed!
         context.dispatch("getOwnGoods");
         context.dispatch("getSelectedFriendGoods");
       },
 
       async checkGoodsAdmin(context) {
-        const ownerAddress = await context.state.goodsContract.methods.owner(
-        ).call();
-        const isOwner = ownerAddress == context.state.accountAddress;
+        const isOwner = await repository.isGoodsAdmin(
+          context.state.accountAddress,
+          context.state.goodsContract,
+        );
         context.commit("isGoodsAdmin", isOwner);
       },
 
       async checkAsobiCoinAdmin(context) {
-        const ownerAddress = await context.state.asobiCoinContract.methods.owner(
-        ).call();
-        const isOwner = ownerAddress === context.state.accountAddress;
+        const isOwner = await repository.isAsobiCoinAdmin(
+          context.state.accountAddress,
+          context.state.asobiCoinContract,
+        );
         context.commit("isAsobiCoinAdmin", isOwner);
       },
 
       async createGoodFor(context, address) {
-        const tokenID = dapp.generateTokenID();
-        await context.state.goodsContract.methods.mint(address, tokenID).send();
+        await repository.createGood(
+          address,
+          context.state.goodsContract,
+        );
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
-
         const oldGoodState = {...context.state.goods.find((good)=>{
           return good.id == id;
         })};
         context.commit("setGoodForSale", { id, forSale, price, confirmed:false });
-        try{
+        try {
           price = String(price);
-          const approved = await context.state.goodsContract.methods.getApproved(
-            id,
-          ).call() === context.state.escrowContract.options.address;
-          if (!forSale) {
-            if (approved) {
-              console.log("Removing approval");
-              await context.state.goodsContract.methods.approve(
-                "0x0",
-                id,
-              ).send();
-            }
-            return;
-          }
-          if (!approved) {
-            console.log("Escrow contract not yet approved", approved);
-            await context.state.goodsContract.methods.approve(
-              context.state.escrowContract.options.address,
-              id,
-            ).send();
-          } else {
-            console.log("Escrow contract already approved");
-          }
-          await context.state.escrowContract.methods.setPrice(
-            id,
-            dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
-          ).send();
-        }catch(e){
+          await repository.setGoodForSale(
+            id, price, forSale,
+            context.state.goodsContract,
+            context.state.escrowContract,
+          );
+        } catch(e) {
           context.commit("setGoodForSale", oldGoodState);
         }
-
       },
 
       async buyGood(context, { id }) {
-        // Check whether we have already approved spending
-        const price = dapp.web3.utils.toBN(
-          await context.state.escrowContract.methods.getPrice(
-            id,
-          ).call()
+        await repository.buyGood(
+          id,
+          context.state.accountAddress,
+          context.state.goodsContract,
+          context.state.asobiCoinContract,
+          context.state.escrowContract,
         );
-
-        const allowance = dapp.web3.utils.toBN(
-          await context.state.asobiCoinContract.methods.allowance(
-            context.state.accountAddress,
-            context.state.escrowContract.options.address,
-          ).call()
-        );
-
-        // Approve spending
-        if (allowance.lt(price)) {
-          await context.state.asobiCoinContract.methods.approve(
-            context.state.escrowContract.options.address,
-            dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
-          ).send();
-        } else {
-          console.log(
-            "Allowance",
-            allowance.toString(),
-            "sufficient for price",
-            price.toString(),
-          );
-        }
-        let swap = context.state.escrowContract.methods.swap(id);
-        await swap.send();
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
-        const address = friend.id;
-        amount = dapp.web3.utils.toWei(amount, "ether");
-        await context.state.asobiCoinContract.methods.mint(
-          address,
-          amount,
-        ).send();
+        await repository.createCoin(
+          friend.id,
+          dapp.web3.utils.toWei(amount, "ether"),
+          context.state.asobiCoinContract,
+        );
       },
-
-
-
     },
     getters: {
       selectFriend: state => {
