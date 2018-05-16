@@ -342,7 +342,7 @@ const createStore = () => {
         const isOwner = await repository.isGoodsAdmin(
           context.state.accountAddress,
           context.state.goodsContract,
-        )
+        );
         context.commit("isGoodsAdmin", isOwner);
       },
 
@@ -358,7 +358,7 @@ const createStore = () => {
         await repository.createGood(
           address,
           context.state.goodsContract,
-        )
+        );
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
@@ -390,9 +390,9 @@ const createStore = () => {
 
       async sendCoinsToFriend(context, { friend, amount }) {
         await repository.createCoin(
-            friend.id,
-            dapp.web3.utils.toWei(amount, "ether"),
-            context.state.asobiCoinContract,
+          friend.id,
+          dapp.web3.utils.toWei(amount, "ether"),
+          context.state.asobiCoinContract,
         );
       },
     },
