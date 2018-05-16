@@ -50,8 +50,7 @@ import GoodInspector from "./../components/GoodInspector.vue";
 
 export default {
   mounted() {
-    this.$store.dispatch("getOwnGoods");
-    this.$store.dispatch("getSelectedFriendGoods");
+    this.$store.dispatch("getOwnGoods",true);
   },
   components: {
     draggable,

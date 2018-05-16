@@ -140,7 +140,7 @@ const createStore = () => {
     actions: {
       selectFriend(context, id) {
         context.commit("selectedFriendId", id);
-        context.dispatch("getSelectedFriendGoods");
+        context.dispatch("getSelectedFriendGoods",true);
 
         p2pManager.subscribe(id,context);
       },
@@ -153,7 +153,7 @@ const createStore = () => {
           let friends = Wallets.find({}).fetch();
           context.commit("friends", friends);
           if (friends.length > 0) {
-            context.dispatch("getSelectedFriendGoods");
+            context.dispatch("getSelectedFriendGoods",true);
           }
         });
       },
@@ -175,29 +175,37 @@ const createStore = () => {
         );
       },
 
-      async getOwnGoods(context) {
-        context.commit("goodsLoading", true);
+      async getOwnGoods(context, loading = false) {
+        if(loading){
+          context.commit("goodsLoading", true);
+        }
         let goods = await repository.getGoodsForAddress(
           context.state.accountAddress,
         );
         context.commit("goods", goods);
-        context.commit("goodsLoading", false);
+        if(loading){
+          context.commit("goodsLoading", false);
+        }
       },
 
-      async getSelectedFriendGoods(context) {
+      async getSelectedFriendGoods(context, loading=false) {
         if (!context.state.selectedFriendId) {
           return;
         }
 
         let address = context.state.selectedFriendId;
 
-        context.commit("friendGoodsLoading", true);
+        if(loading){
+          context.commit("friendGoodsLoading", true);
+        }
         const goods = await repository.getGoodsForAddress(
           address,
         );
 
         context.commit("friendGoods", goods);
-        context.commit("friendGoodsLoading", false);
+        if(loading){
+          context.commit("friendGoodsLoading", false);
+        }
       },
 
       async createAsobiCoinContract(context) {
