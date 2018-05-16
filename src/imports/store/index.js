@@ -214,9 +214,10 @@ const createStore = () => {
       async getBalance(context) {
         context.commit(
           "balance",
-          await context.state.asobiCoinContract.methods.balanceOf(
+          await repository.getAsobiCoinBalance(
             context.state.accountAddress,
-          ).call(),
+            context.state.asobiCoinContract,
+          ),
         );
       },
 

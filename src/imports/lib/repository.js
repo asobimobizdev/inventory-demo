@@ -8,7 +8,7 @@ class Repository {
   }
 
   async getGoodsForAddress(address, goods, escrow) {
-    const balance = await goods.methods.balanceOf(address).call();
+    const balance = await this.getGoodsBalance(address, goods);
     const items = [];
     for (let i = 0; i < balance; i += 1) {
       const id = await goods.methods.tokenOfOwnerByIndex(address, i).call();
@@ -104,6 +104,18 @@ class Repository {
 
   async isGoodsAdmin(address, goods) {
     return await this.isAdmin(address, goods);
+  }
+
+  async getBalance(address, contract) {
+    return await contract.methods.balanceOf(address).call();
+  }
+
+  async getGoodsBalance(address, goods) {
+    return await this.getBalance(address, goods);
+  }
+
+  async getAsobiCoinBalance(address, coin) {
+    return await this.getBalance(address, coin);
   }
 
   generateGoodID() {
