@@ -34,11 +34,7 @@ export default class Repository {
   }
 
   async transferGood(goodID, from, to) {
-    await this.c.goodsContract.methods.transferFrom(
-      from,
-      to,
-      goodID,
-    ).send();
+    await this.c.goodsContract.methods.transferFrom(from, to, goodID).send();
   }
 
   async setGoodForSale(goodID, price, forSale) {
@@ -48,10 +44,7 @@ export default class Repository {
     if (!forSale) {
       if (approved) {
         console.log("Removing approval");
-        await this.c.goodsContract.methods.approve(
-          "0x0",
-          goodID,
-        ).send();
+        await this.c.goodsContract.methods.approve("0x0", goodID).send();
       }
       return;
     }
@@ -101,8 +94,7 @@ export default class Repository {
   }
 
   async isAdmin(address, contract) {
-    const result = await contract.methods.owner().call();
-    return result === address;
+    return (await contract.methods.owner().call()) === address;
   }
 
   async isAsobiCoinAdmin(address) {

@@ -370,10 +370,7 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-        await repository.buyGood(
-          id,
-          context.state.accountAddress,
-        );
+        await repository.buyGood(id, context.state.accountAddress);
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
