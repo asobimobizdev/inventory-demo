@@ -119,10 +119,14 @@ const createStore = () => {
           const goodID = transaction.goodID;
           if(transaction.to == state.accountAddress){
             const good = state.friendGoods.find(good => good.id == goodID );
+            good.forSale = false;
+            good.isOwned = true;
             state.friendGoods = state.friendGoods.filter( good => good.id != goodID );
             state.goods = [...state.goods, ...[good]];
           }else{
             const good = state.goods.find(good => good.id == goodID );
+            good.forSale = false;
+            good.isOwned = false;
             state.goods = state.goods.filter( good => good.id != goodID );
             state.friendGoods = [...state.friendGoods, ...[good]];
           }
@@ -145,7 +149,10 @@ const createStore = () => {
           return good;
         });
       },
-
+      ["setGoodPrice"](state, {goodID, price}){
+        const good = state.goods.find(good => good.id == goodID);
+        good.price = price;
+      },
     },
     actions: {
       selectFriend(context, id) {
