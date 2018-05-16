@@ -92,6 +92,7 @@ contract Trade {
     function addGood(uint256 goodID) onlyTrader(msg.sender) external {
         address trader = msg.sender;
         require(goods.ownerOf(goodID) == trader);
+        require(!isFinal());
 
         uint256 traderIndex = _traderIndex(trader);
         traderGoodsIndex[goodID] = traderGoods[traderIndex].length;
@@ -102,6 +103,7 @@ contract Trade {
 
     function removeGood(uint256 goodID) onlyTrader(msg.sender) external {
         address trader = msg.sender;
+        require(!isFinal());
         require(goods.ownerOf(goodID) == trader);
 
         uint256 goodsIndex = traderGoodsIndex[goodID];

@@ -22,6 +22,10 @@ contract("Trade", accounts => {
   beforeEach(async () => {
     goods = await Goods.new();
     trade = await Trade.new(goods.address, [traderA, traderB]);
+
+    await goods.mint(traderA, item1);
+    await goods.mint(traderB, item2);
+    await goods.mint(traderB, item3);
   });
 
   it("can be created", async () => {
@@ -60,6 +64,9 @@ contract("Trade", accounts => {
 
     describe("when accepted", () => {
       beforeEach(async () => {
+        await goods.approve(trade.address, item1, traderAOptions);
+        await trade.addGood(item1, traderAOptions);
+
         await trade.accept(traderAOptions);
         await trade.accept(traderBOptions);
       });
@@ -74,19 +81,18 @@ contract("Trade", accounts => {
       });
 
       it("won't let traders remove items", async () => {
-        await goods.mint(traderA, item1);
-        await goods.approve(trade.address, item1, traderAOptions);
         await assertRejected(trade.removeGood(traderAOptions));
+      });
+
+      it("won't let traders add items", async () => {
+        await goods.approve(trade.address, item2, traderBOptions);
+        await assertRejected(trade.removeGood(item2, traderBOptions));
       });
     })
   });
 
   describe("adding goods", () => {
     beforeEach(async () => {
-      await goods.mint(traderA, item1);
-      await goods.mint(traderB, item2);
-      await goods.mint(traderB, item3);
-
       await goods.approve(trade.address, item1, traderAOptions);
       await goods.approve(trade.address, item2, traderBOptions);
       await goods.approve(trade.address, item3, traderBOptions);
