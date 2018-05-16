@@ -5,14 +5,18 @@ import "contracts/Goods.sol";
 
 contract Trade {
 
-    address public playerA;
-    address public playerB;
+    address[] public traders;
 
     Goods goods;
 
-    constructor(Goods _goods, address _playerA, address _playerB) public {
+    mapping(address => uint256[]) offers;
+
+    constructor(Goods _goods, address[] _traders) public {
         goods = _goods;
-        playerA = _playerA;
-        playerB = _playerB;
+        traders = _traders;
+    }
+
+    function numTraders() public view returns (uint256) {
+        return traders.length;
     }
 }

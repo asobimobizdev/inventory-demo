@@ -16,11 +16,15 @@ contract("Trade", accounts => {
 
   beforeEach(async () => {
     goods = await Goods.new();
-    trade = await Trade.new(goods.address, playerA, playerB);
+    trade = await Trade.new(goods.address, [playerA, playerB]);
     // await goods.mint(seller, goodID);
   });
 
   it("can be created", async () => {
-    assert.equal(await trade.playerA(), playerA);
+    assert.equal(await trade.traders(0), playerA);
+  });
+
+  it("returns the correct number of traders", async () => {
+    assert.equal(await trade.numTraders(), 2);
   });
 });
