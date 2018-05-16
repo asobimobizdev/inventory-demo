@@ -36,6 +36,44 @@ contract("Trade", accounts => {
     assert.isTrue(await trade.isTrader(traderA));
   });
 
+  describe("final state", () => {
+    it("is false in the beginning", async () => {
+      assert.isFalse(await trade.isFinal());
+    });
+
+    describe("when trader A accepts", async () => {
+      beforeEach(async () => {
+        await trade.accept(traderAOptions);
+      });
+
+      it("is false if only one trader accepts", async () => {
+        assert.isFalse(await trade.isFinal());
+        assert.equal(await trade.numTradersAccepted(), 1);
+      });
+
+      it("lets trader A withdraw", async () => {
+        await trade.withdraw(traderAOptions);
+        assert.equal(await trade.numTradersAccepted(), 0);
+      });
+    });
+
+    describe("when accepted", () => {
+      beforeEach(async () => {
+        await trade.accept(traderAOptions);
+        await trade.accept(traderBOptions);
+      });
+
+      it("is true", async () => {
+        assert.isTrue(await trade.isFinal());
+      });
+
+      it("won't let traders withdraw", async () => {
+        await assertRejected(trade.withdraw(traderAOptions));
+        await assertRejected(trade.withdraw(traderBOptions));
+      });
+    })
+  });
+
   describe("adding goods", () => {
     beforeEach(async () => {
       await goods.mint(traderA, item1);

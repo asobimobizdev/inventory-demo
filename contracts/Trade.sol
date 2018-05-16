@@ -9,6 +9,8 @@ contract Trade {
 
     address[] public traders;
     mapping(address=>bool) public isTrader;
+    mapping(address => bool) public traderAccepted;
+    uint256 public numTradersAccepted;
 
     Goods goods;
 
@@ -29,11 +31,40 @@ contract Trade {
         _;
     }
 
-    function numTraders() public view returns (uint256) {
+    function numTraders() external view returns (uint256) {
         return traders.length;
     }
 
-    function addGood(uint256 goodID) onlyTrader(msg.sender) public {
+    function numTraderGoods(address trader)
+    onlyTrader(trader) external view returns (uint256) {
+        return traderGoods[trader].length;
+    }
+
+    function traderGoodByIndex(address trader, uint256 index)
+    onlyTrader(trader) external view returns (uint256) {
+        return traderGoods[trader][index];
+    }
+
+    function isFinal() public view returns (bool) {
+        return numTradersAccepted == traders.length;
+    }
+
+    function accept() onlyTrader(msg.sender) external {
+        require(traderAccepted[msg.sender] == false);
+
+        traderAccepted[msg.sender] = true;
+        numTradersAccepted++;
+    }
+
+    function withdraw() onlyTrader(msg.sender) external {
+        require(traderAccepted[msg.sender]);
+        require(!isFinal());
+
+        traderAccepted[msg.sender] = false;
+        numTradersAccepted--;
+    }
+
+    function addGood(uint256 goodID) onlyTrader(msg.sender) external {
         require(goods.ownerOf(goodID) == msg.sender);
 
         traderGoodsIndex[goodID] = traderGoods[msg.sender].length;
@@ -43,7 +74,7 @@ contract Trade {
         emit GoodAdded(msg.sender, goodID);
     }
 
-    function removeGood(uint256 goodID) onlyTrader(msg.sender) public {
+    function removeGood(uint256 goodID) onlyTrader(msg.sender) external {
         require(goods.ownerOf(goodID) == msg.sender);
         uint index = traderGoodsIndex[goodID];
 
@@ -52,15 +83,5 @@ contract Trade {
         }
         traderGoods[msg.sender].length--;
         numGoods--;
-    }
-
-    function numTraderGoods(address trader)
-    onlyTrader(trader) public view returns (uint256) {
-        return traderGoods[trader].length;
-    }
-
-    function traderGoodByIndex(address trader, uint256 index)
-    onlyTrader(trader) public view returns (uint256) {
-        return traderGoods[trader][index];
     }
 }
