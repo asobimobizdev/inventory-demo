@@ -34,6 +34,7 @@ contract("Trade", accounts => {
 
   it("lets users check if they are traders", async () => {
     assert.isTrue(await trade.isTrader(traderA));
+    assert.isFalse(await trade.isTrader(thirdPerson));
   });
 
   describe("final state", () => {
