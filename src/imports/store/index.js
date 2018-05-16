@@ -186,7 +186,6 @@ const createStore = () => {
           "balance",
           await repository.getAsobiCoinBalance(
             context.state.accountAddress,
-            repository.c.asobiCoinContract,
           ),
         );
       },
@@ -195,8 +194,6 @@ const createStore = () => {
         context.commit("goodsLoading", true);
         let goods = await repository.getGoodsForAddress(
           context.state.accountAddress,
-          repository.c.goodsContract,
-          repository.c.escrowContract,
         );
         context.commit("goods", goods);
         context.commit("goodsLoading", false);
@@ -212,8 +209,6 @@ const createStore = () => {
         context.commit("friendGoodsLoading", true);
         const goods = await repository.getGoodsForAddress(
           address,
-          repository.c.goodsContract,
-          repository.c.escrowContract,
         );
 
         context.commit("friendGoods", goods);
@@ -343,7 +338,6 @@ const createStore = () => {
       async checkGoodsAdmin(context) {
         const isOwner = await repository.isGoodsAdmin(
           context.state.accountAddress,
-          repository.c.goodsContract,
         );
         context.commit("isGoodsAdmin", isOwner);
       },
@@ -351,7 +345,6 @@ const createStore = () => {
       async checkAsobiCoinAdmin(context) {
         const isOwner = await repository.isAsobiCoinAdmin(
           context.state.accountAddress,
-          repository.c.asobiCoinContract,
         );
         context.commit("isAsobiCoinAdmin", isOwner);
       },
@@ -359,7 +352,6 @@ const createStore = () => {
       async createGoodFor(context, address) {
         await repository.createGood(
           address,
-          repository.c.goodsContract,
         );
       },
 
@@ -372,8 +364,6 @@ const createStore = () => {
           price = String(price);
           await repository.setGoodForSale(
             id, price, forSale,
-            repository.c.goodsContract,
-            repository.c.escrowContract,
           );
         } catch(e) {
           context.commit("setGoodForSale", oldGoodState);
@@ -381,20 +371,13 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-        await repository.buyGood(
-          id,
-          context.state.accountAddress,
-          repository.c.goodsContract,
-          repository.c.asobiCoinContract,
-          repository.c.escrowContract,
-        );
+        await repository.buyGood(id, context.state.accountAddress);
       },
 
       async sendCoinsToFriend(context, { friend, amount }) {
         await repository.createCoin(
           friend.id,
           dapp.web3.utils.toWei(amount, "ether"),
-          repository.c.asobiCoinContract,
         );
       },
     },
