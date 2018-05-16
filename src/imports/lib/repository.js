@@ -66,6 +66,19 @@ class Repository {
     ).send();
   }
 
+  async isAdmin(address, contract) {
+    const result = await contract.methods.owner().call();
+    return result === address;
+  }
+
+  async isAsobiCoinAdmin(address, coin) {
+    return await this.isAdmin(address, coin);
+  }
+
+  async isGoodsAdmin(address, goods) {
+    return await this.isAdmin(address, goods);
+  }
+
   generateGoodID() {
     return this.web3.utils.randomHex(32);
   }

@@ -338,16 +338,18 @@ const createStore = () => {
       },
 
       async checkGoodsAdmin(context) {
-        const ownerAddress = await context.state.goodsContract.methods.owner(
-        ).call();
-        const isOwner = ownerAddress == context.state.accountAddress;
+        const isOwner = await repository.isGoodsAdmin(
+          context.state.accountAddress,
+          context.state.goodsContract,
+        )
         context.commit("isGoodsAdmin", isOwner);
       },
 
       async checkAsobiCoinAdmin(context) {
-        const ownerAddress = await context.state.asobiCoinContract.methods.owner(
-        ).call();
-        const isOwner = ownerAddress === context.state.accountAddress;
+        const isOwner = await repository.isAsobiCoinAdmin(
+          context.state.accountAddress,
+          context.state.asobiCoinContract,
+        );
         context.commit("isAsobiCoinAdmin", isOwner);
       },
 
@@ -414,9 +416,6 @@ const createStore = () => {
           amount,
         ).send();
       },
-
-
-
     },
     getters: {
       selectFriend: state => {
