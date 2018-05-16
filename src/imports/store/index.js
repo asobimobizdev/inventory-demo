@@ -27,6 +27,7 @@ const repository = new Repository(dapp);
 
 const createStore = () => {
   return new Vuex.Store({
+    strict: process.env.NODE_ENV !== "production",
     state: {
       dappInit: false,
       isGoodsAdmin: false,
