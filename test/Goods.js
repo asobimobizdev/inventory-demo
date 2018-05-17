@@ -39,6 +39,12 @@ contract("Goods", accounts => {
       await token.mint(account, tokenId);
     });
 
+    it("lets users transfer tokens without approval", async () => {
+      await token.transferFrom(
+        account, otherAccount, tokenId, options,
+      );
+    });
+
     it("lets users transfer tokens", async () => {
       await token.approve(otherAccount, tokenId, options);
       await token.transferFrom(
