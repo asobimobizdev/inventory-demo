@@ -1,148 +1,124 @@
 pragma solidity ^0.4.23;
 
+import "zeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol";
+
 import "contracts/Goods.sol";
 
 
-contract Trade {
+contract Trade is ERC721Receiver  {
 
-    event GoodAdded(address _trader, uint256 goodID);
-    event GoodRemoved(address _trader, uint256 goodID);
-    event GoodExchanged(address _from, address _to, uint256 goodID);
-    event TradeAccepted(address _trader);
-    event TradeWithdrawn(address _trader);
+    event GoodAdded(address indexed _trader, uint256 goodID);
+    event GoodRemoved(address indexed _trader, uint256 goodID);
+    event GoodExchanged(address indexed _from, address indexed _to, uint256 indexed goodID);
+    event TradeAccepted(address indexed _trader);
+    event TradeWithdrawn(address indexed _trader);
     event TradeFinalized();
+    event ExchangeFinished();
+
 
     address[2] public traders;
-    bool[2] public traderAccepted;
+    mapping(address => bool) public traderAccepted;
 
     Goods goods;
 
-    uint256[][2] public traderGoods;
-    mapping(uint256 => uint256) public traderGoodsIndex;
+    mapping(uint256 => address) public goodsTrader;
 
     constructor(Goods _goods, address[2] _traders) public {
         goods = _goods;
         traders = _traders;
     }
 
-    modifier onlyTrader(address trader) {
-        require(isTrader(trader));
+    modifier traderOnly() {
+        require(isTrader(msg.sender));
         _;
     }
 
-    function numTraders() external view returns (uint256) {
-        return traders.length;
-    }
-
-    function numTraderGoods(address trader) external view returns (uint256) {
-        return _numTraderGoods(_traderIndex(trader));
-    }
-
     function numTradersAccepted() external view returns (uint256) {
-        if (isFinal()) {
-            return 2;
-        }
-        if (traderAccepted[0] || traderAccepted[1]) {
-            return 1;
-        }
-        return 0;
-    }
-
-    function traderGoodByIndex(address trader, uint256 index)
-    onlyTrader(trader) external view returns (uint256) {
-        return traderGoods[_traderIndex(trader)][index];
+        return _numTradersAccepted();
     }
 
     function isFinal() public view returns (bool) {
-        if (!traderAccepted[0]) {
-            return false;
-        }
-        if (!traderAccepted[1]) {
-            return false;
-        }
-        return true;
-    }
-
-    function numGoods() public view returns (uint256) {
-        return traderGoods[0].length + traderGoods[1].length;
+        return _numTradersAccepted() == 2;
     }
 
     function isTrader(address trader) public view returns (bool) {
         return trader == traders[0] || trader == traders[1];
     }
 
-    function accept() onlyTrader(msg.sender) external {
-        uint256 traderIndex = _traderIndex(msg.sender);
-        require(traderAccepted[traderIndex] == false);
+    function accept() traderOnly() external {
+        require(traderAccepted[msg.sender] == false);
 
-        traderAccepted[traderIndex] = true;
+        traderAccepted[msg.sender] = true;
 
         emit TradeAccepted(msg.sender);
+        if (isFinal()) {
+            emit TradeFinalized();
+        }
     }
 
-    function withdraw() onlyTrader(msg.sender) external {
-        uint256 traderIndex = _traderIndex(msg.sender);
-        require(traderAccepted[traderIndex]);
+    function withdraw() traderOnly() external {
+        require(traderAccepted[msg.sender]);
         require(!isFinal());
 
-        traderAccepted[traderIndex] = false;
+        traderAccepted[msg.sender] = false;
         emit TradeWithdrawn(msg.sender);
     }
 
-    function addGood(uint256 goodID) onlyTrader(msg.sender) external {
-        address trader = msg.sender;
-        require(goods.ownerOf(goodID) == trader);
+    function onERC721Received(address from, uint256 goodID, bytes data)
+        public returns (bytes4) {
+        // We can't verify msg.sender here because the call is coming from
+        // the goods contract
+        require(msg.sender == address(goods));
+        require(isTrader(from));
         require(!isFinal());
 
-        uint256 traderIndex = _traderIndex(trader);
-        traderGoodsIndex[goodID] = traderGoods[traderIndex].length;
-        traderGoods[traderIndex].push(goodID);
+        goodsTrader[goodID] = from;
 
-        emit GoodAdded(trader, goodID);
+        emit GoodAdded(from, goodID);
+
+        return ERC721_RECEIVED;
     }
 
-    function removeGood(uint256 goodID) onlyTrader(msg.sender) external {
+    function removeGood(uint256 goodID) external {
         address trader = msg.sender;
         require(!isFinal());
-        require(goods.ownerOf(goodID) == trader);
+        require(goodsTrader[goodID] == trader);
 
-        uint256 goodsIndex = traderGoodsIndex[goodID];
-        uint256 traderIndex = _traderIndex(trader);
-
-        for (uint256 i = goodsIndex; i < traderGoods[traderIndex].length - 1; i++) {
-            traderGoods[traderIndex][i] = traderGoods[traderIndex][i + 1];
-        }
-        traderGoods[traderIndex].length--;
+        goods.safeTransferFrom(address(this), trader, goodID);
 
         emit GoodRemoved(trader, goodID);
     }
 
-    function exchange() external {
+    function getGoods() traderOnly() external {
         require(isFinal());
+        uint256 balance = goods.balanceOf(address(this));
+        // We need to keep record how many goods we skipped because they
+        // are not supposed to be transferred to one of the traders
+        // It really feels like a hack, but it works.
+        // XXX HACK Justus 2018-05-17
+        uint256 goodsSkipped = 0;
 
-        for(uint256 ownerIndex = 0; ownerIndex < traders.length; ownerIndex++) {
-            address owner = traders[ownerIndex];
-            uint256 receiverIndex = (traders.length - 1) - ownerIndex;
-            address receiver = traders[receiverIndex];
-            uint256 numGoods = _numTraderGoods(ownerIndex);
-            for(uint256 goodIndex = 0; goodIndex < numGoods; goodIndex++) {
-                uint256 goodID = traderGoods[ownerIndex][goodIndex];
-                goods.transferFrom(owner, receiver, goodID);
-                emit GoodExchanged(owner, receiver, goodID);
+        for(uint256 goodIndex = 0; goodIndex < balance; goodIndex++) {
+            uint256 goodID = goods.tokenOfOwnerByIndex(
+                address(this),
+                goodsSkipped
+            );
+            if (goodsTrader[goodID] == msg.sender) {
+                goodsSkipped++;
+                continue;
             }
+            goods.safeTransferFrom(address(this), msg.sender, goodID);
         }
+        emit ExchangeFinished();
     }
 
-    function _numTraderGoods(uint256 _index) internal view returns (uint256) {
-        return traderGoods[_index].length;
-    }
-
-    function _traderIndex(address trader)
-    onlyTrader(trader) internal view returns (uint256) {
-        if (trader == traders[0]) {
-            return 0;
-        } else {
+    function _numTradersAccepted() internal view returns (uint256) {
+        if (traderAccepted[traders[0]] && traderAccepted[traders[1]]) {
+            return 2;
+        }
+        if (traderAccepted[traders[0]] || traderAccepted[traders[1]]) {
             return 1;
         }
+        return 0;
     }
 }

@@ -8,13 +8,16 @@ const Trade = artifacts.require("contracts/Trade.sol");
 contract("Trade", accounts => {
   const traderA = accounts[1];
   const traderB = accounts[2];
+  const thirdPerson = accounts[3];
   const traderAOptions = {from: traderA};
   const traderBOptions = {from: traderB};
-  const thirdPerson = accounts[3];
+  const thirdPersonOptions = {from: thirdPerson};
 
-  const item1 = 1;
-  const item2 = 2;
-  const item3 = 3;
+  const good1 = 1;
+  const good2 = 2;
+  const good3 = 3;
+  const good4 = 4;
+  const good5 = 5;
 
   let goods;
   let trade;
@@ -22,21 +25,13 @@ contract("Trade", accounts => {
   beforeEach(async () => {
     goods = await Goods.new();
     trade = await Trade.new(goods.address, [traderA, traderB]);
-
-    await goods.mint(traderA, item1);
-    await goods.mint(traderB, item2);
-    await goods.mint(traderB, item3);
   });
 
   it("can be created", async () => {
     assert.equal(await trade.traders(0), traderA);
   });
 
-  it("returns the correct number of traders", async () => {
-    assert.equal(await trade.numTraders(), 2);
-  });
-
-  it("lets users check if they are traders", async () => {
+  it("knows which address is a trader", async () => {
     assert.isTrue(await trade.isTrader(traderA));
     assert.isFalse(await trade.isTrader(thirdPerson));
   });
@@ -60,101 +55,143 @@ contract("Trade", accounts => {
         await trade.withdraw(traderAOptions);
         assert.equal(await trade.numTradersAccepted(), 0);
       });
+
+      describe("and trader B accepts", () => {
+        beforeEach(async () => {
+          await trade.accept(traderBOptions);
+        });
+
+        it("is finalized", async () => {
+          assert.isTrue(await trade.isFinal());
+        });
+
+        it("won't transfer any goods", async () => {
+          await trade.getGoods(traderAOptions);
+        });
+      });
     });
-
-    describe("when accepted", () => {
-      beforeEach(async () => {
-        await goods.approve(trade.address, item1, traderAOptions);
-        await trade.addGood(item1, traderAOptions);
-
-        await trade.accept(traderAOptions);
-        await trade.accept(traderBOptions);
-      });
-
-      it("is true", async () => {
-        assert.isTrue(await trade.isFinal());
-      });
-
-      it("won't let traders withdraw", async () => {
-        await assertRejected(trade.withdraw(traderAOptions));
-        await assertRejected(trade.withdraw(traderBOptions));
-      });
-
-      it("won't let traders remove items", async () => {
-        await assertRejected(trade.removeGood(traderAOptions));
-      });
-
-      it("won't let traders add items", async () => {
-        await goods.approve(trade.address, item2, traderBOptions);
-        await assertRejected(trade.removeGood(item2, traderBOptions));
-      });
-    })
   });
 
-  describe("adding goods", () => {
+  describe("with one good", () => {
     beforeEach(async () => {
-      await goods.approve(trade.address, item1, traderAOptions);
-      await goods.approve(trade.address, item2, traderBOptions);
-      await goods.approve(trade.address, item3, traderBOptions);
+      await goods.mint(traderA, good1);
+      await goods.safeTransferFrom(
+        traderA,
+        trade.address,
+        good1,
+        traderAOptions,
+      );
     });
 
-    it("has no goods in the beginning", async () => {
-      assert.equal(await trade.numGoods(), 0);
+    it("keeps track of the trader", async () => {
+      assert.equal(await trade.goodsTrader(good1), traderA);
     });
 
-    it("lets traders add goods", async () => {
-      await trade.addGood(item1, traderAOptions);
-      assert.equal((await trade.numGoods()).toNumber(), 1);
+    it("lets trader B get their goods", async () => {
+      await trade.accept(traderAOptions);
+      await trade.accept(traderBOptions);
+      await trade.getGoods(traderBOptions);
+      assert.equal(await goods.ownerOf(good1), traderB);
     });
 
-    it("checks ownership", async () => {
-      await assertRejected(trade.addGood(item1, traderBOptions));
-    });
-
-
-    describe("with one good added", () => {
+    describe("and with one more good", async () => {
       beforeEach(async () => {
-        await trade.addGood(item1, traderAOptions);
+        await goods.mint(traderB, good2);
+        await goods.safeTransferFrom(
+          traderB,
+          trade.address,
+          good2,
+          traderBOptions,
+        );
       });
 
-      it("knows how many trades one trader has", async () => {
-        assert.equal(await trade.numTraderGoods(traderA), 1);
-        await assertRejected(trade.numTraderGoods(thirdPerson));
+      it("lets trader A get their goods", async () => {
+        await trade.accept(traderAOptions);
+        await trade.accept(traderBOptions);
+        await trade.getGoods(traderAOptions);
+        assert.equal(await goods.ownerOf(good2), traderA);
+      });
+    });
+  });
+
+  describe("goods", () => {
+    beforeEach(async () => {
+      await goods.mint(traderA, good1);
+      await goods.mint(traderB, good2);
+      await goods.mint(traderB, good3);
+      await goods.mint(traderA, good4);
+      await goods.mint(thirdPerson, good5);
+    });
+
+    it("can be added by traders", async () => {
+      await goods.safeTransferFrom(
+        traderA,
+        trade.address,
+        good1,
+        traderAOptions,
+      );
+      assert.equal(await goods.ownerOf(good1), trade.address);
+    });
+
+    it("cannot be added by a third person", async () => {
+      await assertRejected(goods.safeTransferFrom(
+        thirdPerson,
+        trade.address,
+        good5,
+        thirdPersonOptions,
+      ));
+    });
+
+    describe("with trader A good transfer", () => {
+      beforeEach(async () => {
+        await goods.safeTransferFrom(
+          traderA,
+          trade.address,
+          good1,
+          traderAOptions
+        );
       });
 
-      it("keeps track of the individual goods offered", async () => {
-        assert.equal(await trade.traderGoodByIndex(traderA, 0), item1);
+      it("lets trader A remove goods", async () => {
+        assert.equal((await goods.ownerOf(good1)), trade.address);
+        await trade.removeGood(good1, traderAOptions);
+        assert.equal((await goods.ownerOf(good1)), traderA);
       });
 
-      it("lets you remove goods", async () => {
-        await trade.removeGood(item1, traderAOptions);
-        assert.equal((await trade.numTraderGoods(traderA)).toNumber(), 0);
-        assert.equal((await trade.numGoods()).toNumber(), 0);
+      it("won't let a anyone else remove goods", async () => {
+        assert.equal((await goods.ownerOf(good1)), trade.address);
+        await assertRejected(trade.removeGood(good1, traderBOptions));
+        await assertRejected(trade.removeGood(good1, thirdPersonOptions));
+        assert.equal((await goods.ownerOf(good1)), trade.address);
       });
     });
 
-    describe("with all goods added", () => {
+    describe("fully added", () => {
       beforeEach(async () => {
-        await trade.addGood(item1, traderAOptions);
-        await trade.addGood(item2, traderBOptions);
-        await trade.addGood(item3, traderBOptions);
+        await goods.safeTransferFrom(
+          traderA, trade.address, good1, traderAOptions,
+        );
+        await goods.safeTransferFrom(
+          traderB, trade.address, good2, traderBOptions,
+        );
+        await goods.safeTransferFrom(
+          traderB, trade.address, good3, traderBOptions,
+        );
+        await goods.safeTransferFrom(
+          traderA, trade.address, good4, traderAOptions,
+        );
       });
 
-      it("keeps correct counts", async () => {
-        assert.equal((await trade.numTraderGoods(traderB)).toNumber(), 2);
-        assert.equal((await trade.numGoods()).toNumber(), 3);
-
-        await trade.removeGood(item2, traderBOptions);
-        assert.equal((await trade.numTraderGoods(traderB)).toNumber(), 1);
-        assert.equal((await trade.numGoods()).toNumber(), 2);
-
-        await trade.removeGood(item3, traderBOptions);
-        assert.equal((await trade.numTraderGoods(traderB)).toNumber(), 0);
-        assert.equal((await trade.numGoods()).toNumber(), 1);
+      it("correctly counts all goods", async () => {
+        assert.equal(await goods.balanceOf(trade.address), 4);
+        assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 0), good1);
+        assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 1), good2);
+        assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 2), good3);
+        assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 3), good4);
       });
 
       it("won't allow exchanging before finalization", async () => {
-        await assertRejected(trade.exchange(traderBOptions));
+        await assertRejected(trade.getGoods(traderBOptions));
       });
 
       describe("and finalized", () => {
@@ -163,16 +200,37 @@ contract("Trade", accounts => {
           await trade.accept(traderBOptions);
         });
 
-        it("lets traders exchange the items", async () => {
-          await trade.exchange();
-          assert.equal(await goods.ownerOf(item1), traderB);
-          assert.equal(await goods.ownerOf(item2), traderA);
-          assert.equal(await goods.ownerOf(item3), traderA);
+        it("lets trader A get their goods", async () => {
+          await trade.getGoods(traderAOptions);
+          assert.equal(await goods.ownerOf(good1), trade.address);
+          assert.equal(await goods.ownerOf(good2), traderA);
+          assert.equal(await goods.ownerOf(good3), traderA);
+          assert.equal(await goods.ownerOf(good4), trade.address);
         });
 
-        it("will fail if item approvals are taken away", async () => {
-          await goods.approve("0x0", item1, traderAOptions);
-          await assertRejected(trade.exchange());
+        it("lets trader B get their goods", async () => {
+          await trade.getGoods(traderBOptions);
+          assert.equal(await goods.ownerOf(good1), traderB);
+          assert.equal(await goods.ownerOf(good2), trade.address);
+          assert.equal(await goods.ownerOf(good3), trade.address);
+          assert.equal(await goods.ownerOf(good4), traderB);
+        });
+
+        it("won't let traders withdraw", async () => {
+          await assertRejected(trade.withdraw(traderAOptions));
+          await assertRejected(trade.withdraw(traderBOptions));
+        });
+
+        it("won't let traders remove goods", async () => {
+          await assertRejected(trade.removeGood(traderAOptions));
+        });
+
+        it("won't let traders add goods", async () => {
+          await assertRejected(
+            goods.safeTransferFrom(
+              traderA, trade.address, good4, traderAOptions,
+            )
+          );
         });
       });
     });
