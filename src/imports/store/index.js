@@ -1,10 +1,10 @@
 import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
 import Repository from "../lib/repository";
-import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
 import { Wallets } from "./../api/collections";
+import trade from "./trade";
 
 window.Wallets = Wallets;
 
@@ -28,6 +28,9 @@ const repository = new Repository(dapp);
 const createStore = () => {
   return new Vuex.Store({
     strict: process.env.NODE_ENV !== "production",
+    modules:{
+      trade,
+    },
     state: {
       dappInit: false,
       isGoodsAdmin: false,
