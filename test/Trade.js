@@ -61,6 +61,10 @@ contract("Trade", accounts => {
         assert.equal(await trade.numTradersAccepted(), 0);
       });
 
+      it("won't let trader A cancel", async () => {
+        await assertRejected(trade.cancel(traderAOptions));
+      });
+
       describe("and trader B accepts", () => {
         beforeEach(async () => {
           await trade.accept(traderBOptions);

@@ -90,6 +90,8 @@ contract Trade is ERC721Receiver {
       * @dev Will throw if the trader accepted
       */
     function cancel() traderOnly() external {
+        require(!traderAccepted[msg.sender]);
+
         isCancelled = true;
         emit TradeCancelled(msg.sender);
     }
