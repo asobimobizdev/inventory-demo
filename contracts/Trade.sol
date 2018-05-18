@@ -7,9 +7,13 @@ import "contracts/Goods.sol";
 
 contract Trade is ERC721Receiver  {
 
-    event GoodAdded(address indexed _trader, uint256 goodID);
-    event GoodRemoved(address indexed _trader, uint256 goodID);
-    event GoodExchanged(address indexed _from, address indexed _to, uint256 indexed goodID);
+    event GoodAdded(address indexed _trader, uint256 _goodID);
+    event GoodRemoved(address indexed _trader, uint256 _goodID);
+    event GoodExchanged(
+        address indexed _from,
+        address indexed _to,
+        uint256 indexed _goodID
+    );
     event TradeAccepted(address indexed _trader);
     event TradeWithdrawn(address indexed _trader);
     event TradeFinalized();

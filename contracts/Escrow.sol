@@ -6,8 +6,13 @@ import "contracts/Goods.sol";
 
 contract Escrow {
 
-    event Swapped(address buyer, address seller, uint256 goodID, uint256 price);
-    event PriceSet(address seller, uint256 goodID, uint256 price);
+    event Swapped(
+        address _buyer,
+        address _seller,
+        uint256 _goodID,
+        uint256 _price
+    );
+    event PriceSet(address _seller, uint256 _goodID, uint256 _price);
 
     AsobiCoin asobiCoin;
     Goods goods;
