@@ -7,21 +7,26 @@
   <el-container class="trande-container">
     <el-header>
       <transition :name="toolBarSlideAnimationType">
-        <div class="content center" v-if="!offersShowed" key="user-list">
+        <div class="content center" v-if="!hasTrade" key="user-list">
           <h1>Users list</h1>
         </div>
-        <div class="content" v-else key="trade-view">
-          <el-button class="back-button" type="primary" round @click="backToUserList()" icon="el-icon-arrow-left">User list</el-button>
+        <div class="content center" v-else key="trade-view">
+          <h1>Trade</h1>
         </div>
       </transition>
     </el-header>
     <el-main >
 
       <transition :name="slideAnimationType">
-        <div class="content user-list" v-if="!offersShowed" key="user-list">
+        <div class="content user-list" v-if="!hasTrade" key="user-list">
           <el-table
-            :data="friends"
+            ref="usersTable"
+            :data="otherUsers"
             class="table"
+            highlight-current-row
+            @current-change="userTableSelectionChanged"
+            current-row-key="id"
+            @mounted="userTableMounted"
             >
             <el-table-column
               prop="name"
@@ -36,8 +41,8 @@
           </el-table>
         </div>
         <div class="content" v-else key="trade-view">
-          <goods-collection class="my-offer" :goods="selectedMyOffer" title="My Offer"/>
-          <goods-collection class="user-offer" :goods="[]" title="[username] Offer"/>
+          <goods-collection class="my-offer" :goods="myOffer" title="My Offer"/>
+          <goods-collection class="user-offer" :goods="otherOffer" :title="otherUser.name + ' Offer'"/>
         </div>
       </transition>
 
@@ -45,10 +50,10 @@
 
     <el-footer>
       <transition :name="toolBarSlideAnimationType">
-        <div class="content center" v-if="!offersShowed" key="user-list">
-          <el-button type="primary" round @click="startTrade()">Start Trade</el-button>
+        <div class="content center" v-if="!hasTrade" key="user-list">
+          <el-button type="primary" round @click="startTradeWithSelectedUser()" v-if="selectedFriendId">Start Trade</el-button>
         </div>
-        <div class="content center" v-else key="trade-view">
+        <div class="content center trade-view" v-else key="trade-view">
           <el-button type="danger" round @click="cancelTrade()">Cancel Trade</el-button>
           <el-button type="success" round @click="confirmTrade()">Confirm Trade</el-button>
         </div>
@@ -61,62 +66,78 @@
 
 <script>
 import GoodsCollection from "./../components/GoodsCollection.vue";
+import { mapActions, mapState, mapGetters } from "vuex";
+
 export default {
   components: {
-    "goods-collection": GoodsCollection,
+    "goods-collection": GoodsCollection
   },
   mounted() {
     this.$store.dispatch("getOwnGoods", true);
-  },
-  data() {
-    return {
-      offersShowed: false,
-    };
+    if (this.selectedUser) {
+      this.$refs.usersTable.setCurrentRow(this.selectedUser);
+    }
   },
   computed: {
+    ...mapState(["selectedFriendId"]),
+    ...mapGetters(["otherUsers"]),
+    ...mapGetters("trade", ["otherUser"]),
+    hasTrade() {
+      return this.$store.state.trade.id;
+    },
     goods: {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {},
+      set(value) {}
     },
-    friends() {
-      return this.$store.state.friends;
-    },
-    selectedMyOffer: {
+    myOffer: {
       get() {
-        return this.$store.getters.allGoods;
+        return this.$store.state.trade.myGoods;
       },
       set(value) {
         console.log("selectedMyOffer", value);
+      }
+    },
+    otherOffer: {
+      get() {
+        return this.$store.state.trade.otherGoods;
       },
+      set(value) {
+        // console.log("selectedMyOffer", value);
+      }
     },
     slideAnimationType() {
-      return this.offersShowed ? "slide-left" : "slide-right";
+      return this.hasTrade ? "slide-left" : "slide-right";
     },
     toolBarSlideAnimationType() {
-      return this.offersShowed ? "tool-bar-slide-left" : "tool-bar-slide-right";
-    },
+      return this.hasTrade ? "tool-bar-slide-left" : "tool-bar-slide-right";
+    }
   },
   methods: {
-    startTrade() {
-      this.offersShowed = true;
+    ...mapActions("trade", [
+      "startTradeWithSelectedUser",
+      "cancelTrade",
+      "confirmTrade"
+    ]),
+    userTableSelectionChanged(user) {
+      this.$store.dispatch("selectedFriendId", user.id);
     },
-    backToUserList() {
-      this.offersShowed = false;
-    },
-    cancelTrade() {
-      this.offersShowed = false;
-    },
-    confirmTrade() {
-      this.offersShowed = false;
-    },
+    userTableMounted() {
+      console.log("userTableMounted");
+    }
   },
+  watch: {
+    selectedUser(user) {
+      this.$refs.usersTable.setCurrentRow(user);
+    }
+  }
 };
 </script>
 
-
 <style lang="stylus" scoped>
+
+gutter = 4px
 
 fullSizeContent()
   display flex
@@ -138,24 +159,24 @@ fullSizeContent()
   min-height calc(100% - 100px)
   display flex
   background-color #ccc
-  padding 5px
+  padding gutter
 
   >.el-aside
     // background alpha(#f00,0.3)
-    padding 5px
+    padding gutter
     display flex
     >.my-goods
       flex 1 1 auto
 
   >.trande-container
-    padding 5px
+    padding gutter
 
     >.el-header
       background #fff
-      height 60px
+      height 56px!important
       fullSizeContent()
       >.content
-        padding 10px
+        padding gutter*2
         display flex
 
         h1
@@ -170,11 +191,15 @@ fullSizeContent()
 
       fullSizeContent()
       >.content
-        padding 10px
+        padding gutter*2
 
         >*
-          margin-right 5px
+          margin-left (gutter / 2)
+          margin-right (gutter / 2)
           flex 1 1 auto
+
+          &:nth-child(1)
+            margin-left 0px
 
           &:last-child
             margin-right 0px
@@ -182,6 +207,7 @@ fullSizeContent()
         &.user-list
           background #fff
           display flex
+          padding-top 0px
           padding-bottom 0px
 
           >.table
@@ -189,20 +215,18 @@ fullSizeContent()
             flex 1 1 auto
             height 100%
 
-
-
     >.el-footer
       background #fff
-      padding 10px
+      // padding gutter*2
       display flex
-      height 60px
+      height 56px!important
       fullSizeContent()
       >.content
-        padding 10px
+        padding gutter*2
 
-
-
-
+        &.trade-view
+          >*
+            width 140px
 </style>
 
 <style lang="stylus">

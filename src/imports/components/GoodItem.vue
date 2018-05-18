@@ -44,7 +44,7 @@ export default {
     },
     styleForIcon() {
       let seed = this.seed;
-      let angle = (seed * 130.43445) % 360;
+      let angle = this.random.floatBetween(0, 360);
       let colorH = this.hue;
       let startColor = `hsl(${colorH},     80%, 70%)`;
       let stopColor = `hsl(${colorH + 70}, 80%, 70%)`;

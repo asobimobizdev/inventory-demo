@@ -50,9 +50,9 @@ import GoodInspector from "./../components/GoodInspector.vue";
 
 export default {
   mounted() {
-    this.$store.dispatch("getOwnGoods",true);
+    this.$store.dispatch("getOwnGoods", true);
 
-    if(this.friends.length > 0){
+    if (this.friends.length > 0) {
       this.checkSelectedFriend(this.friends);
     }
   },
@@ -66,10 +66,7 @@ export default {
   },
   computed: {
     friends() {
-      const friends = this.$store.state.friends.filter(friend => {
-        return friend.id !== this.$store.state.accountAddress;
-      });
-      return friends;
+      return this.$store.getters.otherUsers;
     },
     hasFriends() {
       return this.$store.state.friends.length > 0;
@@ -118,7 +115,7 @@ export default {
     },
   },
   methods: {
-    checkSelectedFriend(friends){
+    checkSelectedFriend(friends) {
       console.log("checkSelectedFriend");
       if (friends.length < 0) return;
       if (!this.$store.state.selectedFriendId) {
