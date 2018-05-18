@@ -39,6 +39,13 @@ contract Trade is ERC721Receiver {
         require(isTrader(msg.sender));
         _;
     }
+    /**
+      * @dev Return the total numbers of traders
+      * @return Number of traders
+      */
+    function numTraders() external view returns (uint256) {
+        return traders.length;
+    }
 
     /**
       * @dev Return the number of traders that have accepted this trade
