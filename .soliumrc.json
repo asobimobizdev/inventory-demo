@@ -1,7 +1,8 @@
 {
-  "extends": "solium:recommended",
+  "extends": "solium:all",
   "plugins": [
-    "security"
+    "security",
+    "zeppelin"
   ],
   "rules": {
     "quotes": [
@@ -11,6 +12,7 @@
     "indentation": [
       "error",
       4
-    ]
+    ],
+    "max-len": ["warning", 79]
   }
 }

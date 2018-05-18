@@ -22,6 +22,7 @@
     "random-seed": "^0.3.0",
     "signalhub": "^4.9.0",
     "simple-peer": "^9.0.0",
+    "solium-plugin-zeppelin": "git+https://github.com/OpenZeppelin/solium-plugin-zeppelin.git#aec043c90d158210a6baa95b5247fa2dedd8775e",
     "truffle": "^4.1.8",
     "vue": "^2.5.13",
     "vue-meteor-tracker": "^1.2.3",
