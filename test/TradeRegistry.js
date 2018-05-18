@@ -26,8 +26,11 @@ contract("TradeRegistry", accounts => {
     assert.equal(await registry.numTrades(), 0);
   });
 
-  describe("one trade added", () => {
+  it("will only let participating traders add a trade", async () => {
+    await assertRejected(registry.add(trade.address, traderCOptions));
+  });
 
+  describe("one trade added", () => {
     beforeEach(async () => {
       await registry.add(trade.address, traderAOptions);
     });

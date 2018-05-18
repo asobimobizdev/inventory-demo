@@ -13,13 +13,26 @@ contract TradeRegistry {
     mapping(address => uint256) tradeIndex;
     address[] trades;
 
+    /**
+      * @dev Return the number of trades
+      * @return Return the number of trades
+      */
     function numTrades() external view returns (uint256) {
         return trades.length;
     }
 
-    function add(address trade) external {
-        trades.push(trade);
+    /**
+      * @dev Add a trade
+      * @dev Can only be added by the traders
+      * @param tradeAddress Address of the trade
+      */
+    function add(address tradeAddress) external {
+        Trade trade = Trade(tradeAddress);
 
-        emit TradeAdded(trade);
+        require(trade.isTrader(msg.sender));
+
+        trades.push(tradeAddress);
+
+        emit TradeAdded(tradeAddress);
     }
 }
