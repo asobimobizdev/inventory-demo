@@ -36,6 +36,24 @@ contract("Trade", accounts => {
     assert.isFalse(await trade.isTrader(thirdPerson));
   });
 
+  describe("cancelling", () => {
+    beforeEach(async () => {
+      await trade.cancel(traderAOptions);
+    });
+
+    it("the trade is cancelled", async () => {
+      assert.isFalse(await trade.isActive());
+    });
+
+    it("won't let someone cancel again", async () => {
+      await assertRejected(trade.cancel(traderBOptions));
+    });
+
+    it("won't let someone accept", async () => {
+      await assertRejected(trade.accept(traderAOptions));
+    });
+  });
+
   describe("final state", () => {
     it("is false in the beginning", async () => {
       assert.isFalse(await trade.isFinal());
@@ -56,6 +74,10 @@ contract("Trade", accounts => {
         assert.equal(await trade.numTradersAccepted(), 0);
       });
 
+      it("won't let trader A cancel", async () => {
+        await assertRejected(trade.cancel(traderAOptions));
+      });
+
       describe("and trader B accepts", () => {
         beforeEach(async () => {
           await trade.accept(traderBOptions);
@@ -64,52 +86,6 @@ contract("Trade", accounts => {
         it("is finalized", async () => {
           assert.isTrue(await trade.isFinal());
         });
-
-        it("won't transfer any goods", async () => {
-          await trade.getGoods(traderAOptions);
-        });
-      });
-    });
-  });
-
-  describe("with one good", () => {
-    beforeEach(async () => {
-      await goods.mint(traderA, good1);
-      await goods.safeTransferFrom(
-        traderA,
-        trade.address,
-        good1,
-        traderAOptions,
-      );
-    });
-
-    it("keeps track of the trader", async () => {
-      assert.equal(await trade.goodsTrader(good1), traderA);
-    });
-
-    it("lets trader B get their goods", async () => {
-      await trade.accept(traderAOptions);
-      await trade.accept(traderBOptions);
-      await trade.getGoods(traderBOptions);
-      assert.equal(await goods.ownerOf(good1), traderB);
-    });
-
-    describe("and with one more good", async () => {
-      beforeEach(async () => {
-        await goods.mint(traderB, good2);
-        await goods.safeTransferFrom(
-          traderB,
-          trade.address,
-          good2,
-          traderBOptions,
-        );
-      });
-
-      it("lets trader A get their goods", async () => {
-        await trade.accept(traderAOptions);
-        await trade.accept(traderBOptions);
-        await trade.getGoods(traderAOptions);
-        assert.equal(await goods.ownerOf(good2), traderA);
       });
     });
   });
@@ -121,16 +97,6 @@ contract("Trade", accounts => {
       await goods.mint(traderB, good3);
       await goods.mint(traderA, good4);
       await goods.mint(thirdPerson, good5);
-    });
-
-    it("can be added by traders", async () => {
-      await goods.safeTransferFrom(
-        traderA,
-        trade.address,
-        good1,
-        traderAOptions,
-      );
-      assert.equal(await goods.ownerOf(good1), trade.address);
     });
 
     it("cannot be added by a third person", async () => {
@@ -150,6 +116,10 @@ contract("Trade", accounts => {
           good1,
           traderAOptions
         );
+      });
+
+      it("is belong to the trade contract", async () => {
+        assert.equal(await goods.ownerOf(good1), trade.address);
       });
 
       it("lets trader A remove goods", async () => {
@@ -188,6 +158,14 @@ contract("Trade", accounts => {
         assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 1), good2);
         assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 2), good3);
         assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 3), good4);
+      });
+
+      it("refunds all goods on cancel", async () => {
+        await trade.cancel(traderAOptions);
+        assert.equal(await goods.ownerOf(good1), traderA);
+        assert.equal(await goods.ownerOf(good2), traderB);
+        assert.equal(await goods.ownerOf(good3), traderB);
+        assert.equal(await goods.ownerOf(good4), traderA);
       });
 
       it("won't allow exchanging before finalization", async () => {
