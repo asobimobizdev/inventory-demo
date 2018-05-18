@@ -48,11 +48,25 @@ contract("TradeRegistry", accounts => {
       await assertRejected(registry.add(trade.address, traderCOptions));
     });
 
-    it("can remove finalized trades", async () => {
-      await trade.accept(traderAOptions);
-      await trade.accept(traderBOptions);
-      await registry.remove(traderAOptions);
-      assert.equal(await registry.numTrades(), 0);
+    describe("with the finalized trade removed", () => {
+      beforeEach(async () => {
+        await trade.accept(traderAOptions);
+        await trade.accept(traderBOptions);
+        await registry.remove(traderAOptions);
+      });
+
+      it("counts zero trades", async () => {
+        assert.equal(await registry.numTrades(), 0);
+      });
+
+      it("won't accept the same trade again", async () => {
+        await assertRejected(registry.add(trade.address, traderAOptions));
+      });
+
+      it("can add another trade for the same users", async () => {
+        const otherTrade = await Trade.new("0x0", [traderA, traderB]);
+        await registry.add(otherTrade.address, traderAOptions);
+      });
     });
 
     it("can't remove ongoing trades", async () => {
