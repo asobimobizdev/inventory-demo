@@ -5,6 +5,10 @@ import "zeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol";
 import "contracts/Goods.sol";
 
 
+/**
+  * @title Trade contract that allows atomic exchange of multiple goods
+  * @dev Only two trading parties are supported
+  */
 contract Trade is ERC721Receiver {
     event GoodAdded(address indexed _trader, uint256 _goodID);
     event GoodRemoved(address indexed _trader, uint256 _goodID);
@@ -36,10 +40,18 @@ contract Trade is ERC721Receiver {
         _;
     }
 
+    /**
+      * @dev Return the number of traders that have accepted this trade
+      * @return Number of traders that accepted
+      */
     function numTradersAccepted() external view returns (uint256) {
         return _numTradersAccepted();
     }
 
+    /**
+      * @dev Accept the trade
+      * @dev Can only be called by a trader
+      */
     function accept() traderOnly() external {
         require(traderAccepted[msg.sender] == false);
 
@@ -51,6 +63,10 @@ contract Trade is ERC721Receiver {
         }
     }
 
+    /**
+      * @dev Withdraw trade acceptance
+      * @dev Can only be called by a trader
+      */
     function withdraw() traderOnly() external {
         require(traderAccepted[msg.sender]);
         require(!isFinal());
@@ -59,6 +75,11 @@ contract Trade is ERC721Receiver {
         emit TradeWithdrawn(msg.sender);
     }
 
+    /**
+      * @dev Remove a good that was added to the trade
+      * @dev Can only be called by a trader
+      * @param goodID the good ID to remove
+      */
     function removeGood(uint256 goodID) external {
         address trader = msg.sender;
         require(!isFinal());
@@ -69,6 +90,10 @@ contract Trade is ERC721Receiver {
         emit GoodRemoved(trader, goodID);
     }
 
+    /**
+      * @dev Retrieve the goods after the trade is finalized
+      * @dev Can only be called by a trader
+      */
     function getGoods() traderOnly() external {
         require(isFinal());
         uint256 balance = goods.balanceOf(address(this));
@@ -92,14 +117,29 @@ contract Trade is ERC721Receiver {
         emit ExchangeFinished();
     }
 
+    /**
+      * @dev Query the trade state
+      * @return Return true if the trade is finalized
+      */
     function isFinal() public view returns (bool) {
         return _numTradersAccepted() == 2;
     }
 
+    /**
+      * @dev Query the trader state of a given address
+      * @return Return true if the trade is finalized
+      */
     function isTrader(address trader) public view returns (bool) {
         return trader == traders[0] || trader == traders[1];
     }
 
+    /**
+      * @dev Handle ERC721 token reception
+      * @param from The address of the token sender
+      * @param goodID The good that was sent
+      * @param data Data attachment
+      * @return Return some complicated keccak thing if everything worked
+      */
     function onERC721Received(address from, uint256 goodID, bytes data)
         public returns (bytes4)
         {
@@ -116,6 +156,10 @@ contract Trade is ERC721Receiver {
         return ERC721_RECEIVED;
     }
 
+    /**
+      * @dev Return the number of traders that have accepted this trade
+      * @return Return the number of traders that have accepted this trade
+      */
     function _numTradersAccepted() internal view returns (uint256) {
         if (traderAccepted[traders[0]] && traderAccepted[traders[1]]) {
             return 2;

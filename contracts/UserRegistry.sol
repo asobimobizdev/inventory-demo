@@ -1,6 +1,11 @@
 pragma solidity ^0.4.23;
 
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
+
+/**
+  * @title UserRegistry keeps track of users
+  */
 contract UserRegistry {
     event UserAdded(address indexed _user);
     event UserRemoved(address indexed _user);
@@ -10,6 +15,9 @@ contract UserRegistry {
     address[] users;
     mapping(address => uint256) userIndex;
 
+    /**
+      * @dev Allow a user to add themselves
+      */
     function add() external {
         userIndex[msg.sender] = users.length;
         users.push(msg.sender);
@@ -18,17 +26,24 @@ contract UserRegistry {
         emit UserAdded(msg.sender);
     }
 
+    /**
+      * @dev Allow a user that is already added to remove themselves
+      */
     function remove() external {
         require(isUser[msg.sender]);
 
         isUser[msg.sender] = false;
 
-        users[userIndex[msg.sender]] = users[users.length - 1];
+        users[userIndex[msg.sender]] = users[SafeMath.sub(users.length, 1)];
         users.length--;
 
         emit UserRemoved(msg.sender);
     }
 
+    /**
+      * @dev Return the number of users that are in this registry
+      * @return Return the number of users that are in this registry
+      */
     function numUsers() external view returns (uint256) {
         return users.length;
     }
