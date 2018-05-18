@@ -15,7 +15,7 @@ jobs:
       - run:
           command: npm run lint
       - run:
-          command: npm run truffle-lint
+          command: npm run solium-lint
           working_directory: ~/asobicoin
       - run:
           command: npm run truffle-test
