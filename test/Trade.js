@@ -160,6 +160,14 @@ contract("Trade", accounts => {
         assert.equal(await goods.tokenOfOwnerByIndex(trade.address, 3), good4);
       });
 
+      it("refunds all goods on cancel", async () => {
+        await trade.cancel(traderAOptions);
+        assert.equal(await goods.ownerOf(good1), traderA);
+        assert.equal(await goods.ownerOf(good2), traderB);
+        assert.equal(await goods.ownerOf(good3), traderB);
+        assert.equal(await goods.ownerOf(good4), traderA);
+      });
+
       it("won't allow exchanging before finalization", async () => {
         await assertRejected(trade.getGoods(traderBOptions));
       });

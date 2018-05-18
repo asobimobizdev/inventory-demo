@@ -98,6 +98,13 @@ contract Trade is ERC721Receiver {
         require(!traderAccepted[msg.sender]);
 
         isActive = false;
+
+        uint256 balance = goods.balanceOf(address(this));
+        for (uint256 goodIndex = 0; goodIndex < balance; goodIndex++) {
+            uint256 goodID = goods.tokenOfOwnerByIndex(address(this), 0);
+            address owner = goodsTrader[goodID];
+            goods.safeTransferFrom(address(this), owner, goodID);
+        }
         emit TradeCancelled(msg.sender);
     }
 
