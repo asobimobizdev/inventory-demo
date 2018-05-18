@@ -36,14 +36,27 @@ contract("Trade", accounts => {
     assert.isFalse(await trade.isTrader(thirdPerson));
   });
 
+  describe("cancelling", () => {
+    beforeEach(async () => {
+      await trade.cancel(traderAOptions);
+    });
+
+    it("the trade is cancelled", async () => {
+      assert.isFalse(await trade.isActive());
+    });
+
+    it("won't let someone cancel again", async () => {
+      await assertRejected(trade.cancel(traderBOptions));
+    });
+
+    it("won't let someone accept", async () => {
+      await assertRejected(trade.accept(traderAOptions));
+    });
+  });
+
   describe("final state", () => {
     it("is false in the beginning", async () => {
       assert.isFalse(await trade.isFinal());
-    });
-
-    it("lets trader A cancel", async () => {
-      await trade.cancel(traderAOptions);
-      assert.isTrue(await trade.isCancelled());
     });
 
     describe("when trader A accepts", async () => {

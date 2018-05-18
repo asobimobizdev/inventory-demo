@@ -28,13 +28,18 @@ contract Trade is ERC721Receiver {
     mapping(address => bool) public traderAccepted;
 
     Goods goods;
-    bool public isCancelled;
+    bool public isActive = true;
 
     mapping(uint256 => address) public goodsTrader;
 
     constructor(Goods _goods, address[2] _traders) public {
         goods = _goods;
         traders = _traders;
+    }
+
+    modifier activeOnly() {
+        require(isActive);
+        _;
     }
 
     modifier traderOnly() {
@@ -61,7 +66,7 @@ contract Trade is ERC721Receiver {
       * @dev Accept the trade
       * @dev Can only be called by a trader
       */
-    function accept() traderOnly() external {
+    function accept() activeOnly() traderOnly() external {
         require(traderAccepted[msg.sender] == false);
 
         traderAccepted[msg.sender] = true;
@@ -76,7 +81,7 @@ contract Trade is ERC721Receiver {
       * @dev Withdraw trade acceptance
       * @dev Can only be called by a trader
       */
-    function withdraw() traderOnly() external {
+    function withdraw() activeOnly() traderOnly() external {
         require(traderAccepted[msg.sender]);
         require(!isFinal());
 
@@ -89,20 +94,19 @@ contract Trade is ERC721Receiver {
       * @dev Can only be called by a trader
       * @dev Will throw if the trader accepted
       */
-    function cancel() traderOnly() external {
+    function cancel() activeOnly() traderOnly() external {
         require(!traderAccepted[msg.sender]);
 
-        isCancelled = true;
+        isActive = false;
         emit TradeCancelled(msg.sender);
     }
-
 
     /**
       * @dev Remove a good that was added to the trade
       * @dev Can only be called by a trader
       * @param goodID the good ID to remove
       */
-    function removeGood(uint256 goodID) external {
+    function removeGood(uint256 goodID) activeOnly() traderOnly() external {
         address trader = msg.sender;
         require(!isFinal());
         require(goodsTrader[goodID] == trader);
@@ -116,7 +120,7 @@ contract Trade is ERC721Receiver {
       * @dev Retrieve the goods after the trade is finalized
       * @dev Can only be called by a trader
       */
-    function getGoods() traderOnly() external {
+    function getGoods() activeOnly() traderOnly() external {
         require(isFinal());
         uint256 balance = goods.balanceOf(address(this));
         // We need to keep record how many goods we skipped because they
@@ -163,6 +167,7 @@ contract Trade is ERC721Receiver {
       * @return Return some complicated keccak thing if everything worked
       */
     function onERC721Received(address from, uint256 goodID, bytes data)
+        activeOnly()
         public returns (bytes4)
         {
         // We can't verify msg.sender here because the call is coming from
