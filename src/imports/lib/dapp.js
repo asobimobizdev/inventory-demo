@@ -2,6 +2,8 @@ import Web3 from "web3";
 import { Goods } from "../../../contracts/Goods.sol";
 import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 import { Escrow } from "../../../contracts/Escrow.sol";
+import { TradeRegistry } from "../../../contracts/TradeRegistry.sol";
+import { UserRegistry } from "../../../contracts/UserRegistry.sol";
 
 // const WEBSOCKET_NODE = "wss://geth-light.herokuapp.com/";
 const WEBSOCKET_NODE = "wss://rinkeby.infura.io/ws";
@@ -20,6 +22,8 @@ export default class Dapp {
       Goods,
       AsobiCoin,
       Escrow,
+      TradeRegistry,
+      UserRegistry,
     };
   }
 
