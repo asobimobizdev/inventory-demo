@@ -28,6 +28,9 @@ contract("TradeRegistry", accounts => {
   });
 
   it("won't accept finalized trades", async () => {
+    await trade.accept(traderAOptions);
+    await trade.accept(traderBOptions);
+    await assertRejected(registry.add(trade.address, traderAOptions));
   });
 
   describe("one trade added", () => {

@@ -34,6 +34,7 @@ contract TradeRegistry {
         Trade trade = Trade(tradeAddress);
 
         require(trade.isTrader(msg.sender));
+        require(!trade.isFinal());
 
         trades.push(tradeAddress);
         for (uint256 i = 0; i < trade.numTraders(); i++) {
