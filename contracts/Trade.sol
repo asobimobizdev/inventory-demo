@@ -5,8 +5,7 @@ import "zeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol";
 import "contracts/Goods.sol";
 
 
-contract Trade is ERC721Receiver  {
-
+contract Trade is ERC721Receiver {
     event GoodAdded(address indexed _trader, uint256 _goodID);
     event GoodRemoved(address indexed _trader, uint256 _goodID);
     event GoodExchanged(
@@ -41,14 +40,6 @@ contract Trade is ERC721Receiver  {
         return _numTradersAccepted();
     }
 
-    function isFinal() public view returns (bool) {
-        return _numTradersAccepted() == 2;
-    }
-
-    function isTrader(address trader) public view returns (bool) {
-        return trader == traders[0] || trader == traders[1];
-    }
-
     function accept() traderOnly() external {
         require(traderAccepted[msg.sender] == false);
 
@@ -66,21 +57,6 @@ contract Trade is ERC721Receiver  {
 
         traderAccepted[msg.sender] = false;
         emit TradeWithdrawn(msg.sender);
-    }
-
-    function onERC721Received(address from, uint256 goodID, bytes data)
-        public returns (bytes4) {
-        // We can't verify msg.sender here because the call is coming from
-        // the goods contract
-        require(msg.sender == address(goods));
-        require(isTrader(from));
-        require(!isFinal());
-
-        goodsTrader[goodID] = from;
-
-        emit GoodAdded(from, goodID);
-
-        return ERC721_RECEIVED;
     }
 
     function removeGood(uint256 goodID) external {
@@ -102,7 +78,7 @@ contract Trade is ERC721Receiver  {
         // XXX HACK Justus 2018-05-17
         uint256 goodsSkipped = 0;
 
-        for(uint256 goodIndex = 0; goodIndex < balance; goodIndex++) {
+        for (uint256 goodIndex = 0; goodIndex < balance; goodIndex++) {
             uint256 goodID = goods.tokenOfOwnerByIndex(
                 address(this),
                 goodsSkipped
@@ -114,6 +90,30 @@ contract Trade is ERC721Receiver  {
             goods.safeTransferFrom(address(this), msg.sender, goodID);
         }
         emit ExchangeFinished();
+    }
+
+    function isFinal() public view returns (bool) {
+        return _numTradersAccepted() == 2;
+    }
+
+    function isTrader(address trader) public view returns (bool) {
+        return trader == traders[0] || trader == traders[1];
+    }
+
+    function onERC721Received(address from, uint256 goodID, bytes data)
+        public returns (bytes4)
+        {
+        // We can't verify msg.sender here because the call is coming from
+        // the goods contract
+        require(msg.sender == address(goods));
+        require(isTrader(from));
+        require(!isFinal());
+
+        goodsTrader[goodID] = from;
+
+        emit GoodAdded(from, goodID);
+
+        return ERC721_RECEIVED;
     }
 
     function _numTradersAccepted() internal view returns (uint256) {

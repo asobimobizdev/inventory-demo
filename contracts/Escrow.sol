@@ -24,15 +24,6 @@ contract Escrow {
         goods = _goods;
     }
 
-    function isListed(uint256 goodID) public view returns (bool) {
-        return goodPrices[goodID] > 0 &&
-            goods.getApproved(goodID) == address(this);
-    }
-
-    function getPrice(uint256 goodID) public view returns (uint256) {
-        return goodPrices[goodID];
-    }
-
     function setPrice(uint256 goodID, uint256 price) external {
         address seller = msg.sender;
         require(goods.ownerOf(goodID) == seller);
@@ -52,6 +43,20 @@ contract Escrow {
         require(asobiCoin.transferFrom(buyer, seller, price));
         goods.transferFrom(seller, buyer, goodID);
 
-        emit Swapped(buyer, seller, goodID, price);
+        emit Swapped(
+            buyer,
+            seller,
+            goodID,
+            price
+        );
+    }
+
+    function isListed(uint256 goodID) public view returns (bool) {
+        return goodPrices[goodID] > 0 &&
+            goods.getApproved(goodID) == address(this);
+    }
+
+    function getPrice(uint256 goodID) public view returns (uint256) {
+        return goodPrices[goodID];
     }
 }
