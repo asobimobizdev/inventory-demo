@@ -15,7 +15,7 @@ contract TradeRegistry {
 
     mapping(address => address) traderTrade;
     mapping(address => uint256) tradeIndex;
-    address[] trades;
+    address[] public trades;
 
     /**
       * @dev Return the number of trades

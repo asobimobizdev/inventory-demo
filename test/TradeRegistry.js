@@ -48,6 +48,10 @@ contract("TradeRegistry", accounts => {
       await assertRejected(registry.add(trade.address, traderCOptions));
     });
 
+    it("allows retrieving trades", async () => {
+      assert.equal(trade.address, await registry.trades(0));
+    });
+
     describe("with the finalized trade removed", () => {
       beforeEach(async () => {
         await trade.accept(traderAOptions);
@@ -57,6 +61,7 @@ contract("TradeRegistry", accounts => {
 
       it("counts zero trades", async () => {
         assert.equal(await registry.numTrades(), 0);
+        await assertRejected(registry.trades(0));
       });
 
       it("won't accept the same trade again", async () => {
