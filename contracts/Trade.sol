@@ -19,6 +19,7 @@ contract Trade is ERC721Receiver {
     );
     event TradeAccepted(address indexed _trader);
     event TradeWithdrawn(address indexed _trader);
+    event TradeCancelled(address indexed _trader);
     event TradeFinalized();
     event ExchangeFinished();
 
@@ -27,6 +28,7 @@ contract Trade is ERC721Receiver {
     mapping(address => bool) public traderAccepted;
 
     Goods goods;
+    bool public isCancelled;
 
     mapping(uint256 => address) public goodsTrader;
 
@@ -81,6 +83,17 @@ contract Trade is ERC721Receiver {
         traderAccepted[msg.sender] = false;
         emit TradeWithdrawn(msg.sender);
     }
+
+    /**
+      * @dev Cancel a trade
+      * @dev Can only be called by a trader
+      * @dev Will throw if the trader accepted
+      */
+    function cancel() traderOnly() external {
+        isCancelled = true;
+        emit TradeCancelled(msg.sender);
+    }
+
 
     /**
       * @dev Remove a good that was added to the trade
