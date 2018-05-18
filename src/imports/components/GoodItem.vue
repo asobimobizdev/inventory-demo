@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import assets from '../assets.json';
+import assets from "../assets.json";
 import randGen from "random-seed";
 
 export default {

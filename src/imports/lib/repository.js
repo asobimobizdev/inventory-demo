@@ -8,6 +8,31 @@ export default class Repository {
     this.c = {};
   }
 
+  async createAsobiCoinContract(context) {
+    return await dapp.deployContract(dapp.contracts.AsobiCoin, []);
+  }
+
+  async createGoodsContract(context) {
+    return await dapp.deployContract(dapp.contracts.Goods, []);
+  }
+
+  async createEscrowContract(context) {
+    return await dapp.deployContract(
+      dapp.contracts.Escrow, [
+        this.c.asobiCoinContract.options.address,
+        this.c.goodsContract.options.address,
+      ]
+    );
+  }
+
+  async createTradeRegistry(context) {
+    return await dapp.deployContract(dapp.contracts.TradeRegistry, []);
+  }
+
+  async createUserRegistry(context) {
+    return await dapp.deployContract(dapp.contracts.UserRegistry, [])
+  }
+
   async getGoodsForAddress(address) {
     const getGood = async (index) => {
       const id = await this.c.goodsContract.methods.tokenOfOwnerByIndex(

@@ -209,24 +209,23 @@ const createStore = () => {
       },
 
       async createAsobiCoinContract(context) {
-        const contract = await dapp.deployContract(
-          dapp.contracts.AsobiCoin, []
-        );
+        await repository.createAsobiCoinContract();
       },
 
       async createGoodsContract(context) {
-        const contract = await dapp.deployContract(
-          dapp.contracts.Goods, []
-        );
+        await repository.createGoodsContract();
       },
 
       async createEscrowContract(context) {
-        const contract = await dapp.deployContract(
-          dapp.contracts.Escrow, [
-            repository.c.asobiCoinContract.options.address,
-            repository.c.goodsContract.options.address,
-          ]
-        );
+        await repository.createEscrowContract();
+      },
+
+      async createTradeRegistry(context) {
+        await repository.createTradeRegistry();
+      },
+
+      async createUserRegistry(context) {
+        await repository.createUserRegistry();
       },
 
       getGoodsContract(context) {
