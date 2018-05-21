@@ -27,11 +27,12 @@ contract("UserRegistry", accounts => {
 
   describe("when one user is added", () => {
     beforeEach(async () => {
-      await userRegistry.add(accountAOptions);
+      await userRegistry.add("user a", accountAOptions);
     });
 
     it("has one user", async () => {
       assert.equal(await userRegistry.numUsers(), 1);
+      assert.equal(await userRegistry.userName(accountA), "user a");
       assert.isTrue(await userRegistry.isUser(accountA));
     });
 
@@ -47,8 +48,8 @@ contract("UserRegistry", accounts => {
 
     describe("and a few more users", () => {
       beforeEach(async () => {
-        await userRegistry.add(accountBOptions);
-        await userRegistry.add(accountCOptions);
+        await userRegistry.add("user b", accountBOptions);
+        await userRegistry.add("user c", accountCOptions);
       });
 
       it("has three user", async () => {
