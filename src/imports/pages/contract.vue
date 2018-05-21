@@ -9,6 +9,12 @@
     <el-card class="create-contract-box full-centered-content">
       <el-button @click="createEscrowContract()" type="primary" round >Create Escrow Contract</el-button>
     </el-card>
+    <el-card class="create-contract-box full-centered-content">
+      <el-button @click="createTradeRegistry()" type="primary" round >Create Trade Registry</el-button>
+    </el-card>
+    <el-card class="create-contract-box full-centered-content">
+      <el-button @click="createUserRegistry()" type="primary" round >Create User Registry</el-button>
+    </el-card>
   </el-main>
 </template>
 
@@ -27,6 +33,12 @@ export default {
     },
     createEscrowContract() {
       this.$store.dispatch("createEscrowContract");
+    },
+    createTradeRegistry() {
+      this.$store.dispatch("createTradeRegistry");
+    },
+    createUserRegistry() {
+      this.$store.dispatch("createUserRegistry");
     },
   },
 };

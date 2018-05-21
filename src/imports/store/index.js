@@ -10,10 +10,6 @@ window.Wallets = Wallets;
 
 // const localStorage = window.localStorage;
 
-const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
-const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
-const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
-
 function growGoodFromId(id) {
   let good = {};
   good.seed = seedParams.seedFromString(id);
@@ -209,36 +205,27 @@ const createStore = () => {
       },
 
       async createAsobiCoinContract(context) {
-        const contract = await dapp.deployContract(
-          dapp.contracts.AsobiCoin, []
-        );
+        await repository.createAsobiCoinContract();
       },
 
       async createGoodsContract(context) {
-        const contract = await dapp.deployContract(
-          dapp.contracts.Goods, []
-        );
+        await repository.createGoodsContract();
       },
 
       async createEscrowContract(context) {
-        const contract = await dapp.deployContract(
-          dapp.contracts.Escrow, [
-            repository.c.asobiCoinContract.options.address,
-            repository.c.goodsContract.options.address,
-          ]
-        );
+        await repository.createEscrowContract();
+      },
+
+      async createTradeRegistry(context) {
+        await repository.createTradeRegistry();
+      },
+
+      async createUserRegistry(context) {
+        await repository.createUserRegistry();
       },
 
       getGoodsContract(context) {
-        repository.c.goodsContract = dapp.getContractAt(
-          dapp.contracts.Goods,
-          GOODS_ADDRESS,
-        );
-        repository.c.goodsContractEvents = dapp.getContractAt(
-          dapp.contracts.Goods,
-          GOODS_ADDRESS,
-          dapp.web3Event,
-        );
+        repository.loadGoodsContract();
 
         repository.c.goodsContractEvents.events.Transfer()
           .on("data", async (data) => {
@@ -265,15 +252,7 @@ const createStore = () => {
       },
 
       getAsobiCoinContract(context) {
-        repository.c.asobiCoinContract = dapp.getContractAt(
-          dapp.contracts.AsobiCoin,
-          ASOBI_COIN_ADDRESS,
-        );
-        repository.c.asobiCoinContractEvents = dapp.getContractAt(
-          dapp.contracts.AsobiCoin,
-          ASOBI_COIN_ADDRESS,
-          dapp.web3Event,
-        );
+        repository.loadAsobiCoinContract();
         repository.c.asobiCoinContractEvents.events.Transfer()
           .on("data", (event) => {
             console.log("AsobiCoin Transfer event", event);
@@ -283,15 +262,7 @@ const createStore = () => {
       },
 
       getEscrowContract(context) {
-        repository.c.escrowContract = dapp.getContractAt(
-          dapp.contracts.Escrow,
-          ESCROW_ADDRESS,
-        );
-        repository.c.escrowContractEvents = dapp.getContractAt(
-          dapp.contracts.Escrow,
-          ESCROW_ADDRESS,
-          dapp.web3Event,
-        );
+        repository.loadEscrowContract();
         repository.c.escrowContractEvents.events.PriceSet()
           .on("data", (event) => {
             console.log("Escrow PriceSet event", event);
