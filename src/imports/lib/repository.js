@@ -44,36 +44,24 @@ export default class Repository {
   }
 
   loadGoodsContract() {
-    this.c.goodsContract = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
-    this.c.goodsContractEvents = this.dapp.getContractAt(
-      Goods,
-      GOODS_ADDRESS,
-      this.dapp.web3Event,
-    );
+    [
+      this.c.goodsContract,
+      this.c.goodsContractEvents,
+    ] = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
   }
 
   loadAsobiCoinContract() {
-    this.c.asobiCoinContract = this.dapp.getContractAt(
-      AsobiCoin,
-      ASOBI_COIN_ADDRESS,
-    );
-    this.c.asobiCoinContractEvents = this.dapp.getContractAt(
-      AsobiCoin,
-      ASOBI_COIN_ADDRESS,
-      this.dapp.web3Event,
-    );
+    [
+      this.c.asobiCoinContract,
+      this.c.asobiCoinContractEvents,
+    ] = this.dapp.getContractAt(AsobiCoin, GOODS_ADDRESS);
   }
 
   loadEscrowContract() {
-    this.c.escrowContract = this.dapp.getContractAt(
-      Escrow,
-      ESCROW_ADDRESS,
-    );
-    this.c.escrowContractEvents = this.dapp.getContractAt(
-      Escrow,
-      ESCROW_ADDRESS,
-      this.dapp.web3Event,
-    );
+    [
+      this.c.escrowContract,
+      this.c.escrowContractEvents,
+    ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
   async getGoodsForAddress(address) {

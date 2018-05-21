@@ -26,19 +26,16 @@ export default class Dapp {
     this.web3.eth.defaultAccount = this.defaultAccount;
   }
 
-  getContract(contract, address, web3Instance) {
-    web3Instance = web3Instance || this.web3;
-    const options = {
-      from: web3Instance.eth.defaultAccount,
-      gasPrice: web3Instance.utils.toWei(GAS_PRICE, "gwei"),
-      data: contract.bytecode,
-    };
-    const instance = new web3Instance.eth.Contract(
-      contract.abi,
-      address,
-      options,
-    );
-    return instance;
+  getContract(contract, address) {
+    function _get(web3Instance) {
+      const options = {
+        from: web3Instance.eth.defaultAccount,
+        gasPrice: web3Instance.utils.toWei(GAS_PRICE, "gwei"),
+        data: contract.bytecode,
+      };
+      return new web3Instance.eth.Contract(contract.abi, address, options);
+    }
+    return [_get(this.web3), _get(this.web3Event)];
   }
 
   getContractAt(contract, address, web3Instance) {
