@@ -13,7 +13,7 @@ contract TradeRegistry {
     event TradeAdded(address indexed _trade);
     event TradeRemoved(address indexed _trade);
 
-    mapping(address => address) traderTrade;
+    mapping(address => address) public traderTrade;
     mapping(address => uint256) tradeIndex;
     address[] public trades;
 

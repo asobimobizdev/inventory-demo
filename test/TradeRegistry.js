@@ -38,6 +38,10 @@ contract("TradeRegistry", accounts => {
       await registry.add(trade.address, traderAOptions);
     });
 
+    it("can get the trade for trader a", async () => {
+      assert.equal(await registry.traderTrade(traderA), trade.address);
+    });
+
     it("counts one trade", async () => {
       assert.equal(await registry.numTrades(), 1);
     });
