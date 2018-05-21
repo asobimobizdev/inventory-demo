@@ -60,6 +60,14 @@ class SolidityCompiler {
       );
 
       const outData = JSON.parse(output);
+      for (let error of outData.errors || []) {
+        if (error.severity == 'error') {
+          file.error({
+            message: error.message,
+            column: error.sourceLocation.start,
+          });
+        }
+      }
       let jsContent = "module.exports = {";
       for (let contractFile in outData.contracts) {
         const contracts = outData.contracts[contractFile];
