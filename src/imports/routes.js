@@ -25,10 +25,12 @@ export const beforeEach = async function (to, from, next) {
     store.dispatch("getGoodsContract");
     store.dispatch("getAsobiCoinContract");
     store.dispatch("getEscrowContract");
+    store.dispatch("getTradeRegistryContract");
     store.dispatch("getUserRegistryContract");
     store.dispatch("getBalance");
     store.dispatch("getFriends");
     store.dispatch("getRegisterState");
+    store.dispatch("getTrades");
     store.commit("dapp/initialized", true);
   }
 

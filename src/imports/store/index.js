@@ -44,6 +44,7 @@ const createStore = () => {
       unconfirmedTransactions: {},
       selectedGoodId: null,
       balance: 0,
+      trades: [],
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -141,6 +142,9 @@ const createStore = () => {
       ["setRegistered"](state, {userName, registered} ) {
         state.registered = registered;
         state.userName = userName;
+      },
+      ["trades"](state, trades) {
+        state.trades = trades;
       },
     },
     actions: {
@@ -293,6 +297,21 @@ const createStore = () => {
             context.dispatch("getFriends");
           })
           .on("error", console.log);
+      },
+
+      getTradeRegistryContract(context) {
+        repository.loadTradeRegistryContract();
+        repository.c.tradeRegistryContractEvents.events.allEvents()
+          .on("data", (event) => {
+            console.log("Trade Registry event", event);
+            context.dispatch("getTrades");
+          })
+          .on("error", console.log);
+      },
+
+      async getTrades(context) {
+        const trades = await repository.getTrades();
+        context.commit("trades", trades);
       },
 
       async transferGoodToSelectedFriend(context, good) {

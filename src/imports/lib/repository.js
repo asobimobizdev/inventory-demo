@@ -5,6 +5,7 @@ import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 import { Escrow } from "../../../contracts/Escrow.sol";
 import { TradeRegistry } from "../../../contracts/TradeRegistry.sol";
 import { UserRegistry } from "../../../contracts/UserRegistry.sol";
+import { Trade } from "../../../contracts/Trade.sol";
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
@@ -66,6 +67,13 @@ export default class Repository {
       this.c.escrowContract,
       this.c.escrowContractEvents,
     ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
+  }
+
+  loadTradeRegistryContract() {
+    [
+      this.c.tradeRegistryContract,
+      this.c.tradeRegistryContractEvents,
+    ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
   }
 
   loadUserRegistryContract() {
@@ -224,18 +232,37 @@ export default class Repository {
       const address = await this.c.userRegistryContract.methods.users(
         index
       ).call();
-      const friend = {
+      return {
         id: address,
         name: await this.c.userRegistryContract.methods.userName(
           address,
         ).call(),
       };
-      return friend;
     };
-    const numFriends = await this.c.userRegistryContract.methods.numUsers(
-    ).call();
-    const indices = range(numFriends);
+    const indices = range(
+      await this.c.userRegistryContract.methods.numUsers().call()
+    );
     const friends = await Promise.all(indices.map(getFriend));
     return friends;
+  }
+
+  async getTrades() {
+    const getTrade = async (index) => {
+      const address = await this.c.methods.trades(index).call();
+      const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
+        Trade,
+        address,
+      );
+      return {
+        id: address,
+        tradeContract,
+        tradeContractEvents,
+      };
+    };
+    const indices = range(
+      await this.c.userRegistryContract.methods.numUsers().call()
+    );
+    const trades = await Promise.all(indices.map(getTrade));
+    return trades;
   }
 }
