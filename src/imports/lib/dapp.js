@@ -43,7 +43,7 @@ export default class Dapp {
   }
 
   async deployContract(contract, args, web3Instance) {
-    const contractInstance = this.getContract(contract);
+    const [contractInstance, _] = this.getContract(contract);
     const promise = contractInstance.deploy(
       {
         arguments: args,
