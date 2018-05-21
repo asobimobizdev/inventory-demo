@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import assets from '../assets.json';
 import randGen from "random-seed";
 
 export default {
@@ -26,6 +27,11 @@ export default {
     hue: { type: Number, default: 0 },
   },
   computed: {
+    assetPath() {
+      let len = Object.keys(assets).length;
+      let number = this.random.intBetween(1, len);
+      return `assets/${number.toString().padStart(4, "0")}/thumb.png`;
+    },
     styleForBg() {
       let seed = this.seed;
       let angle = (seed * 1330.443445) % 120 - 60;
