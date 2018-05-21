@@ -11,6 +11,7 @@ contract UserRegistry {
     event UserRemoved(address indexed _user);
 
     mapping(address => bool) public isUser;
+    mapping(address => string) public userName;
 
     address[] users;
     mapping(address => uint256) userIndex;
@@ -18,10 +19,11 @@ contract UserRegistry {
     /**
       * @dev Allow a user to add themselves
       */
-    function add() external {
+    function add(string name) external {
         userIndex[msg.sender] = users.length;
         users.push(msg.sender);
         isUser[msg.sender] = true;
+        userName[msg.sender] = name;
 
         emit UserAdded(msg.sender);
     }
@@ -33,6 +35,7 @@ contract UserRegistry {
         require(isUser[msg.sender]);
 
         isUser[msg.sender] = false;
+        delete userName[msg.sender];
 
         users[userIndex[msg.sender]] = users[SafeMath.sub(users.length, 1)];
         users.length--;
