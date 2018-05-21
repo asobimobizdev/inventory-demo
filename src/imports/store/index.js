@@ -309,11 +309,6 @@ const createStore = () => {
           .on("error", console.log);
       },
 
-      async getTrades(context) {
-        const trades = await repository.getTrades();
-        context.commit("trades", trades);
-      },
-
       async transferGoodToSelectedFriend(context, good) {
         let address = context.state.selectedFriendId;
 

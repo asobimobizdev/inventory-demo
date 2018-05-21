@@ -33,9 +33,24 @@ export default {
     },
   },
   actions: {
+    async loadTrade(context) {
+      const result = await repository.loadTrade(
+        context.rootState.accountAddress,
+      );
+      console.log("loadTrade", result);
+      if (!result) {
+        return;
+      }
+      context.commit("setTrade", result);
+    },
     async startTradeWithSelectedUser(context) {
       const otherUserID = context.rootState.selectedFriendId;
       if (!otherUserID) return;
+
+      const trade = await repository.createTrade(
+        context.rootState.accountAddress,
+        otherUserID,
+      );
 
       await timeout(500);
 

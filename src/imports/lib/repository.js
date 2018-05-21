@@ -83,6 +83,31 @@ export default class Repository {
     ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
   }
 
+  async loadTrade(address) {
+    const id = await this.c.tradeRegistryContract.methods.traderTrade(
+      address,
+    ).call();
+    if (id == "0x0000000000000000000000000000000000000000") {
+      return null;
+    }
+    const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
+      Trade,
+      id,
+    );
+
+    this.c = {
+      ...this.c,
+      tradeContract,
+      tradeContractEvents,
+    };
+    const [userA, userB] = await Promise.all([
+      tradeContract.methods.traders(0).call(),
+      tradeContract.methods.traders(1).call(),
+    ])
+    const otherUserID = userA == address ? userB : userA;
+    return {id, otherUserID};
+  }
+
   async getGoodsForAddress(address) {
     const getGood = async (index) => {
       const id = await this.c.goodsContract.methods.tokenOfOwnerByIndex(
