@@ -198,6 +198,19 @@ export default class Repository {
     return this.web3.utils.randomHex(32);
   }
 
+  async getRegisterState(address) {
+    const registered = await this.c.userRegistryContract.methods.isUser(
+      address,
+    ).call();
+    let name = null;
+    if (registered) {
+      name = await this.c.userRegistryContract.methods.userName(
+        address,
+      ).call();
+    }
+    return {registered, name};
+  }
+
   async registerUser(name) {
     await this.c.userRegistryContract.methods.add(name).send();
   }
