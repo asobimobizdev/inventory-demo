@@ -8,7 +8,7 @@
         <h1>My Goods</h1>
       </div>
       <div class="collection grid" >
-        <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
+        <draggable v-model='goods' class="container" id="myGoods" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
           <div class="item" v-for="(good,index) in goods" :key="index" v-loading="!good.confirmed" >
             <good-item v-bind="good" :active="false">
             </good-item>
@@ -64,7 +64,7 @@
               <h1>My Offer</h1>
             </div>
             <div class="collection grid" >
-              <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
+              <draggable v-model='goods' class="container" id="myOffer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
                 <div class="item" v-for="(good,index) in myOffer" :key="index" v-loading="!good.confirmed" >
                   <good-item v-bind="good" :active="false">
                   </good-item>
@@ -142,7 +142,7 @@ export default {
     },
     myOffer: {
       get() {
-        return this.$store.state.trade.myGoods;
+        return this.$store.getters["trade/allMyOfferedGoods"];
       },
       set(value) {
         console.log("selectedMyOffer", value);
@@ -180,19 +180,21 @@ export default {
       return true;
     },
     onMyGoodsDrop(e) {
-      console.log("onMyGoodsDrop", e);
-      // const from = e.from.id;
-      // const to = e.to.id;
-      // if (from != "goodsContainer" || to != "friendGoodsContainer") {
-      //   return;
-      // }
+      const from = e.from.id;
+      const to = e.to.id;
 
-      // const oldIndex = e.oldIndex;
-      // const good = this.goods[oldIndex];
+      console.log("onMyGoodsDrop", from, to);
 
-      // if (!good.confirmed) return;
+      if (from != "myGoods" || to != "myOffer") {
+        return;
+      }
 
-      // this.$store.dispatch("transferGoodToSelectedFriend", good);
+      const oldIndex = e.oldIndex;
+      const good = this.goods[oldIndex];
+
+      if (!good.confirmed) return;
+
+      this.$store.dispatch("trade/transfereGoodToMyOffer", good);
     }
   },
   watch: {
