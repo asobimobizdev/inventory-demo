@@ -1,28 +1,6 @@
 <template>
 
 <el-main class="host full-centered-content">
-
-  <el-card class="add-box">
-    <div slot="header" class="clearfix">
-      <h1 align="center">Add a Friend!</h1>
-    </div>
-    <el-form :inline="false" label-position="top" :model="form" :rules="rules" ref="form" label-width="90px" class="demo-form">
-
-      <el-form-item label="Name" prop="name">
-        <el-input v-model="form.name"></el-input>
-      </el-form-item>
-
-      <el-form-item label="Address" prop="id">
-        <el-input v-model="form.id"></el-input>
-      </el-form-item>
-
-      <el-form-item align="center">
-        <el-button type="primary" @click="submitForm('form')" round>Add</el-button>
-      </el-form-item>
-
-    </el-form>
-  </el-card>
-
   <h1 class="title" align="center">Friends List</h1>
   <el-table
     :data="friends"
@@ -52,8 +30,20 @@
       </template>
     </el-table-column>
   </el-table>
+  <el-card class="add-box">
+    <div slot="header" class="clearfix">
+      <h1 align="center">Add a Friend!</h1>
+    </div>
+    <el-form :inline="false" label-position="top" :model="form" :rules="rules" ref="form" label-width="90px" class="demo-form">
 
-
+      <el-form-item label="Name" prop="name">
+        <el-input v-model="form.name"></el-input>
+      </el-form-item>
+      <el-form-item align="center">
+        <el-button type="primary" @click="submitForm('form')" round>Add</el-button>
+      </el-form-item>
+    </el-form>
+  </el-card>
 </el-main>
 </template>
 
@@ -74,14 +64,6 @@ export default {
           {
             required: true,
             message: "Please input friend name",
-            trigger: "blur",
-          },
-        ],
-
-        name: [
-          {
-            required: true,
-            message: "Please input friend address",
             trigger: "blur",
           },
         ],
