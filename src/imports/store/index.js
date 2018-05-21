@@ -14,12 +14,11 @@ const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
 const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
 
-export function growGoodFromId(id) {
+export function decorateGoodWithId(id) {
   let good = {};
   good.seed = seedParams.seedFromString(id);
-  good.hue = seedParams.hueFromSeed(good.seed);
-  good.name = seedParams.nameForSeedWithHSL(good.seed, good.hue + 35, 80, 70);
-
+  good.name = seedParams.nameForSeed(good.seed);
+  good.thumbPath = seedParams.assetsThumbPathWithSeed(good.seed);
   return good;
 }
 
@@ -61,7 +60,7 @@ const createStore = () => {
         goods = goods.map(good => {
           return {
             ...good,
-            ...growGoodFromId(good.id),
+            ...decorateGoodWithId(good.id),
             isOwned: true,
           };
         });
@@ -86,7 +85,7 @@ const createStore = () => {
         goods = goods.map(good => {
           return {
             ...good,
-            ...growGoodFromId(good.id),
+            ...decorateGoodWithId(good.id),
             isOwned: false,
           };
         });
@@ -439,7 +438,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
-            ...growGoodFromId(transaction.goodID),
+            ...decorateGoodWithId(transaction.goodID),
           });
         }
 
@@ -471,7 +470,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
-            ...growGoodFromId(transaction.goodID),
+            ...decorateGoodWithId(transaction.goodID),
           });
         }
 

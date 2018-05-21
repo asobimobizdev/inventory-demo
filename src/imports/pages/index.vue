@@ -59,7 +59,7 @@ export default {
   components: {
     draggable,
     "good-item": GoodItem,
-    "good-inspector": GoodInspector,
+    "good-inspector": GoodInspector
   },
   data() {
     return {};
@@ -85,13 +85,13 @@ export default {
         });
 
         this.$store.dispatch("selectedFriendId", friend.id);
-      },
+      }
     },
     goods: {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {},
+      set(value) {}
     },
     goodsLoading() {
       return this.$store.state.goodsLoading;
@@ -100,19 +100,19 @@ export default {
       get() {
         return this.$store.getters.allFriendGoods;
       },
-      set(value) {},
+      set(value) {}
     },
     friendGoodsLoading() {
       return this.$store.state.friendGoodsLoading;
     },
     selectedGood() {
       return this.$store.getters.selectedGood;
-    },
+    }
   },
   watch: {
     friends(friends) {
       this.checkSelectedFriend(friends);
-    },
+    }
   },
   methods: {
     checkSelectedFriend(friends) {
@@ -149,8 +149,8 @@ export default {
     isGoodSelected(good) {
       if (!this.$store.state.selectedGoodId || !good) return false;
       return good.id == this.$store.state.selectedGoodId;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -236,46 +236,6 @@ export default {
       right 0
       bottom 0
 
-      >.icon
-        background-color #f88
-        width 80px
-        height 80px
-        border-radius 40px
-        margin-bottom 0px
-        // animation-name icon-rotation
-        // animation-duration 20s
-        // animation-iteration-count infinite
-        // animation-timing-function linear
-        transition all 300ms ease-in-out
-
-      >.label
-        display block
-        margin 0
-        padding 0 10px
-        text-align center
-        background-color alpha(#fff,0.1)
-        line-height 20px
-        height 20px
-        letter-spacing 0.1em
-        white-space nowrap
-        overflow hidden
-        text-overflow ellipsis
-
-        position absolute
-
-        bottom 0
-        left 0
-        right 0
-
-        transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
-        transform translate(0,20px)
-
-      &:hover,&:active
-        >.icon
-          transform translate(0,-10px)
-        >.label
-          transform translate(0,0px)
-
 .goods
   height 100%
   flex 1 1 auto
@@ -302,8 +262,8 @@ export default {
 
 <style lang="stylus">
 
-.goods, .friend-goods
-  &.el-loading-parent--relative >.el-loading-mask
-    top 60px !important
+// .goods, .friend-goods
+//   &.el-loading-parent--relative >.el-loading-mask
+//     top 60px !important
 
 </style>

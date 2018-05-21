@@ -1,4 +1,4 @@
-import { growGoodFromId, repository } from "./index";
+import { decorateGoodWithId, repository } from "./index";
 
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -108,7 +108,7 @@ export default {
         unconfirmedGoods.push({
           id: transaction.goodID,
           confirmed: false,
-          ...growGoodFromId(transaction.goodID),
+          ...decorateGoodWithId(transaction.goodID),
         });
       }
 
