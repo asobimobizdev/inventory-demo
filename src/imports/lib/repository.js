@@ -1,5 +1,15 @@
 import { dapp } from "./dapp.js";
 
+import { Goods } from "../../../contracts/Goods.sol";
+import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
+import { Escrow } from "../../../contracts/Escrow.sol";
+import { TradeRegistry } from "../../../contracts/TradeRegistry.sol";
+import { UserRegistry } from "../../../contracts/UserRegistry.sol";
+
+const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
+const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
+const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
+
 
 export default class Repository {
   constructor(dapp) {
@@ -8,29 +18,62 @@ export default class Repository {
     this.c = {};
   }
 
-  async createAsobiCoinContract(context) {
-    return await dapp.deployContract(dapp.contracts.AsobiCoin, []);
+  async createAsobiCoinContract() {
+    return await dapp.deployContract(AsobiCoin, []);
   }
 
-  async createGoodsContract(context) {
-    return await dapp.deployContract(dapp.contracts.Goods, []);
+  async createGoodsContract() {
+    return await dapp.deployContract(Goods, []);
   }
 
-  async createEscrowContract(context) {
+  async createEscrowContract() {
     return await dapp.deployContract(
-      dapp.contracts.Escrow, [
+      Escrow, [
         this.c.asobiCoinContract.options.address,
         this.c.goodsContract.options.address,
       ]
     );
   }
 
-  async createTradeRegistry(context) {
-    return await dapp.deployContract(dapp.contracts.TradeRegistry, []);
+  async createTradeRegistry() {
+    return await dapp.deployContract(TradeRegistry, []);
   }
 
-  async createUserRegistry(context) {
-    return await dapp.deployContract(dapp.contracts.UserRegistry, [])
+  async createUserRegistry() {
+    return await dapp.deployContract(UserRegistry, []);
+  }
+
+  loadGoodsContract() {
+    this.c.goodsContract = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
+    this.c.goodsContractEvents = this.dapp.getContractAt(
+      Goods,
+      GOODS_ADDRESS,
+      this.dapp.web3Event,
+    );
+  }
+
+  loadAsobiCoinContract() {
+    this.c.asobiCoinContract = this.dapp.getContractAt(
+      AsobiCoin,
+      ASOBI_COIN_ADDRESS,
+    );
+    this.c.asobiCoinContractEvents = this.dapp.getContractAt(
+      AsobiCoin,
+      ASOBI_COIN_ADDRESS,
+      this.dapp.web3Event,
+    );
+  }
+
+  loadEscrowContract() {
+    this.c.escrowContract = this.dapp.getContractAt(
+      Escrow,
+      ESCROW_ADDRESS,
+    );
+    this.c.escrowContractEvents = this.dapp.getContractAt(
+      Escrow,
+      ESCROW_ADDRESS,
+      this.dapp.web3Event,
+    );
   }
 
   async getGoodsForAddress(address) {
