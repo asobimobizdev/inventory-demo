@@ -34,6 +34,8 @@ const createStore = () => {
       accountAddress: null,
       goods: [],
       goodsLoading: false,
+      registered: false,
+      userName: null,
       friends: [],
       friendsLoading: false,
       friendGoods: [],
@@ -136,6 +138,10 @@ const createStore = () => {
         const good = state.goods.find(good => good.id == goodID);
         good.price = price;
       },
+      ["setRegistered"](state, {userName, registered} ) {
+        state.registered = registered;
+        state.userName = userName;
+      },
     },
     actions: {
       selectedFriendId(context, id) {
@@ -144,7 +150,7 @@ const createStore = () => {
         p2pManager.subscribe(id, context);
       },
 
-      async subscribeToFriends(context) {
+      async getFriends(context) {
         let friends = await repository.getFriends();
         context.commit("friends", friends);
         if (friends.length > 0) {
@@ -156,8 +162,16 @@ const createStore = () => {
         await repository.registerUser(name);
       },
 
-      async deleteFriend(context, friend) {
+      async unregisterUser(context) {
         await repository.unregisterUser();
+      },
+
+      async getRegisterState(context) {
+        const result = await repository.getRegisterState(
+          context.state.accountAddress,
+        );
+        console.log("getRegisterState", result);
+        context.commit("setRegistered", result);
       },
 
       async getBalance(context) {
@@ -272,6 +286,13 @@ const createStore = () => {
 
       getUserRegistryContract(context) {
         repository.loadUserRegistryContract();
+        repository.c.userRegistryContractEvents.events.allEvents()
+          .on("data", (event) => {
+            console.log("User Registry event", event);
+            context.dispatch("getRegisterState");
+            context.dispatch("getFriends");
+          })
+          .on("error", console.log);
       },
 
       async transferGoodToSelectedFriend(context, good) {

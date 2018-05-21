@@ -26,21 +26,31 @@
       <template slot-scope="scope" >
         <el-button v-if="isAsobiCoinAdmin" @click="sendCoinsToFriend(scope.$index)" type="warning" icon="el-icon-plus" round>100 ₳</el-button>
         <el-button v-if="isGoodsAdmin" @click="createGoodForFriendAt(scope.$index)" type="success" icon="el-icon-plus" circle></el-button>
-        <el-button @click="deleteFriendAt(scope.$index)" type="danger" icon="el-icon-delete" circle></el-button>
       </template>
     </el-table-column>
   </el-table>
   <el-card class="add-box">
     <div slot="header" class="clearfix">
-      <h1 align="center">Add a Friend!</h1>
+      <h1 align="center">Register yourself!</h1>
     </div>
-    <el-form :inline="false" label-position="top" :model="form" :rules="rules" ref="form" label-width="90px" class="demo-form">
-
+    <el-form
+      :inline="false"
+      :model="form"
+      :rules="rules"
+      ref="form"
+      label-position="top"
+      @submit.prevent.native="submitForm('form')"
+      label-width="90px">
       <el-form-item label="Name" prop="name">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item align="center">
-        <el-button type="primary" @click="submitForm('form')" round>Add</el-button>
+        <el-button @click="unregisterUser()" type="danger" icon="el-icon-delete" round v-if="registered">
+          Unregister
+        </el-button>
+        <el-button type="primary" @click="submitForm('form')" round v-else>
+          Register
+        </el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -56,14 +66,13 @@ export default {
   data() {
     return {
       form: {
-        id: "",
         name: "",
       },
       rules: {
-        id: [
+        name: [
           {
             required: true,
-            message: "Please input friend name",
+            message: "Please input your name",
             trigger: "blur",
           },
         ],
@@ -80,14 +89,17 @@ export default {
     isAsobiCoinAdmin() {
       return this.$store.state.isAsobiCoinAdmin;
     },
+    registered() {
+      return this.$store.state.registered;
+    },
   },
   methods: {
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
-        if (!valid) return;
-
+      this.$refs[formName].validate().then((valid) => {
+        if (!valid) {
+          return;
+        }
         this.$store.dispatch("addFriend", this.form);
-        this.resetForm(formName);
       });
     },
     resetForm(formName) {
@@ -97,9 +109,8 @@ export default {
       const friend = this.$store.state.friends[index];
       this.$store.dispatch("createGoodFor", friend.id);
     },
-    deleteFriendAt(index) {
-      const friend = this.$store.state.friends[index];
-      this.$store.dispatch("deleteFriend", friend);
+    unregisterUser() {
+      this.$store.dispatch("unregisterUser");
     },
     sendCoinsToFriend(index) {
       const friend = this.$store.state.friends[index];
