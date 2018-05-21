@@ -1,7 +1,23 @@
 <template>
 <el-container class="host">
   <el-aside>
-    <goods-collection class="my-goods" :goods="goods" title="My Goods"/>
+    <!-- <goods-collection class="my-goods" :goods="goods" title="My Goods"/> -->
+
+    <div class="goods-collection my-goods" v-loading="goodsLoading">
+      <div class="head">
+        <h1>My Goods</h1>
+      </div>
+      <div class="collection grid" >
+        <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
+          <div class="item" v-for="(good,index) in goods" :key="index" v-loading="!good.confirmed" >
+            <good-item v-bind="good" :active="false">
+            </good-item>
+          </div>
+        </draggable>
+      </div>
+    </div>
+
+
   </el-aside>
 
   <el-container class="trande-container">
@@ -41,8 +57,37 @@
           </el-table>
         </div>
         <div class="content" v-else key="trade-view">
-          <goods-collection class="my-offer" :goods="myOffer" title="My Offer"/>
-          <goods-collection class="user-offer" :goods="otherOffer" :title="otherUser.name + ' Offer'"/>
+          <!-- <goods-collection class="my-offer" :goods="myOffer" title="My Offer"/> -->
+
+          <div class="goods-collection my-offer" v-loading="goodsLoading">
+            <div class="head">
+              <h1>My Offer</h1>
+            </div>
+            <div class="collection grid" >
+              <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
+                <div class="item" v-for="(good,index) in myOffer" :key="index" v-loading="!good.confirmed" >
+                  <good-item v-bind="good" :active="false">
+                  </good-item>
+                </div>
+              </draggable>
+            </div>
+          </div>
+
+          <!-- <goods-collection class="user-offer" :goods="otherOffer" :title="otherUser.name + ' Offer'"/> -->
+
+          <div class="goods-collection other-offer" v-loading="goodsLoading">
+            <div class="head">
+              <h1>{{otherUser.name}} Offer</h1>
+            </div>
+            <div class="collection grid" >
+              <!-- <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop"> -->
+                <div class="item" v-for="(good,index) in otherOffer" :key="index" v-loading="!good.confirmed" >
+                  <good-item v-bind="good" :active="false">
+                  </good-item>
+                </div>
+              <!-- </draggable> -->
+            </div>
+          </div>
         </div>
       </transition>
 
@@ -67,10 +112,14 @@
 <script>
 import GoodsCollection from "./../components/GoodsCollection.vue";
 import { mapActions, mapState, mapGetters } from "vuex";
+import GoodItem from "./../components/GoodItem.vue";
+import draggable from "vuedraggable";
 
 export default {
   components: {
-    "goods-collection": GoodsCollection
+    draggable,
+    "goods-collection": GoodsCollection,
+    "good-item": GoodItem
   },
   mounted() {
     this.$store.dispatch("getOwnGoods", true);
@@ -79,7 +128,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selectedFriendId"]),
+    ...mapState(["selectedFriendId", "goodsLoading"]),
     ...mapGetters(["otherUsers"]),
     ...mapGetters("trade", ["otherUser"]),
     hasTrade() {
@@ -125,6 +174,25 @@ export default {
     },
     userTableMounted() {
       console.log("userTableMounted");
+    },
+
+    checkMoveOfMyGoods(e) {
+      return true;
+    },
+    onMyGoodsDrop(e) {
+      console.log("onMyGoodsDrop", e);
+      // const from = e.from.id;
+      // const to = e.to.id;
+      // if (from != "goodsContainer" || to != "friendGoodsContainer") {
+      //   return;
+      // }
+
+      // const oldIndex = e.oldIndex;
+      // const good = this.goods[oldIndex];
+
+      // if (!good.confirmed) return;
+
+      // this.$store.dispatch("transferGoodToSelectedFriend", good);
     }
   },
   watch: {
@@ -158,7 +226,7 @@ fullSizeContent()
   width 100%
   min-height calc(100% - 100px)
   display flex
-  background-color #ccc
+  background-color #eee
   padding gutter
 
   >.el-aside
@@ -197,6 +265,7 @@ fullSizeContent()
           margin-left (gutter / 2)
           margin-right (gutter / 2)
           flex 1 1 auto
+          width 50%
 
           &:nth-child(1)
             margin-left 0px
