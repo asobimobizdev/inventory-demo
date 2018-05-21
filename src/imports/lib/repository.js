@@ -267,27 +267,6 @@ export default class Repository {
     const indices = range(
       await this.c.userRegistryContract.methods.numUsers().call()
     );
-    const friends = await Promise.all(indices.map(getFriend));
-    return friends;
-  }
-
-  async getTrades() {
-    const getTrade = async (index) => {
-      const address = await this.c.methods.trades(index).call();
-      const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
-        Trade,
-        address,
-      );
-      return {
-        id: address,
-        tradeContract,
-        tradeContractEvents,
-      };
-    };
-    const indices = range(
-      await this.c.userRegistryContract.methods.numUsers().call()
-    );
-    const trades = await Promise.all(indices.map(getTrade));
-    return trades;
+    return await Promise.all(indices.map(getFriend));
   }
 }
