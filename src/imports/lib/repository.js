@@ -48,6 +48,23 @@ export default class Repository {
     return await dapp.deployContract(UserRegistry, []);
   }
 
+  async createTrade(userA, userB) {
+    const trade = await this.dapp.deployContract(
+      Trade,
+      [
+        this.c.goodsContract.options.address,
+        [
+          userA,
+          userB,
+        ],
+      ],
+    );
+    await this.c.tradeRegistryContract.methods.add(
+      trade.options.address
+    ).send();
+    return trade;
+  }
+
   loadGoodsContract() {
     [
       this.c.goodsContract,
