@@ -12,6 +12,9 @@
         <el-menu-item index="/">
           <router-link :to="{ name: 'home' }" exact>Inventory</router-link>
         </el-menu-item>
+        <el-menu-item index="/trading">
+          <router-link :to="{ name: 'trading' }" exact>Trading</router-link>
+        </el-menu-item>
         <el-menu-item index="/friends">
           <router-link :to="{ name: 'friends' }" exact>Friends</router-link>
         </el-menu-item>

@@ -1,10 +1,6 @@
 <template>
-<div class="good" :style="styleForBg" :class="{ 'has-drawer': hasDrawer, 'active': active }">
-  <div class="icon" :style="styleForIcon">
-    <div class="chars">
-      <div v-for="(char,index) in characteristics" :key="index" :style="styleForCt(char)"></div>
-    </div>
-  </div>
+<div class="good" :class="{ 'has-drawer': hasDrawer, 'active': active }">
+  <div class="icon" :style="styleForIcon"></div>
   <div class="drawer" v-if="hasDrawer">
     <slot></slot>
   </div>
@@ -13,8 +9,8 @@
 </template>
 
 <script>
-import assets from "../assets.json";
-import randGen from "random-seed";
+
+import seedParams from "../lib/seedParams";
 
 export default {
   props: {
@@ -25,62 +21,14 @@ export default {
     active: { type: Boolean, default: false },
     seed: { type: Number, default: 0 },
     hue: { type: Number, default: 0 },
+    thumbPath: { type: String, default: null }
   },
   computed: {
-    assetPath() {
-      let len = Object.keys(assets).length;
-      let number = this.random.intBetween(1, len);
-      return `assets/${number.toString().padStart(4, "0")}/thumb.png`;
-    },
-    styleForBg() {
-      let seed = this.seed;
-      let angle = (seed * 1330.443445) % 120 - 60;
-      let colorH = this.hue;
-      let startColor = `hsl(${colorH - 20}, 60%, 80%)`;
-      let stopColor = `hsl(${colorH + 70},  90%, 70%)`;
-      return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-      };
-    },
     styleForIcon() {
-      let seed = this.seed;
-      let angle = (seed * 130.43445) % 360;
-      let colorH = this.hue;
-      let startColor = `hsl(${colorH},     80%, 70%)`;
-      let stopColor = `hsl(${colorH + 70}, 80%, 70%)`;
-      let shadowColor = `hsla(${colorH + 80}, 100%, 40%,0.2)`;
-      let shadowColor2 = `hsla(${colorH}, 90%, 30%,0.1)`;
-      let shadowColor3 = `hsla(${colorH + 80}, 90%, 90%,0.05)`;
       return {
-        background: `linear-gradient(${angle}deg, ${startColor}, ${stopColor})`,
-        boxShadow: `0 4px 18px ${shadowColor}, 0 1px 4px ${shadowColor2}, inset 0 0px 0px 1px ${shadowColor3}`,
+        backgroundImage: `url(${this.thumbPath})`
       };
-    },
-    characteristics() {
-      const minCount = 3;
-      const maxCount = 11;
-      const numItems = this.random.intBetween(minCount, maxCount);
-      const normNumItems = (numItems - minCount) / (maxCount - minCount);
-
-      const items = Array(numItems)
-        .fill({})
-        .map((it, i) => {
-          return {
-            x: this.random.floatBetween(-1, 1),
-            y: this.random.floatBetween(-1, 1),
-            r: this.random.floatBetween(0.01, 1.6),
-            deg: this.random.floatBetween(0, 360),
-            opacity: this.random.floatBetween(0.1, 0.7),
-            normCount: normNumItems,
-            // color: this.random(100) > 0 ? "255" : "0"
-            color: "255",
-          };
-        });
-      return items;
-    },
-    random() {
-      return new randGen(this.seed);
-    },
+    }
   },
 
   methods: {
@@ -93,10 +41,10 @@ export default {
         background: `linear-gradient(${
           ct.deg
         }deg, rgba(${colorStr},${ct.opacity /
-          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`,
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
       };
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -116,31 +64,20 @@ export default {
   min-height 100px
   position relative
   overflow hidden
+  background-color #f0f0f0
 
   >.icon
-    background-color #f88
+    background-color #eee
     width 80px
     height 80px
-    border-radius 40px
+    // border-radius 40px
     margin-bottom 0px
     // transition all 300ms ease-in-out
     position relative
     overflow hidden
-    .chars
-      position absolute
-      top 0
-      left 0
-      width 100%
-      height 100%
-
-      >div
-        position absolute
-        border-radius 50%
-        transform translate(-50%, -50%)
-        top -10px
-        left -10px
-        width 100px
-        height 100px
+    background-size contain
+    background-position center center
+    background-repeat no-repeat
 
   >.drawer
     display none
@@ -189,11 +126,11 @@ export default {
       // transition transform 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
       transform translate(0,70px)
 
-    &:hover,&:active
-      >.icon
-        transform translate(0,-30px)
-      >.drawer
-        transform translate(0,10px)
+    // &:hover,&:active
+    //   >.icon
+    //     transform translate(0,-30px)
+    //   >.drawer
+    //     transform translate(0,10px)
 
   &.active
     >.icon

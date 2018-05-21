@@ -1,29 +1,32 @@
 import Vuex from "vuex";
 import { dapp } from "../lib/dapp";
 import Repository from "../lib/repository";
-import uuid from "uuid/v1";
 import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
 import { Wallets } from "./../api/collections";
+import trade from "./trade";
 
 window.Wallets = Wallets;
 
 // const localStorage = window.localStorage;
 
-function growGoodFromId(id) {
+export function decorateGoodWithId(id) {
+
   let good = {};
   good.seed = seedParams.seedFromString(id);
-  good.hue = seedParams.hueFromSeed(good.seed);
-  good.name = seedParams.nameForSeedWithHSL(good.seed, good.hue + 35, 80, 70);
-
+  good.name = seedParams.nameForSeed(good.seed);
+  good.thumbPath = seedParams.assetsThumbPathWithSeed(good.seed);
   return good;
 }
 
-const repository = new Repository(dapp);
+export const repository = new Repository(dapp);
 
 const createStore = () => {
   return new Vuex.Store({
     strict: process.env.NODE_ENV !== "production",
+    modules: {
+      trade,
+    },
     state: {
       dappInit: false,
       isGoodsAdmin: false,
@@ -54,7 +57,7 @@ const createStore = () => {
         goods = goods.map(good => {
           return {
             ...good,
-            ...growGoodFromId(good.id),
+            ...decorateGoodWithId(good.id),
             isOwned: true,
           };
         });
@@ -79,7 +82,7 @@ const createStore = () => {
         goods = goods.map(good => {
           return {
             ...good,
-            ...growGoodFromId(good.id),
+            ...decorateGoodWithId(good.id),
             isOwned: false,
           };
         });
@@ -107,7 +110,7 @@ const createStore = () => {
       },
       ["removeUnconfirmedTransaction"](state, transaction) {
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
-        if(!state.unconfirmedTransactions[tID]) return;
+        if (!state.unconfirmedTransactions[tID]) return;
         delete state.unconfirmedTransactions[tID];
         state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
       },
@@ -117,28 +120,27 @@ const createStore = () => {
       ["balance"](state, balance) {
         state.balance = dapp.web3.utils.fromWei(balance);
       },
-      ["setGoodForSale"](state, { id, forSale, price, confirmed } ){
+      ["setGoodForSale"](state, { id, forSale, price, confirmed }) {
         state.goods = state.goods.map(good => {
-          if(good.id == id){
+          if (good.id == id) {
             good.forSale = forSale;
             good.price = price;
             good.confirmed = confirmed;
-            good = {...good};
+            good = { ...good };
           }
           return good;
         });
       },
-      ["setGoodPrice"](state, {goodID, price}){
+      ["setGoodPrice"](state, { goodID, price }) {
         const good = state.goods.find(good => good.id == goodID);
         good.price = price;
       },
     },
     actions: {
-      selectFriend(context, id) {
+      selectedFriendId(context, id) {
         context.commit("selectedFriendId", id);
-        context.dispatch("getSelectedFriendGoods",true);
-
-        p2pManager.subscribe(id,context);
+        context.dispatch("getSelectedFriendGoods", true);
+        p2pManager.subscribe(id, context);
       },
 
       subscribeToFriends(context) {
@@ -149,7 +151,7 @@ const createStore = () => {
           let friends = Wallets.find({}).fetch();
           context.commit("friends", friends);
           if (friends.length > 0) {
-            context.dispatch("getSelectedFriendGoods",true);
+            context.dispatch("getSelectedFriendGoods", true);
           }
         });
       },
@@ -172,26 +174,26 @@ const createStore = () => {
       },
 
       async getOwnGoods(context, loading = false) {
-        if(loading){
+        if (loading) {
           context.commit("goodsLoading", true);
         }
         let goods = await repository.getGoodsForAddress(
           context.state.accountAddress,
         );
         context.commit("goods", goods);
-        if(loading){
+        if (loading) {
           context.commit("goodsLoading", false);
         }
       },
 
-      async getSelectedFriendGoods(context, loading=false) {
+      async getSelectedFriendGoods(context, loading = false) {
         if (!context.state.selectedFriendId) {
           return;
         }
 
         let address = context.state.selectedFriendId;
 
-        if(loading){
+        if (loading) {
           context.commit("friendGoodsLoading", true);
         }
         const goods = await repository.getGoodsForAddress(
@@ -199,7 +201,7 @@ const createStore = () => {
         );
 
         context.commit("friendGoods", goods);
-        if(loading){
+        if (loading) {
           context.commit("friendGoodsLoading", false);
         }
       },
@@ -231,10 +233,10 @@ const createStore = () => {
           .on("data", async (data) => {
 
             const transaction = {
-              from:data.returnValues._from,
-              to:data.returnValues._to,
-              goodID:data.returnValues._tokenId,
-              confirmed:true,
+              from: data.returnValues._from,
+              to: data.returnValues._to,
+              goodID: data.returnValues._tokenId,
+              confirmed: true,
             };
 
             console.log("Good Transaction", transaction);
@@ -286,14 +288,14 @@ const createStore = () => {
         context.commit("addUnconfirmedTransaction", transaction);
         p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
 
-        try{
+        try {
           await repository.transferGood(
             goodID,
             context.state.accountAddress,
             address,
             repository.c.goodsContract,
           );
-        }catch(e){
+        } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
           p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, false);
@@ -322,16 +324,18 @@ const createStore = () => {
       },
 
       async setGoodForSale(context, { id, forSale, price }) {
-        const oldGoodState = {...context.state.goods.find((good)=>{
-          return good.id == id;
-        })};
-        context.commit("setGoodForSale", { id, forSale, price, confirmed:false });
+        const oldGoodState = {
+          ...context.state.goods.find((good) => {
+            return good.id == id;
+          }),
+        };
+        context.commit("setGoodForSale", { id, forSale, price, confirmed: false });
         try {
           price = String(price);
           await repository.setGoodForSale(
             id, price, forSale,
           );
-        } catch(e) {
+        } catch (e) {
           context.commit("setGoodForSale", oldGoodState);
         }
       },
@@ -347,9 +351,9 @@ const createStore = () => {
         context.commit("addUnconfirmedTransaction", transaction);
         p2pManager.addUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID);
 
-        try{
+        try {
           await repository.buyGood(id, context.state.accountAddress);
-        }catch(e){
+        } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
           p2pManager.removeUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID, false);
@@ -364,20 +368,26 @@ const createStore = () => {
       },
     },
     getters: {
-      selectFriend: state => {
+      otherUsers: state => {
+        const friends = state.friends.filter(friend => {
+          return friend.id !== state.accountAddress;
+        });
+        return friends;
+      },
+      selectedFriend: state => {
         const friend = state.friends.find(friend => {
           return friend.id == state.selectedFriendId;
         });
         return friend;
       },
-      selectedGood: (state,getters) =>{
-        if(!state.selectedGoodId) return null;
-        let selectedGood = getters.allGoods.find(good =>{
+      selectedGood: (state, getters) => {
+        if (!state.selectedGoodId) return null;
+        let selectedGood = getters.allGoods.find(good => {
           return good.id == state.selectedGoodId;
         });
 
-        if(!selectedGood){
-          selectedGood = getters.allFriendGoods.find(good =>{
+        if (!selectedGood) {
+          selectedGood = getters.allFriendGoods.find(good => {
             return good.id == state.selectedGoodId;
           });
         }
@@ -400,7 +410,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
-            ...growGoodFromId(transaction.goodID),
+            ...decorateGoodWithId(transaction.goodID),
           });
         }
 
@@ -432,7 +442,7 @@ const createStore = () => {
           unconfirmedGoods.push({
             id: transaction.goodID,
             confirmed: false,
-            ...growGoodFromId(transaction.goodID),
+            ...decorateGoodWithId(transaction.goodID),
           });
         }
 
