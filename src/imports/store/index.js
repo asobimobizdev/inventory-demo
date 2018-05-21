@@ -156,7 +156,7 @@ const createStore = () => {
         await repository.registerUser(name);
       },
 
-      async deleteFriend(context, friend) {
+      async unregisterUser(context) {
         await repository.unregisterUser();
       },
 

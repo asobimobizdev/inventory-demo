@@ -26,7 +26,6 @@
       <template slot-scope="scope" >
         <el-button v-if="isAsobiCoinAdmin" @click="sendCoinsToFriend(scope.$index)" type="warning" icon="el-icon-plus" round>100 ₳</el-button>
         <el-button v-if="isGoodsAdmin" @click="createGoodForFriendAt(scope.$index)" type="success" icon="el-icon-plus" circle></el-button>
-        <el-button @click="deleteFriendAt(scope.$index)" type="danger" icon="el-icon-delete" circle></el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -40,7 +39,12 @@
         <el-input v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item align="center">
-        <el-button type="primary" @click="submitForm('form')" round>Add</el-button>
+        <el-button type="primary" @click="submitForm('form')" round>
+          Register
+        </el-button>
+        <el-button @click="unregisterUser()" type="danger" icon="el-icon-delete" round>
+          Unregister
+        </el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -97,9 +101,8 @@ export default {
       const friend = this.$store.state.friends[index];
       this.$store.dispatch("createGoodFor", friend.id);
     },
-    deleteFriendAt(index) {
-      const friend = this.$store.state.friends[index];
-      this.$store.dispatch("deleteFriend", friend);
+    unregisterUser() {
+      this.$store.dispatch("unregisterUser");
     },
     sendCoinsToFriend(index) {
       const friend = this.$store.state.friends[index];
