@@ -61,7 +61,7 @@ class SolidityCompiler {
 
       const outData = JSON.parse(output);
       for (let error of outData.errors || []) {
-        if (error.severity == 'error') {
+        if (error.severity == "error") {
           file.error({
             message: error.message,
             column: error.sourceLocation.start,
