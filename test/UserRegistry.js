@@ -54,6 +54,7 @@ contract("UserRegistry", accounts => {
 
       it("has three user", async () => {
         assert.equal(await userRegistry.numUsers(), 3);
+        assert.equal(await userRegistry.users(2), accountC);
       });
 
       it("lets user A remove themselves", async () => {

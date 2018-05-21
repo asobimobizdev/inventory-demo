@@ -21,14 +21,14 @@ export default {
     active: { type: Boolean, default: false },
     seed: { type: Number, default: 0 },
     hue: { type: Number, default: 0 },
-    thumbPath: { type: String, default: null }
+    thumbPath: { type: String, default: null },
   },
   computed: {
     styleForIcon() {
       return {
-        backgroundImage: `url(${this.thumbPath})`
+        backgroundImage: `url(${this.thumbPath})`,
       };
-    }
+    },
   },
 
   methods: {
@@ -41,10 +41,10 @@ export default {
         background: `linear-gradient(${
           ct.deg
         }deg, rgba(${colorStr},${ct.opacity /
-          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`
+          (ct.normCount + 1)}),  rgba(${colorStr},0.0) )`,
       };
-    }
-  }
+    },
+  },
 };
 </script>
 

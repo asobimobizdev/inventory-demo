@@ -118,6 +118,7 @@ const createStore = () => {
         state.selectedGoodId = id;
       },
       ["balance"](state, balance) {
+        console.log("ASB Balance:", balance);
         state.balance = dapp.web3.utils.fromWei(balance);
       },
       ["setGoodForSale"](state, { id, forSale, price, confirmed }) {
@@ -143,25 +144,20 @@ const createStore = () => {
         p2pManager.subscribe(id, context);
       },
 
-      subscribeToFriends(context) {
-        const handle = Meteor.subscribe("friendsWallets");
-
-        Meteor.autorun(_ => {
-          if (!handle.ready()) return;
-          let friends = Wallets.find({}).fetch();
-          context.commit("friends", friends);
-          if (friends.length > 0) {
-            context.dispatch("getSelectedFriendGoods", true);
-          }
-        });
+      async subscribeToFriends(context) {
+        let friends = await repository.getFriends();
+        context.commit("friends", friends);
+        if (friends.length > 0) {
+          context.dispatch("getSelectedFriendGoods", true);
+        }
       },
 
-      addFriend(context, friend) {
-        Wallets.insert(friend);
+      async addFriend(context, { name }) {
+        await repository.registerUser(name);
       },
 
-      deleteFriend(context, friend) {
-        Wallets.remove(friend._id);
+      async deleteFriend(context, friend) {
+        await repository.unregisterUser();
       },
 
       async getBalance(context) {
@@ -272,6 +268,10 @@ const createStore = () => {
             context.dispatch("getSelectedFriendGoods");
           })
           .on("error", console.log);
+      },
+
+      getUserRegistryContract(context) {
+        repository.loadUserRegistryContract();
       },
 
       async transferGoodToSelectedFriend(context, good) {

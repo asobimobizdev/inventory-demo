@@ -13,7 +13,7 @@ contract UserRegistry {
     mapping(address => bool) public isUser;
     mapping(address => string) public userName;
 
-    address[] users;
+    address[] public users;
     mapping(address => uint256) userIndex;
 
     /**
