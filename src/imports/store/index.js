@@ -118,6 +118,7 @@ const createStore = () => {
         state.selectedGoodId = id;
       },
       ["balance"](state, balance) {
+        console.log("ASB Balance:", balance);
         state.balance = dapp.web3.utils.fromWei(balance);
       },
       ["setGoodForSale"](state, { id, forSale, price, confirmed }) {

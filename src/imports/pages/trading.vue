@@ -119,7 +119,7 @@ export default {
   components: {
     draggable,
     "goods-collection": GoodsCollection,
-    "good-item": GoodItem
+    "good-item": GoodItem,
   },
   mounted() {
     this.$store.dispatch("getOwnGoods", true);
@@ -138,7 +138,7 @@ export default {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     myOffer: {
       get() {
@@ -146,7 +146,7 @@ export default {
       },
       set(value) {
         console.log("selectedMyOffer", value);
-      }
+      },
     },
     otherOffer: {
       get() {
@@ -154,20 +154,20 @@ export default {
       },
       set(value) {
         // console.log("selectedMyOffer", value);
-      }
+      },
     },
     slideAnimationType() {
       return this.hasTrade ? "slide-left" : "slide-right";
     },
     toolBarSlideAnimationType() {
       return this.hasTrade ? "tool-bar-slide-left" : "tool-bar-slide-right";
-    }
+    },
   },
   methods: {
     ...mapActions("trade", [
       "startTradeWithSelectedUser",
       "cancelTrade",
-      "confirmTrade"
+      "confirmTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
@@ -195,13 +195,13 @@ export default {
       if (!good.confirmed) return;
 
       this.$store.dispatch("trade/transfereGoodToMyOffer", good);
-    }
+    },
   },
   watch: {
     selectedUser(user) {
       this.$refs.usersTable.setCurrentRow(user);
-    }
-  }
+    },
+  },
 };
 </script>
 
