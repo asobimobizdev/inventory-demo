@@ -11,6 +11,7 @@ window.Wallets = Wallets;
 // const localStorage = window.localStorage;
 
 export function decorateGoodWithId(id) {
+
   let good = {};
   good.seed = seedParams.seedFromString(id);
   good.name = seedParams.nameForSeed(good.seed);

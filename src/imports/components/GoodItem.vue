@@ -9,6 +9,7 @@
 </template>
 
 <script>
+
 import seedParams from "../lib/seedParams";
 
 export default {
