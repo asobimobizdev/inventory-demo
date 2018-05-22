@@ -34,7 +34,7 @@ export default {
       state.myGoods = goods.map((good) => {
         return {
           ...good,
-          ...decorateGoodWithId(good),
+          ...decorateGoodWithId(good.id),
         };
       });
     },
@@ -42,7 +42,7 @@ export default {
       state.otherGoods = goods.map((good) => {
         return {
           ...good,
-          ...decorateGoodWithId(good),
+          ...decorateGoodWithId(good.id),
         };
       });
     },
