@@ -312,7 +312,7 @@ export default class Repository {
     return await Promise.all(indices.map(getFriend));
   }
 
-  async unlistTrade() {
+  async closeTrade() {
     console.log("Removing trade from registry");
     await this.c.tradeRegistryContract.methods.remove().send();
   }
@@ -330,11 +330,6 @@ export default class Repository {
   async confirmTrade() {
     console.log("Accepting trade");
     await this.c.tradeContract.methods.accept().send();
-  }
-
-  async withdrawTrade() {
-    console.log("Withdrawing from trade");
-    await this.c.tradeContract.methods.withdraw().send();
   }
 
   async getTradeGoods() {
