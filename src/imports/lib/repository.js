@@ -120,7 +120,7 @@ export default class Repository {
     const [userA, userB] = await Promise.all([
       tradeContract.methods.traders(0).call(),
       tradeContract.methods.traders(1).call(),
-    ])
+    ]);
     const otherUserID = userA == address ? userB : userA;
     return {id, otherUserID};
   }
