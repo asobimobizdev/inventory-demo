@@ -44,7 +44,6 @@ const createStore = () => {
       unconfirmedTransactions: {},
       selectedGoodId: null,
       balance: 0,
-      trades: [],
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {

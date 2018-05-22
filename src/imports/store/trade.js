@@ -4,26 +4,31 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const initialState = {
+  id: null,
+  otherUserID: null,
+  myGoods: [],
+  otherGoods: [],
+  accepted: false,
+  otherAccepted: false,
+  pulled: false,
+};
+
 export default {
   namespaced: true,
-  state: {
-    id: null,
-    otherUserID: null,
-    myGoods: [],
-    otherGoods: [],
-  },
+  state: initialState,
   mutations: {
-    ["setTrade"](state, { id, otherUserID }) {
+    ["setTrade"](state, { id, otherUserID, accepted, otherAccepted, pulled }) {
       state.id = id;
       state.otherUserID = otherUserID;
       state.myGoods = [];
       state.otherGoods = [];
+      state.accepted = accepted;
+      state.otherAccepted = otherAccepted;
+      state.pulled = pulled;
     },
     ["resetTrade"](state) {
-      state.id = null;
-      state.otherUserID = null;
-      state.myGoods = [];
-      state.otherGoods = [];
+      state = {...state, initialState};
     },
     ["setMyGoods"](state, goods) {
       state.myGoods = goods.map((good) => {
@@ -62,6 +67,13 @@ export default {
         "setOtherGoods",
         tradeGoods.filter((good) => !filter(good)),
       );
+
+      repository.c.tradeContractEvents.events.allEvents()
+        .on("data", (event) => {
+          console.log("Trade event", event);
+          context.dispatch("loadTrade");
+        })
+        .on("error", console.log);
     },
     async startTradeWithSelectedUser(context) {
       const otherUserID = context.rootState.selectedFriendId;
@@ -87,6 +99,13 @@ export default {
     async confirmTrade(context) {
       await repository.confirmTrade();
       context.commit("resetTrade");
+    },
+    async withdrawTrade(context) {
+      await repository.withdrawTrade();
+    },
+    async pullGoods(context) {
+      await repository.pullGoods();
+      // ??
     },
     async transfereGoodToMyOffer(context, good) {
       const transaction = {

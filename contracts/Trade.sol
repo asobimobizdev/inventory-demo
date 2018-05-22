@@ -21,11 +21,12 @@ contract Trade is ERC721Receiver {
     event TradeWithdrawn(address indexed _trader);
     event TradeCancelled(address indexed _trader);
     event TradeFinalized();
-    event ExchangeFinished();
+    event GoodsPulled(address indexed _trader);
 
 
     address[2] public traders;
     mapping(address => bool) public traderAccepted;
+    mapping(address => bool) public traderPulledGoods;
 
     Goods goods;
     bool public isActive = true;
@@ -35,6 +36,11 @@ contract Trade is ERC721Receiver {
     constructor(Goods _goods, address[2] _traders) public {
         goods = _goods;
         traders = _traders;
+    }
+
+    modifier noneAccepted() {
+        require(_numTradersAccepted() == 0);
+        _;
     }
 
     modifier activeOnly() {
@@ -96,7 +102,6 @@ contract Trade is ERC721Receiver {
       */
     function cancel() activeOnly() traderOnly() external {
         require(!traderAccepted[msg.sender]);
-
         isActive = false;
 
         uint256 balance = goods.balanceOf(address(this));
@@ -113,7 +118,12 @@ contract Trade is ERC721Receiver {
       * @dev Can only be called by a trader
       * @param goodID the good ID to remove
       */
-    function removeGood(uint256 goodID) activeOnly() traderOnly() external {
+    function removeGood(uint256 goodID)
+        activeOnly()
+        traderOnly()
+        noneAccepted()
+        external
+        {
         address trader = msg.sender;
         require(!isFinal());
         require(goodsTrader[goodID] == trader);
@@ -129,6 +139,7 @@ contract Trade is ERC721Receiver {
       */
     function getGoods() activeOnly() traderOnly() external {
         require(isFinal());
+        require(!traderPulledGoods[msg.sender]);
         uint256 balance = goods.balanceOf(address(this));
         // We need to keep record how many goods we skipped because they
         // are not supposed to be transferred to one of the traders
@@ -147,7 +158,9 @@ contract Trade is ERC721Receiver {
             }
             goods.safeTransferFrom(address(this), msg.sender, goodID);
         }
-        emit ExchangeFinished();
+        traderPulledGoods[msg.sender] = true;
+
+        emit GoodsPulled(msg.sender);
     }
 
     /**
@@ -175,6 +188,7 @@ contract Trade is ERC721Receiver {
       */
     function onERC721Received(address from, uint256 goodID, bytes data)
         activeOnly()
+        noneAccepted()
         public returns (bytes4)
         {
         // We can't verify msg.sender here because the call is coming from

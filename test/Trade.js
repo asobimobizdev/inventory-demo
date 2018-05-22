@@ -31,6 +31,11 @@ contract("Trade", accounts => {
     assert.equal(await trade.traders(0), traderA);
   });
 
+  it("has no goods pulled", async () => {
+    assert.isFalse(await trade.traderPulledGoods(traderA));
+    assert.isFalse(await trade.traderPulledGoods(traderB));
+  });
+
   it("knows which address is a trader", async () => {
     assert.isTrue(await trade.isTrader(traderA));
     assert.isFalse(await trade.isTrader(thirdPerson));
@@ -99,6 +104,18 @@ contract("Trade", accounts => {
       await goods.mint(thirdPerson, good5);
     });
 
+    it("won't let trader A add after accepting", async () => {
+      await trade.accept(traderAOptions);
+      await assertRejected(
+        goods.safeTransferFrom(
+          traderA,
+          trade.address,
+          good1,
+          traderAOptions
+        )
+      );
+    });
+
     it("cannot be added by a third person", async () => {
       await assertRejected(goods.safeTransferFrom(
         thirdPerson,
@@ -126,6 +143,11 @@ contract("Trade", accounts => {
         assert.equal((await goods.ownerOf(good1)), trade.address);
         await trade.removeGood(good1, traderAOptions);
         assert.equal((await goods.ownerOf(good1)), traderA);
+      });
+
+      it("won't let trader A remove after accepting", async () => {
+        await trade.accept(traderAOptions);
+        await assertRejected(trade.removeGood(good1, traderAOptions));
       });
 
       it("won't let a anyone else remove goods", async () => {
@@ -184,6 +206,12 @@ contract("Trade", accounts => {
           assert.equal(await goods.ownerOf(good2), traderA);
           assert.equal(await goods.ownerOf(good3), traderA);
           assert.equal(await goods.ownerOf(good4), trade.address);
+          assert.isTrue(await trade.traderPulledGoods(traderA));
+        });
+
+        it("won't let trader A get their goods a second time", async () => {
+          await trade.getGoods(traderAOptions);
+          await assertRejected(trade.getGoods(traderAOptions));
         });
 
         it("lets trader B get their goods", async () => {
@@ -192,6 +220,7 @@ contract("Trade", accounts => {
           assert.equal(await goods.ownerOf(good2), trade.address);
           assert.equal(await goods.ownerOf(good3), trade.address);
           assert.equal(await goods.ownerOf(good4), traderB);
+          assert.isTrue(await trade.traderPulledGoods(traderB));
         });
 
         it("won't let traders withdraw", async () => {

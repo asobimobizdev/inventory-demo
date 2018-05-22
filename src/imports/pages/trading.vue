@@ -61,7 +61,12 @@
 
           <div class="goods-collection my-offer" v-loading="goodsLoading">
             <div class="head">
-              <h1>My Offer</h1>
+              <h1>
+                My Offer
+                <small v-if="accepted">
+                  (You have Accepted)
+                </small>
+              </h1>
             </div>
             <div class="collection grid" >
               <draggable v-model='goods' class="container" id="myOffer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
@@ -77,7 +82,12 @@
 
           <div class="goods-collection other-offer" v-loading="goodsLoading">
             <div class="head">
-              <h1>{{otherUser.name}} Offer</h1>
+              <h1>
+                {{otherUser.name}} Offer
+                <small v-if="otherAccepted">
+                  (Accepted)
+                </small>
+              </h1>
             </div>
             <div class="collection grid" >
               <!-- <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop"> -->
@@ -99,8 +109,10 @@
           <el-button type="primary" round @click="startTradeWithSelectedUser()" v-if="selectedFriendId">Start Trade</el-button>
         </div>
         <div class="content center trade-view" v-else key="trade-view">
-          <el-button type="danger" round @click="cancelTrade()">Cancel Trade</el-button>
-          <el-button type="success" round @click="confirmTrade()">Confirm Trade</el-button>
+          <el-button type="danger" v-if="!accepted" round @click="cancelTrade()">Cancel Trade</el-button>
+          <el-button type="warning" v-if="accepted" round @click="withdrawTrade()">Withdraw</el-button>
+          <el-button type="success" v-if="!accepted" round @click="confirmTrade()">Confirm Trade</el-button>
+          <el-button type="success" v-if="accepted && otherAccepted" round @click="pullGoods()">Pull Goods</el-button>
         </div>
       </transition>
     </el-footer>
@@ -128,9 +140,18 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selectedFriendId", "goodsLoading"]),
+    ...mapState([
+      "selectedFriendId",
+      "goodsLoading",
+    ]),
     ...mapGetters(["otherUsers"]),
     ...mapGetters("trade", ["otherUser"]),
+    ...mapState("trade",
+      [
+        "accepted",
+        "otherAccepted",
+      ]
+    ),
     hasTrade() {
       return this.$store.state.trade.id;
     },
@@ -168,6 +189,7 @@ export default {
       "startTradeWithSelectedUser",
       "cancelTrade",
       "confirmTrade",
+      "withdrawTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
