@@ -61,6 +61,7 @@ export default {
 
     },
     async cancelTrade(context) {
+      await repository.cancelTrade();
       context.commit("resetTrade");
     },
     async confirmTrade(context) {

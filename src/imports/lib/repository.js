@@ -286,4 +286,16 @@ export default class Repository {
     );
     return await Promise.all(indices.map(getFriend));
   }
+
+  async cancelTrade() {
+    const isActive = await this.c.tradeContract.methods.isActive().call();
+    if (isActive) {
+      console.log("Trade is still active");
+      await this.c.tradeContract.methods.cancel().send();
+    } else {
+      console.log("Trade is not active, skipping cancelling");
+    }
+    console.log("Removing trade from registry");
+    await this.c.tradeRegistry.methods.remove().send();
+  }
 }
