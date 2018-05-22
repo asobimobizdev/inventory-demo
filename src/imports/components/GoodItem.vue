@@ -1,15 +1,14 @@
 <template>
-<div class="good" :class="{ 'has-drawer': hasDrawer, 'active': active }">
+<div class="good" :class="{ 'has-drawer': hasDrawer, 'active': active, 'preview': preview }" v-loading="!confirmed">
   <div class="icon" :style="styleForIcon"></div>
   <div class="drawer" v-if="hasDrawer">
     <slot></slot>
   </div>
-  <div class="for-sale-ribbon" v-if="forSale">FOR SALE</div>
+  <div class="for-sale-ribbon"  :class="{ 'hidden':!forSale }" >FOR SALE</div>
 </div>
 </template>
 
 <script>
-
 import seedParams from "../lib/seedParams";
 
 export default {
@@ -19,8 +18,8 @@ export default {
     forSale: Boolean,
     hasDrawer: { type: Boolean, default: false },
     active: { type: Boolean, default: false },
+    preview: { type: Boolean, default: false },
     seed: { type: Number, default: 0 },
-    hue: { type: Number, default: 0 },
     thumbPath: { type: String, default: null },
   },
   computed: {
@@ -52,7 +51,7 @@ export default {
 <style lang="stylus" scoped>
 .good
   *
-    transition all 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
+    transition all 3000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
 
   display flex
   flex-direction column
@@ -64,16 +63,16 @@ export default {
   min-height 100px
   position relative
   overflow hidden
-  background-color #f0f0f0
+  background-color #333
 
   >.icon
-    background-color #eee
-    width 80px
-    height 80px
+    background-color #444
+    width 100%
+    height 100%
     // border-radius 40px
     margin-bottom 0px
     // transition all 300ms ease-in-out
-    position relative
+    // position relative
     overflow hidden
     background-size contain
     background-position center center
@@ -83,10 +82,11 @@ export default {
     display none
 
   >.for-sale-ribbon
-    fillColor = #f21;
+    transition all 500ms ease-in-out
+    fillColor = saturate(#F56C6A,40);
 
     position absolute
-    background alpha(fillColor,0.6);
+    background alpha(fillColor,0.9);
     top -20px
     right -23px
     height 20px
@@ -101,6 +101,10 @@ export default {
     font-size 8px
     font-weight bold
     letter-spacing 0.1em
+
+    &.hidden
+      transform rotate(10deg) translate(15px,-15px)
+
 
 
   &.has-drawer
@@ -134,5 +138,10 @@ export default {
 
   &.active
     >.icon
-      transform scale(2,2);
+      filter brightness(135%)
+  &.preview
+    &.active
+      >.icon
+        filter none
+
 </style>
