@@ -320,7 +320,7 @@ export default class Repository {
 
   async confirmTrade() {
     console.log("Accepting trade");
-    await this.c.trade.accept().send;
+    await this.c.tradeContract.methods.accept().send();
   }
 
   async getTradeGoods() {
