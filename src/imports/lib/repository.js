@@ -296,6 +296,11 @@ export default class Repository {
       console.log("Trade is not active, skipping cancelling");
     }
     console.log("Removing trade from registry");
-    await this.c.tradeRegistry.methods.remove().send();
+    await this.c.tradeRegistryContract.methods.remove().send();
+  }
+
+  async confirmTrade() {
+    console.log("Accepting trade");
+    await this.c.trade.accept().send;
   }
 }

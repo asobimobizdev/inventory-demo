@@ -304,7 +304,7 @@ const createStore = () => {
         repository.c.tradeRegistryContractEvents.events.allEvents()
           .on("data", (event) => {
             console.log("Trade Registry event", event);
-            context.dispatch("getTrades");
+            context.dispatch("trade/loadTrade");
           })
           .on("error", console.log);
       },

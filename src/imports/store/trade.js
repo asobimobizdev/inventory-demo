@@ -65,6 +65,7 @@ export default {
       context.commit("resetTrade");
     },
     async confirmTrade(context) {
+      await repository.confirmTrade();
       context.commit("resetTrade");
     },
     transfereGoodToMyOffer(context, good) {
