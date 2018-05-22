@@ -332,11 +332,6 @@ export default class Repository {
     await this.c.tradeContract.methods.accept().send();
   }
 
-  async withdrawTrade() {
-    console.log("Withdrawing from trade");
-    await this.c.tradeContract.methods.withdraw().send();
-  }
-
   async getTradeGoods() {
     const getGoodOwner = async (good) => {
       const trader = await this.c.tradeContract.methods.goodsTrader(
