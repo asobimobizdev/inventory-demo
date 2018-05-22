@@ -122,7 +122,14 @@ export default class Repository {
       tradeContract.methods.traders(1).call(),
     ]);
     const otherUserID = userA == address ? userB : userA;
-    return {id, otherUserID};
+    const [accepted, otherAccepted] = await Promise.all([
+      tradeContract.methods.traderAccepted(id).call(),
+      tradeContract.methods.traderAccepted(otherUserID).call(),
+    ]);
+    return {
+      id,
+      otherUserID,
+    };
   }
 
   async getGoodsForAddress(address) {

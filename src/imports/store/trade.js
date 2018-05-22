@@ -11,19 +11,25 @@ export default {
     otherUserID: null,
     myGoods: [],
     otherGoods: [],
+    accepted: false,
+    otherAccepted: false,
   },
   mutations: {
-    ["setTrade"](state, { id, otherUserID }) {
+    ["setTrade"](state, { id, otherUserID, accepted, otherAccepted }) {
       state.id = id;
       state.otherUserID = otherUserID;
       state.myGoods = [];
       state.otherGoods = [];
+      state.accepted = accepted;
+      state.otherAccepted = otherAccepted;
     },
     ["resetTrade"](state) {
       state.id = null;
       state.otherUserID = null;
       state.myGoods = [];
       state.otherGoods = [];
+      state.accepted = false;
+      state.otherAccepted = false;
     },
     ["setMyGoods"](state, goods) {
       state.myGoods = goods.map((good) => {
