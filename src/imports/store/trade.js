@@ -4,32 +4,31 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const initialState = {
+  id: null,
+  otherUserID: null,
+  myGoods: [],
+  otherGoods: [],
+  accepted: false,
+  otherAccepted: false,
+  pulled: false,
+}
+
 export default {
   namespaced: true,
-  state: {
-    id: null,
-    otherUserID: null,
-    myGoods: [],
-    otherGoods: [],
-    accepted: false,
-    otherAccepted: false,
-  },
+  state: initialState,
   mutations: {
-    ["setTrade"](state, { id, otherUserID, accepted, otherAccepted }) {
+    ["setTrade"](state, { id, otherUserID, accepted, otherAccepted, pulled }) {
       state.id = id;
       state.otherUserID = otherUserID;
       state.myGoods = [];
       state.otherGoods = [];
       state.accepted = accepted;
       state.otherAccepted = otherAccepted;
+      state.pulled = pulled;
     },
     ["resetTrade"](state) {
-      state.id = null;
-      state.otherUserID = null;
-      state.myGoods = [];
-      state.otherGoods = [];
-      state.accepted = false;
-      state.otherAccepted = false;
+      state = {...state, initialState}
     },
     ["setMyGoods"](state, goods) {
       state.myGoods = goods.map((good) => {

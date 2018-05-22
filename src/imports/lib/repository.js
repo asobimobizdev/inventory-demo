@@ -126,9 +126,13 @@ export default class Repository {
       tradeContract.methods.traderAccepted(id).call(),
       tradeContract.methods.traderAccepted(otherUserID).call(),
     ]);
+    const pulled = await tradeContract.methods.traderPulledGoods(id).call();
     return {
       id,
       otherUserID,
+      pulled,
+      accepted,
+      otherAccepted
     };
   }
 
