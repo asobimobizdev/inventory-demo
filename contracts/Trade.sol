@@ -37,6 +37,11 @@ contract Trade is ERC721Receiver {
         traders = _traders;
     }
 
+    modifier noneAccepted() {
+        require(_numTradersAccepted() == 0);
+        _;
+    }
+
     modifier activeOnly() {
         require(isActive);
         _;
@@ -96,7 +101,6 @@ contract Trade is ERC721Receiver {
       */
     function cancel() activeOnly() traderOnly() external {
         require(!traderAccepted[msg.sender]);
-
         isActive = false;
 
         uint256 balance = goods.balanceOf(address(this));
@@ -113,7 +117,12 @@ contract Trade is ERC721Receiver {
       * @dev Can only be called by a trader
       * @param goodID the good ID to remove
       */
-    function removeGood(uint256 goodID) activeOnly() traderOnly() external {
+    function removeGood(uint256 goodID)
+        activeOnly()
+        traderOnly()
+        noneAccepted()
+        external
+        {
         address trader = msg.sender;
         require(!isFinal());
         require(goodsTrader[goodID] == trader);
@@ -175,6 +184,7 @@ contract Trade is ERC721Receiver {
       */
     function onERC721Received(address from, uint256 goodID, bytes data)
         activeOnly()
+        noneAccepted()
         public returns (bytes4)
         {
         // We can't verify msg.sender here because the call is coming from

@@ -99,6 +99,18 @@ contract("Trade", accounts => {
       await goods.mint(thirdPerson, good5);
     });
 
+    it("won't let trader A add after accepting", async () => {
+      await trade.accept(traderAOptions);
+      await assertRejected(
+        goods.safeTransferFrom(
+          traderA,
+          trade.address,
+          good1,
+          traderAOptions
+        )
+      );
+    });
+
     it("cannot be added by a third person", async () => {
       await assertRejected(goods.safeTransferFrom(
         thirdPerson,
@@ -126,6 +138,11 @@ contract("Trade", accounts => {
         assert.equal((await goods.ownerOf(good1)), trade.address);
         await trade.removeGood(good1, traderAOptions);
         assert.equal((await goods.ownerOf(good1)), traderA);
+      });
+
+      it("won't let trader A remove after accepting", async () => {
+        await trade.accept(traderAOptions);
+        await assertRejected(trade.removeGood(good1, traderAOptions));
       });
 
       it("won't let a anyone else remove goods", async () => {
