@@ -90,12 +90,12 @@
               </h1>
             </div>
             <div class="collection grid" >
-              <!-- <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop"> -->
+              <div class="container">
                 <div class="item" v-for="(good,index) in otherOffer" :key="index" v-loading="!good.confirmed" >
                   <good-item v-bind="good" :active="false">
                   </good-item>
                 </div>
-              <!-- </draggable> -->
+              </div>
             </div>
           </div>
         </div>
@@ -141,18 +141,10 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      "selectedFriendId",
-      "goodsLoading",
-    ]),
+    ...mapState(["selectedFriendId", "goodsLoading"]),
     ...mapGetters(["otherUsers"]),
     ...mapGetters("trade", ["otherUser"]),
-    ...mapState("trade",
-      [
-        "accepted",
-        "otherAccepted",
-      ]
-    ),
+    ...mapState("trade", ["accepted", "otherAccepted"]),
     hasTrade() {
       return this.$store.state.trade.id;
     },
