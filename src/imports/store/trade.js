@@ -26,7 +26,12 @@ export default {
       state.otherGoods = [];
     },
     ["setMyGoods"](state, goods) {
-      state.myGoods = goods;
+      state.myGoods = goods.map((good) => {
+        return {
+          ...good,
+          ...decorateGoodWithId(good),
+        };
+      });
     },
     ["setOtherGoods"](state, goods) {
       state.otherGoods = goods;
@@ -42,6 +47,16 @@ export default {
         return;
       }
       context.commit("setTrade", result);
+      const tradeGoods = await repository.getTradeGoods();
+      const filter = (good) => good.trader == context.rootState.accountAddress;
+
+      context.commit(
+        "setMyGoods", tradeGoods.filter(filter),
+      );
+      context.commit(
+        "setOtherGoods",
+        tradeGoods.filter((good) => !filter(good)),
+      );
     },
     async startTradeWithSelectedUser(context) {
       const otherUserID = context.rootState.selectedFriendId;

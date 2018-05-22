@@ -315,4 +315,20 @@ export default class Repository {
     console.log("Accepting trade");
     await this.c.trade.accept().send;
   }
+
+  async getTradeGoods() {
+    const getGoodOwner = async (good) => {
+      const trader = await this.c.tradeContract.methods.goodsTrader(
+        good.id,
+      ).call();
+      return {
+        ...good,
+        trader,
+      };
+    };
+    const goodsRaw = await this.getGoodsForAddress(
+      this.c.tradeContract.options.address,
+    );
+    return Promise.all(goodsRaw.map(getGoodOwner));
+  }
 }
