@@ -144,7 +144,7 @@ const createStore = () => {
         const good = state.goods.find(good => good.id == goodID);
         good.price = price;
       },
-      ["setRegistered"](state, {userName, registered} ) {
+      ["setRegistered"](state, { userName, registered }) {
         state.registered = registered;
         state.userName = userName;
       },

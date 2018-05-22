@@ -49,17 +49,16 @@
       grid-gap 5px
       grid-template-columns repeat(auto-fit, minmax(180px,1fr));
 
-.item.el-loading-parent--relative, .good-item.el-loading-parent--relative
-  >div.el-loading-mask
-    background-color alpha(#000,0.0) !important
-    >.el-loading-spinner
-      top: calc(50% - 0px) !important
-      circle
-        stroke: #fff
+// .item.el-loading-parent--relative, .good-item.el-loading-parent--relative, .good.el-loading-parent--relative
+//   >div.el-loading-mask
+//     background-color alpha(#000,0.0) !important
+//     >.el-loading-spinner
+//       top: calc(50% - 0px) !important
+//       circle
+//         stroke: #fff
 
 .el-loading-mask
   z-index initial!important
-
 
 .goods-collection
   display flex
@@ -95,6 +94,26 @@
   .collection
     flex 1 1 auto
 
+    &.list
+      >.container
+        >.item
+          background-color #f0f0f0
+          >.good
+            position absolute
+            top 0
+            left 0
+            bottom 0
+            width 120px
+    &.grid
+      >.container
+        >.item
+          background-color #444
+          height 160px
+          >.good
+            position static
+            width 120px
+            height 120px
+
   .item
     color #fff
     background-color alpha(#fff,0.9)
@@ -104,15 +123,15 @@
     cursor pointer
     height 120px
 
-    >.good
-      display flex
-      flex-direction column
-      flex-wrap wrap
-      justify-content center
-      align-content center
-      align-items center
-      position absolute
-      top 0
-      left 0
-      right 0
-      bottom 0
+    // >.good
+    //   display flex
+    //   flex-direction column
+    //   flex-wrap wrap
+    //   justify-content center
+    //   align-content center
+    //   align-items center
+    //   position absolute
+    //   top 0
+    //   left 0
+    //   right 0
+    //   bottom 0

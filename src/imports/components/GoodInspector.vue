@@ -3,7 +3,7 @@
   <div class="drawer">
     <transition>
     <div class="content" v-if="good">
-      <good-item class="good-item" v-bind="good" :active="true" v-loading="!good.confirmed"/>
+      <good-item class="good-item" v-bind="good" :active="true" :preview="true" />
 
       <div class="infos">
 
@@ -16,6 +16,7 @@
             <el-switch
               v-model="goodForSale"
               active-text="For Sale"
+              :disabled="!good.confirmed"
               />
           </div>
           <div class="buy" v-else>
@@ -53,19 +54,23 @@ export default {
     hasPrice() {
       return this.good && this.good.price && this.good.price.toString() != "0";
     },
-    goodForSale:{
-      set(forSale){
-        this.$store.dispatch("setGoodForSale", {id:this.good.id, forSale, price:this.good.price});
+    goodForSale: {
+      set(forSale) {
+        this.$store.dispatch("setGoodForSale", {
+          id: this.good.id,
+          forSale,
+          price: this.good.price,
+        });
       },
-      get(){
+      get() {
         return this.good.forSale;
       },
     },
-    price:{
-      set(price){
-        this.$store.commit("setGoodPrice", {goodID: this.good.id, price});
+    price: {
+      set(price) {
+        this.$store.commit("setGoodPrice", { goodID: this.good.id, price });
       },
-      get(){
+      get() {
         return this.good.price;
       },
     },
