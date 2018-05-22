@@ -12,7 +12,7 @@ const initialState = {
   accepted: false,
   otherAccepted: false,
   pulled: false,
-}
+};
 
 export default {
   namespaced: true,
@@ -28,7 +28,7 @@ export default {
       state.pulled = pulled;
     },
     ["resetTrade"](state) {
-      state = {...state, initialState}
+      state = {...state, initialState};
     },
     ["setMyGoods"](state, goods) {
       state.myGoods = goods.map((good) => {
@@ -69,11 +69,11 @@ export default {
       );
 
       repository.c.tradeContractEvents.events.allEvents()
-          .on("data", (event) => {
-            console.log("Trade event", event);
-            context.dispatch("loadTrade");
-          })
-          .on("error", console.log);
+        .on("data", (event) => {
+          console.log("Trade event", event);
+          context.dispatch("loadTrade");
+        })
+        .on("error", console.log);
     },
     async startTradeWithSelectedUser(context) {
       const otherUserID = context.rootState.selectedFriendId;
