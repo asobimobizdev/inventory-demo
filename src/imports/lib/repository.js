@@ -148,8 +148,16 @@ export default class Repository {
     return items;
   }
 
-  async transferGood(goodID, from, to) {
+  async transferGood(from, to, goodID) {
     await this.c.goodsContract.methods.transferFrom(from, to, goodID).send();
+  }
+
+  async transferToTrade(accountAddress, goodID) {
+    await this.transferGood(
+      accountAddress,
+      this.c.tradeContract.options.address,
+      goodID,
+    );
   }
 
   async setGoodForSale(goodID, price, forSale) {

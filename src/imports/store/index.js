@@ -108,10 +108,15 @@ const createStore = () => {
         state.accountAddress = address;
       },
       ["addUnconfirmedTransaction"](state, transaction) {
+        // TODO(Giosue) refactor me
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
-        state.unconfirmedTransactions = { [tID]: transaction, ...state.unconfirmedTransactions };
+        state.unconfirmedTransactions = {
+          [tID]: transaction,
+          ...state.unconfirmedTransactions,
+        };
       },
       ["removeUnconfirmedTransaction"](state, transaction) {
+        // TODO(Giosue) refactor me
         const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         if (!state.unconfirmedTransactions[tID]) return;
         delete state.unconfirmedTransactions[tID];
@@ -321,19 +326,28 @@ const createStore = () => {
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
-        p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
+        p2pManager.addUnconfirmedTransaction(
+          context.state.accountAddress,
+          address,
+          goodID,
+        );
 
         try {
           await repository.transferGood(
-            goodID,
             context.state.accountAddress,
             address,
+            goodID,
             repository.c.goodsContract,
           );
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
-          p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, false);
+          p2pManager.removeUnconfirmedTransaction(
+            context.state.accountAddress,
+            address,
+            goodID,
+            false,
+          );
         }
 
       },
@@ -364,7 +378,10 @@ const createStore = () => {
             return good.id == id;
           }),
         };
-        context.commit("setGoodForSale", { id, forSale, price, confirmed: false });
+        context.commit(
+          "setGoodForSale",
+          { id, forSale, price, confirmed: false },
+        );
         try {
           price = String(price);
           await repository.setGoodForSale(
@@ -384,14 +401,23 @@ const createStore = () => {
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
-        p2pManager.addUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID);
+        p2pManager.addUnconfirmedTransaction(
+          transaction.from,
+          transaction.to,
+          transaction.goodID,
+        );
 
         try {
           await repository.buyGood(id, context.state.accountAddress);
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
-          p2pManager.removeUnconfirmedTransaction(transaction.from, transaction.to, transaction.goodID, false);
+          p2pManager.removeUnconfirmedTransaction(
+            transaction.from,
+            transaction.to,
+            transaction.goodID,
+            false,
+          );
         }
       },
 

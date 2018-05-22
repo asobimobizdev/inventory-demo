@@ -68,14 +68,17 @@ export default {
       await repository.confirmTrade();
       context.commit("resetTrade");
     },
-    transfereGoodToMyOffer(context, good) {
+    async transfereGoodToMyOffer(context, good) {
       const transaction = {
-        from: context.state.accountAddress,
+        from: context.rootState.accountAddress,
         to: context.state.id,
         goodID: good.id,
       };
-
       context.commit("addUnconfirmedTransaction", transaction, { root: true });
+      await repository.transferToTrade(
+        context.rootState.accountAddress,
+        good.id,
+      );
       // p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
 
       // try {
@@ -100,6 +103,7 @@ export default {
       };
 
       context.commit("addUnconfirmedTransaction", transaction, { root: true });
+
       // p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
     },
 
