@@ -21,11 +21,12 @@ contract Trade is ERC721Receiver {
     event TradeWithdrawn(address indexed _trader);
     event TradeCancelled(address indexed _trader);
     event TradeFinalized();
-    event ExchangeFinished();
+    event GoodsPulled(address indexed _trader);
 
 
     address[2] public traders;
     mapping(address => bool) public traderAccepted;
+    mapping(address => bool) public traderPulledGoods;
 
     Goods goods;
     bool public isActive = true;
@@ -138,6 +139,7 @@ contract Trade is ERC721Receiver {
       */
     function getGoods() activeOnly() traderOnly() external {
         require(isFinal());
+        require(!traderPulledGoods[msg.sender]);
         uint256 balance = goods.balanceOf(address(this));
         // We need to keep record how many goods we skipped because they
         // are not supposed to be transferred to one of the traders
@@ -156,7 +158,9 @@ contract Trade is ERC721Receiver {
             }
             goods.safeTransferFrom(address(this), msg.sender, goodID);
         }
-        emit ExchangeFinished();
+        traderPulledGoods[msg.sender] = true;
+
+        emit GoodsPulled(msg.sender);
     }
 
     /**
