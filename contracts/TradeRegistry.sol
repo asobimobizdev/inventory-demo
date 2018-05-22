@@ -13,7 +13,7 @@ contract TradeRegistry {
     event TradeAdded(address indexed _trade);
     event TradeRemoved(address indexed _trade);
 
-    mapping(address => address) traderTrade;
+    mapping(address => address) public traderTrade;
     mapping(address => uint256) tradeIndex;
     address[] public trades;
 
@@ -49,13 +49,14 @@ contract TradeRegistry {
     /**
       * @dev Remove a trade
       * @dev Throws if no trade exists
+      * @dev Throws if the trade is finalized or cancelled
       */
     function remove() external {
         address tradeAddress = traderTrade[msg.sender];
         require(tradeAddress != address(0));
 
         Trade trade = Trade(tradeAddress);
-        require(trade.isFinal());
+        require(trade.isFinal() || !trade.isActive());
 
         for (uint256 i = 0; i < trade.numTraders(); i++) {
             address trader = trade.traders(i);

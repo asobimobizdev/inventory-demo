@@ -5,11 +5,12 @@ import { AsobiCoin } from "../../../contracts/AsobiCoin.sol";
 import { Escrow } from "../../../contracts/Escrow.sol";
 import { TradeRegistry } from "../../../contracts/TradeRegistry.sol";
 import { UserRegistry } from "../../../contracts/UserRegistry.sol";
+import { Trade } from "../../../contracts/Trade.sol";
 
 const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
 const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
-const TRADE_REGISTRY_ADDRESS = "0x463a608Ff6db561813Bd4feE4218EECBE019a890";
+const TRADE_REGISTRY_ADDRESS = "0xf2e8cF858bfc74B5cD71A20E1b15cBFD9181c8e2";
 const USER_REGISTRY_ADDRESS = "0x00B9faa34fA24c7a15C7528Fd1c8432cced145B6";
 
 const range = n => Array.from({length: n}, (value, key) => key);
@@ -47,6 +48,23 @@ export default class Repository {
     return await dapp.deployContract(UserRegistry, []);
   }
 
+  async createTrade(userA, userB) {
+    const trade = await this.dapp.deployContract(
+      Trade,
+      [
+        this.c.goodsContract.options.address,
+        [
+          userA,
+          userB,
+        ],
+      ],
+    );
+    await this.c.tradeRegistryContract.methods.add(
+      trade.options.address
+    ).send();
+    return trade;
+  }
+
   loadGoodsContract() {
     [
       this.c.goodsContract,
@@ -58,7 +76,7 @@ export default class Repository {
     [
       this.c.asobiCoinContract,
       this.c.asobiCoinContractEvents,
-    ] = this.dapp.getContractAt(AsobiCoin, GOODS_ADDRESS);
+    ] = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
   }
 
   loadEscrowContract() {
@@ -68,11 +86,43 @@ export default class Repository {
     ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
+  loadTradeRegistryContract() {
+    [
+      this.c.tradeRegistryContract,
+      this.c.tradeRegistryContractEvents,
+    ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
+  }
+
   loadUserRegistryContract() {
     [
       this.c.userRegistryContract,
       this.c.userRegistryContractEvents,
     ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
+  }
+
+  async loadTrade(address) {
+    const id = await this.c.tradeRegistryContract.methods.traderTrade(
+      address,
+    ).call();
+    if (id == "0x0000000000000000000000000000000000000000") {
+      return null;
+    }
+    const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
+      Trade,
+      id,
+    );
+
+    this.c = {
+      ...this.c,
+      tradeContract,
+      tradeContractEvents,
+    };
+    const [userA, userB] = await Promise.all([
+      tradeContract.methods.traders(0).call(),
+      tradeContract.methods.traders(1).call(),
+    ]);
+    const otherUserID = userA == address ? userB : userA;
+    return {id, otherUserID};
   }
 
   async getGoodsForAddress(address) {
@@ -98,8 +148,20 @@ export default class Repository {
     return items;
   }
 
-  async transferGood(goodID, from, to) {
-    await this.c.goodsContract.methods.transferFrom(from, to, goodID).send();
+  async transferGood(from, to, goodID) {
+    await this.c.goodsContract.methods.safeTransferFrom(
+      from,
+      to,
+      goodID,
+    ).send();
+  }
+
+  async transferToTrade(accountAddress, goodID) {
+    await this.transferGood(
+      accountAddress,
+      this.c.tradeContract.options.address,
+      goodID,
+    );
   }
 
   async setGoodForSale(goodID, price, forSale) {
@@ -224,18 +286,49 @@ export default class Repository {
       const address = await this.c.userRegistryContract.methods.users(
         index
       ).call();
-      const friend = {
+      return {
         id: address,
         name: await this.c.userRegistryContract.methods.userName(
           address,
         ).call(),
       };
-      return friend;
     };
-    const numFriends = await this.c.userRegistryContract.methods.numUsers(
-    ).call();
-    const indices = range(numFriends);
-    const friends = await Promise.all(indices.map(getFriend));
-    return friends;
+    const indices = range(
+      await this.c.userRegistryContract.methods.numUsers().call()
+    );
+    return await Promise.all(indices.map(getFriend));
+  }
+
+  async cancelTrade() {
+    const isActive = await this.c.tradeContract.methods.isActive().call();
+    if (isActive) {
+      console.log("Trade is still active");
+      await this.c.tradeContract.methods.cancel().send();
+    } else {
+      console.log("Trade is not active, skipping cancelling");
+    }
+    console.log("Removing trade from registry");
+    await this.c.tradeRegistryContract.methods.remove().send();
+  }
+
+  async confirmTrade() {
+    console.log("Accepting trade");
+    await this.c.trade.accept().send;
+  }
+
+  async getTradeGoods() {
+    const getGoodOwner = async (good) => {
+      const trader = await this.c.tradeContract.methods.goodsTrader(
+        good.id,
+      ).call();
+      return {
+        ...good,
+        trader,
+      };
+    };
+    const goodsRaw = await this.getGoodsForAddress(
+      this.c.tradeContract.options.address,
+    );
+    return Promise.all(goodsRaw.map(getGoodOwner));
   }
 }

@@ -35,11 +35,14 @@ export default class Dapp {
       };
       return new web3Instance.eth.Contract(contract.abi, address, options);
     }
-    return [_get(this.web3), _get(this.web3Event)];
+    return [
+      _get(this.web3),
+      _get(this.web3Event),
+    ];
   }
 
-  getContractAt(contract, address, web3Instance) {
-    return this.getContract(contract, address, web3Instance);
+  getContractAt(contract, address) {
+    return this.getContract(contract, address);
   }
 
   async deployContract(contract, args, web3Instance) {

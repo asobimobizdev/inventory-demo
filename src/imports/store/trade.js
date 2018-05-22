@@ -26,16 +26,46 @@ export default {
       state.otherGoods = [];
     },
     ["setMyGoods"](state, goods) {
-      state.myGoods = goods;
+      state.myGoods = goods.map((good) => {
+        return {
+          ...good,
+          ...decorateGoodWithId(good),
+        };
+      });
     },
     ["setOtherGoods"](state, goods) {
       state.otherGoods = goods;
     },
   },
   actions: {
+    async loadTrade(context) {
+      const result = await repository.loadTrade(
+        context.rootState.accountAddress,
+      );
+      console.log("loadTrade", result);
+      if (!result) {
+        return;
+      }
+      context.commit("setTrade", result);
+      const tradeGoods = await repository.getTradeGoods();
+      const filter = (good) => good.trader == context.rootState.accountAddress;
+
+      context.commit(
+        "setMyGoods", tradeGoods.filter(filter),
+      );
+      context.commit(
+        "setOtherGoods",
+        tradeGoods.filter((good) => !filter(good)),
+      );
+    },
     async startTradeWithSelectedUser(context) {
       const otherUserID = context.rootState.selectedFriendId;
       if (!otherUserID) return;
+
+      const trade = await repository.createTrade(
+        context.rootState.accountAddress,
+        otherUserID,
+      );
 
       await timeout(500);
 
@@ -46,19 +76,24 @@ export default {
 
     },
     async cancelTrade(context) {
+      await repository.cancelTrade();
       context.commit("resetTrade");
     },
     async confirmTrade(context) {
+      await repository.confirmTrade();
       context.commit("resetTrade");
     },
-    transfereGoodToMyOffer(context, good) {
+    async transfereGoodToMyOffer(context, good) {
       const transaction = {
-        from: context.state.accountAddress,
+        from: context.rootState.accountAddress,
         to: context.state.id,
         goodID: good.id,
       };
-
       context.commit("addUnconfirmedTransaction", transaction, { root: true });
+      await repository.transferToTrade(
+        context.rootState.accountAddress,
+        good.id,
+      );
       // p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
 
       // try {
@@ -83,6 +118,7 @@ export default {
       };
 
       context.commit("addUnconfirmedTransaction", transaction, { root: true });
+
       // p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
     },
 

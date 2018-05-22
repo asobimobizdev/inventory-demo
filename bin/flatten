@@ -1,2 +1,2 @@
 #!/bin/bash
-solidity_flattener "$1" --solc-paths="zeppelin-solidity/=$PWD/node_modules/zeppelin-solidity"
+solidity_flattener "$1" --solc-paths="zeppelin-solidity/=$PWD/node_modules/zeppelin-solidity/"

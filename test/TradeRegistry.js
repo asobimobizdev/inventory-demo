@@ -1,7 +1,8 @@
 const assertRejected = require("assert-rejected");
 
-const TradeRegistry = artifacts.require("contracts/TradeRegistry.sol");
+const Goods = artifacts.require("contracts/Goods.sol");
 const Trade = artifacts.require("contracts/Trade.sol");
+const TradeRegistry = artifacts.require("contracts/TradeRegistry.sol");
 
 contract("TradeRegistry", accounts => {
   const traderA = accounts[1];
@@ -15,8 +16,11 @@ contract("TradeRegistry", accounts => {
   let registry;
 
   beforeEach(async () => {
-    registry = await TradeRegistry.new();
-    trade = await Trade.new("0x0", [traderA, traderB]);
+    let goods = await Goods.new();
+    [registry, trade] = await Promise.all([
+      TradeRegistry.new(),
+      Trade.new(goods.address, [traderA, traderB]),
+    ]);
   });
 
   it("has no trades in the beginning", async () => {
@@ -38,6 +42,10 @@ contract("TradeRegistry", accounts => {
       await registry.add(trade.address, traderAOptions);
     });
 
+    it("can get the trade for trader a", async () => {
+      assert.equal(await registry.traderTrade(traderA), trade.address);
+    });
+
     it("counts one trade", async () => {
       assert.equal(await registry.numTrades(), 1);
     });
@@ -50,6 +58,18 @@ contract("TradeRegistry", accounts => {
 
     it("allows retrieving trades", async () => {
       assert.equal(trade.address, await registry.trades(0));
+    });
+
+    describe("with the trade cancelled", () => {
+      beforeEach(async () => {
+        assert.isFalse(await trade.isFinal());
+        await trade.cancel(traderAOptions);
+        assert.isFalse(await trade.isActive());
+      });
+
+      it("can be removed", async () => {
+        await registry.remove(traderAOptions);
+      });
     });
 
     describe("with the finalized trade removed", () => {
