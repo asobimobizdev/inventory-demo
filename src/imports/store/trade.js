@@ -94,6 +94,11 @@ export default {
     },
     async cancelTrade(context) {
       await repository.cancelTrade();
+      await context.dispatch("closeTrade");
+      context.commit("resetTrade");
+    },
+    async closeTrade(context) {
+      await repository.closeTrade();
       context.commit("resetTrade");
     },
     async confirmTrade(context) {
