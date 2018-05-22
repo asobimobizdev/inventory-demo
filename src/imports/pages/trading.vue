@@ -143,7 +143,11 @@ export default {
     ...mapState(["selectedFriendId", "goodsLoading"]),
     ...mapGetters(["otherUsers"]),
     ...mapGetters("trade", ["otherUser"]),
-    ...mapState("trade", ["accepted", "otherAccepted", "pulled"]),
+    ...mapState("trade", [
+      "accepted",
+      "otherAccepted",
+      "pulled",
+    ]),
     hasTrade() {
       return this.$store.state.trade.id;
     },
