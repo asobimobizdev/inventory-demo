@@ -100,9 +100,9 @@ export default class Repository {
     ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
   }
 
-  async loadTrade(address) {
+  async loadTrade(accountAddress) {
     const tradeAddress = await this.c.tradeRegistryContract.methods.traderTrade(
-      address,
+      accountAddress,
     ).call();
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
@@ -121,13 +121,13 @@ export default class Repository {
       tradeContract.methods.traders(0).call(),
       tradeContract.methods.traders(1).call(),
     ]);
-    const otherUserID = userA == address ? userB : userA;
+    const otherUserID = userA == accountAddress ? userB : userA;
     const [accepted, otherAccepted] = await Promise.all([
-      tradeContract.methods.traderAccepted(address).call(),
+      tradeContract.methods.traderAccepted(accountAddress).call(),
       tradeContract.methods.traderAccepted(otherUserID).call(),
     ]);
     const pulled = await tradeContract.methods.traderPulledGoods(
-      tradeAddress,
+      accountAddress,
     ).call();
     return {
       id: tradeAddress,
