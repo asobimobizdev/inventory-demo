@@ -28,7 +28,7 @@ export default {
       state.pulled = pulled;
     },
     ["resetTrade"](state) {
-      state = {...state, initialState};
+      state = {...state, ...initialState};
     },
     ["setMyGoods"](state, goods) {
       state.myGoods = goods.map((good) => {
