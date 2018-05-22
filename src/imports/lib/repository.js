@@ -101,15 +101,15 @@ export default class Repository {
   }
 
   async loadTrade(address) {
-    const id = await this.c.tradeRegistryContract.methods.traderTrade(
+    const tradeAddress = await this.c.tradeRegistryContract.methods.traderTrade(
       address,
     ).call();
-    if (id == "0x0000000000000000000000000000000000000000") {
+    if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
     const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
       Trade,
-      id,
+      tradeAddress,
     );
 
     this.c = {
@@ -123,16 +123,18 @@ export default class Repository {
     ]);
     const otherUserID = userA == address ? userB : userA;
     const [accepted, otherAccepted] = await Promise.all([
-      tradeContract.methods.traderAccepted(id).call(),
+      tradeContract.methods.traderAccepted(address).call(),
       tradeContract.methods.traderAccepted(otherUserID).call(),
     ]);
-    const pulled = await tradeContract.methods.traderPulledGoods(id).call();
+    const pulled = await tradeContract.methods.traderPulledGoods(
+      tradeAddress,
+    ).call();
     return {
-      id,
+      id: tradeAddress,
       otherUserID,
       pulled,
       accepted,
-      otherAccepted
+      otherAccepted,
     };
   }
 
@@ -327,6 +329,11 @@ export default class Repository {
     await this.c.tradeContract.methods.accept().send();
   }
 
+  async withdrawTrade() {
+    console.log("Withdrawing from trade");
+    await this.c.tradeContract.methods.withdraw().send();
+  }
+
   async getTradeGoods() {
     const getGoodOwner = async (good) => {
       const trader = await this.c.tradeContract.methods.goodsTrader(
@@ -341,5 +348,9 @@ export default class Repository {
       this.c.tradeContract.options.address,
     );
     return Promise.all(goodsRaw.map(getGoodOwner));
+  }
+
+  async pullGoods() {
+    await this.c.tradeContract.methods.getGoods().send();
   }
 }

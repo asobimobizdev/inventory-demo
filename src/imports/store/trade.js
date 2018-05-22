@@ -67,6 +67,13 @@ export default {
         "setOtherGoods",
         tradeGoods.filter((good) => !filter(good)),
       );
+
+      repository.c.tradeContractEvents.events.allEvents()
+          .on("data", (event) => {
+            console.log("Trade event", event);
+            context.dispatch("loadTrade");
+          })
+          .on("error", console.log);
     },
     async startTradeWithSelectedUser(context) {
       const otherUserID = context.rootState.selectedFriendId;
@@ -92,6 +99,13 @@ export default {
     async confirmTrade(context) {
       await repository.confirmTrade();
       context.commit("resetTrade");
+    },
+    async withdrawTrade(context) {
+      await repository.withdrawTrade();
+    },
+    async pullGoods(context) {
+      await repository.pullGoods();
+      // ??
     },
     async transfereGoodToMyOffer(context, good) {
       const transaction = {
