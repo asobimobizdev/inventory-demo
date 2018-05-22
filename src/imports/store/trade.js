@@ -34,7 +34,12 @@ export default {
       });
     },
     ["setOtherGoods"](state, goods) {
-      state.otherGoods = goods;
+      state.otherGoods = goods.map((good) => {
+        return {
+          ...good,
+          ...decorateGoodWithId(good),
+        };
+      });
     },
   },
   actions: {
