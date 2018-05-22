@@ -76,7 +76,7 @@ export default class Repository {
     [
       this.c.asobiCoinContract,
       this.c.asobiCoinContractEvents,
-    ] = this.dapp.getContractAt(AsobiCoin, GOODS_ADDRESS);
+    ] = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
   }
 
   loadEscrowContract() {
