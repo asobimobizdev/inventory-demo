@@ -28,7 +28,7 @@ export default {
       state.pulled = pulled;
     },
     ["resetTrade"](state) {
-      state = {...state, ...initialState};
+      state = { ...state, ...initialState };
     },
     ["setMyGoods"](state, goods) {
       state.myGoods = goods.map((good) => {
@@ -120,39 +120,36 @@ export default {
         goodID: good.id,
       };
       context.commit("addUnconfirmedTransaction", transaction, { root: true });
-      await repository.transferToTrade(
-        context.rootState.accountAddress,
-        good.id,
-      );
-      // p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
-
-      // try {
-      //   await repository.transferGood(
-      //     goodID,
-      //     context.state.accountAddress,
-      //     address,
-      //     repository.c.goodsContract,
-      //   );
-      // } catch (e) {
-      //   transaction.confirmed = false;
-      //   context.commit("removeUnconfirmedTransaction", transaction);
-      //   p2pManager.removeUnconfirmedTransaction(context.state.accountAddress, address, goodID, false);
-      // }
-
+      try {
+        await repository.transferToTrade(
+          context.rootState.accountAddress,
+          good.id,
+        );
+      } catch (e) {
+        transaction.confirmed = false;
+        context.commit("removeUnconfirmedTransaction", transaction, { root: true });
+      }
     },
     transfereGoodFromMyOffer(context, good) {
       const transaction = {
         from: context.state.id,
-        to: context.state.accountAddress,
+        to: context.rootState.accountAddress,
         goodID: good.id,
       };
 
-      context.commit("addUnconfirmedTransaction", transaction, { root: true });
+      console.log("transfereGoodFromMyOffer", transaction);
 
-      // p2pManager.addUnconfirmedTransaction(context.state.accountAddress, address, goodID);
+      // context.commit("addUnconfirmedTransaction", transaction, { root: true });
+      // try {
+      //   await repository.transferToTrade(
+      //     context.rootState.accountAddress,
+      //     good.id,
+      //   );
+      // } catch (e) {
+      //   transaction.confirmed = false;
+      //   context.commit("removeUnconfirmedTransaction", transaction, { root: true });
+      // }
     },
-
-
   },
   getters: {
     otherUser(state, getters, rootState, rootGetters) {

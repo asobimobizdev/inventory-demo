@@ -9,7 +9,7 @@
       </div>
       <div class="collection grid" >
         <draggable v-model='goods' class="container" id="myGoods" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
-          <div class="item" v-for="(good,index) in goods" :key="index" v-loading="!good.confirmed" >
+          <div class="item" v-for="(good,index) in goods" :key="index" >
             <good-item v-bind="good" :active="false">
             </good-item>
           </div>
@@ -63,14 +63,14 @@
             <div class="head">
               <h1>
                 My Offer
-                <small v-if="accepted">
-                  (You have Accepted)
+                <small v-if="otherAccepted">
+                  (Accepted)
                 </small>
               </h1>
             </div>
             <div class="collection grid" >
               <draggable v-model='goods' class="container" id="myOffer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
-                <div class="item" v-for="(good,index) in myOffer" :key="index" v-loading="!good.confirmed" >
+                <div class="item" v-for="(good,index) in myOffer" :key="index" >
                   <good-item v-bind="good" :active="false">
                   </good-item>
                 </div>
@@ -84,14 +84,14 @@
             <div class="head">
               <h1>
                 {{otherUser.name}} Offer
-                <small v-if="otherAccepted">
+                <small v-if="accepted">
                   (Accepted)
                 </small>
               </h1>
             </div>
             <div class="collection grid" >
               <div class="container">
-                <div class="item" v-for="(good,index) in otherOffer" :key="index" v-loading="!good.confirmed" >
+                <div class="item" v-for="(good,index) in otherOffer" :key="index" >
                   <good-item v-bind="good" :active="false">
                   </good-item>
                 </div>
@@ -143,7 +143,11 @@ export default {
     ...mapState(["selectedFriendId", "goodsLoading"]),
     ...mapGetters(["otherUsers"]),
     ...mapGetters("trade", ["otherUser"]),
-    ...mapState("trade", ["accepted", "otherAccepted", "pulled"]),
+    ...mapState("trade", [
+      "accepted",
+      "otherAccepted",
+      "pulled",
+    ]),
     hasTrade() {
       return this.$store.state.trade.id;
     },
@@ -178,11 +182,12 @@ export default {
   },
   methods: {
     ...mapActions("trade", [
-      "startTradeWithSelectedUser",
       "cancelTrade",
-      "confirmTrade",
       "closeTrade",
+      "confirmTrade",
       "pullGoods",
+      "startTradeWithSelectedUser",
+      "withdrawTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
@@ -198,18 +203,17 @@ export default {
       const from = e.from.id;
       const to = e.to.id;
 
-      console.log("onMyGoodsDrop", from, to);
-
-      if (from != "myGoods" || to != "myOffer") {
-        return;
-      }
-
       const oldIndex = e.oldIndex;
-      const good = this.goods[oldIndex];
 
-      if (!good.confirmed) return;
-
-      this.$store.dispatch("trade/transfereGoodToMyOffer", good);
+      if (from == "myGoods" && to == "myOffer") {
+        const good = this.goods[oldIndex];
+        if (!good.confirmed) return;
+        this.$store.dispatch("trade/transfereGoodToMyOffer", good);
+      } else if (from == "myOffer" && to == "myGoods") {
+        const good = this.myOffer[oldIndex];
+        if (!good.confirmed) return;
+        this.$store.dispatch("trade/transfereGoodFromMyOffer", good);
+      }
     },
   },
   watch: {
