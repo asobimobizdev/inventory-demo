@@ -90,12 +90,12 @@
               </h1>
             </div>
             <div class="collection grid" >
-              <!-- <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop"> -->
+              <div class="container">
                 <div class="item" v-for="(good,index) in otherOffer" :key="index" v-loading="!good.confirmed" >
                   <good-item v-bind="good" :active="false">
                   </good-item>
                 </div>
-              <!-- </draggable> -->
+              </div>
             </div>
           </div>
         </div>
@@ -110,9 +110,8 @@
         </div>
         <div class="content center trade-view" v-else key="trade-view">
           <el-button type="danger" v-if="!accepted" round @click="cancelTrade()">Cancel Trade</el-button>
-          <el-button type="warning" v-if="accepted" round @click="withdrawTrade()">Withdraw</el-button>
           <el-button type="success" v-if="!accepted" round @click="confirmTrade()">Confirm Trade</el-button>
-          <el-button type="success" v-if="accepted && otherAccepted" round @click="pullGoods()">Pull Goods</el-button>
+          <el-button type="success" v-if="accepted && otherAccepted && !pulled" round @click="pullGoods()">Pull Goods</el-button>
           <el-button type="success" v-if="pulled" round @click="closeTrade()">Close Trade</el-button>
         </div>
       </transition>
@@ -141,18 +140,10 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      "selectedFriendId",
-      "goodsLoading",
-    ]),
+    ...mapState(["selectedFriendId", "goodsLoading"]),
     ...mapGetters(["otherUsers"]),
     ...mapGetters("trade", ["otherUser"]),
-    ...mapState("trade",
-      [
-        "accepted",
-        "otherAccepted",
-      ]
-    ),
+    ...mapState("trade", ["accepted", "otherAccepted", "pulled"]),
     hasTrade() {
       return this.$store.state.trade.id;
     },
@@ -190,8 +181,8 @@ export default {
       "startTradeWithSelectedUser",
       "cancelTrade",
       "confirmTrade",
-      "withdrawTrade",
       "closeTrade",
+      "pullGoods",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
