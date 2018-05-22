@@ -182,11 +182,12 @@ export default {
   },
   methods: {
     ...mapActions("trade", [
-      "startTradeWithSelectedUser",
       "cancelTrade",
-      "confirmTrade",
       "closeTrade",
+      "confirmTrade",
       "pullGoods",
+      "startTradeWithSelectedUser",
+      "withdrawTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
