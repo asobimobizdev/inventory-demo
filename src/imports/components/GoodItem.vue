@@ -145,3 +145,13 @@ export default {
         filter none
 
 </style>
+
+<style lang="stylus">
+.good.el-loading-parent--relative
+  >div.el-loading-mask
+    background-color alpha(#000,0.0) !important
+    >.el-loading-spinner
+      top: calc(50% - 0px) !important
+      circle
+        stroke: #fff
+</style>
