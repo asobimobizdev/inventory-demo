@@ -21,21 +21,21 @@ import GoodItem from "./../components/GoodItem.vue";
 export default {
   components: {
     draggable,
-    "good-item": GoodItem
+    "good-item": GoodItem,
   },
   props: {
     title: {
       type: String,
-      default: "Goods"
+      default: "Goods",
     },
     goods: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     loading: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {},
   methods: {
@@ -62,8 +62,8 @@ export default {
     isGoodSelected(good) {
       if (!this.$store.state.selectedGoodId || !good) return false;
       return good.id == this.$store.state.selectedGoodId;
-    }
-  }
+    },
+  },
 };
 </script>
 

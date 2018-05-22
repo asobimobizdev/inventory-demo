@@ -34,6 +34,8 @@ const createStore = () => {
       accountAddress: null,
       goods: [],
       goodsLoading: false,
+      registered: false,
+      userName: null,
       friends: [],
       friendsLoading: false,
       friendGoods: [],
@@ -118,6 +120,7 @@ const createStore = () => {
         state.selectedGoodId = id;
       },
       ["balance"](state, balance) {
+        console.log("ASB Balance:", balance);
         state.balance = dapp.web3.utils.fromWei(balance);
       },
       ["setGoodForSale"](state, { id, forSale, price, confirmed }) {
@@ -135,6 +138,10 @@ const createStore = () => {
         const good = state.goods.find(good => good.id == goodID);
         good.price = price;
       },
+      ["setRegistered"](state, {userName, registered} ) {
+        state.registered = registered;
+        state.userName = userName;
+      },
     },
     actions: {
       selectedFriendId(context, id) {
@@ -143,25 +150,28 @@ const createStore = () => {
         p2pManager.subscribe(id, context);
       },
 
-      subscribeToFriends(context) {
-        const handle = Meteor.subscribe("friendsWallets");
-
-        Meteor.autorun(_ => {
-          if (!handle.ready()) return;
-          let friends = Wallets.find({}).fetch();
-          context.commit("friends", friends);
-          if (friends.length > 0) {
-            context.dispatch("getSelectedFriendGoods", true);
-          }
-        });
+      async getFriends(context) {
+        let friends = await repository.getFriends();
+        context.commit("friends", friends);
+        if (friends.length > 0) {
+          context.dispatch("getSelectedFriendGoods", true);
+        }
       },
 
-      addFriend(context, friend) {
-        Wallets.insert(friend);
+      async addFriend(context, { name }) {
+        await repository.registerUser(name);
       },
 
-      deleteFriend(context, friend) {
-        Wallets.remove(friend._id);
+      async unregisterUser(context) {
+        await repository.unregisterUser();
+      },
+
+      async getRegisterState(context) {
+        const result = await repository.getRegisterState(
+          context.state.accountAddress,
+        );
+        console.log("getRegisterState", result);
+        context.commit("setRegistered", result);
       },
 
       async getBalance(context) {
@@ -270,6 +280,17 @@ const createStore = () => {
             console.log("Escrow PriceSet event", event);
             context.dispatch("getOwnGoods");
             context.dispatch("getSelectedFriendGoods");
+          })
+          .on("error", console.log);
+      },
+
+      getUserRegistryContract(context) {
+        repository.loadUserRegistryContract();
+        repository.c.userRegistryContractEvents.events.allEvents()
+          .on("data", (event) => {
+            console.log("User Registry event", event);
+            context.dispatch("getRegisterState");
+            context.dispatch("getFriends");
           })
           .on("error", console.log);
       },

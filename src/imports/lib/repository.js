@@ -10,7 +10,9 @@ const GOODS_ADDRESS = "0x67cE3ec51417B1Cf9101Fe5e664820CCdA60a89D";
 const ASOBI_COIN_ADDRESS = "0xD4C267B592EaCCc9dFadFbFD73b87d5E8e61d144";
 const ESCROW_ADDRESS = "0x0948D5B7d10E7a4C856A2cC74F68F5E05aEEa93B";
 const TRADE_REGISTRY_ADDRESS = "0x463a608Ff6db561813Bd4feE4218EECBE019a890";
-const USER_REGISTRY_ADDRESS = "0xF0c2583594dfE731EfC74ea180Ce14C5F163553E";
+const USER_REGISTRY_ADDRESS = "0x00B9faa34fA24c7a15C7528Fd1c8432cced145B6";
+
+const range = n => Array.from({length: n}, (value, key) => key);
 
 
 export default class Repository {
@@ -66,6 +68,13 @@ export default class Repository {
     ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
+  loadUserRegistryContract() {
+    [
+      this.c.userRegistryContract,
+      this.c.userRegistryContractEvents,
+    ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
+  }
+
   async getGoodsForAddress(address) {
     const getGood = async (index) => {
       const id = await this.c.goodsContract.methods.tokenOfOwnerByIndex(
@@ -84,7 +93,7 @@ export default class Repository {
       };
     };
     const balance = await this.getGoodsBalance(address, this.c.goodsContract);
-    const indices = Array.from({length: balance}, (value, key) => key);
+    const indices = range(balance);
     const items = await Promise.all(indices.map(getGood));
     return items;
   }
@@ -182,10 +191,51 @@ export default class Repository {
   }
 
   async createCoin(receiver, amount) {
-    await this.asobiCoinContract.methods.mint(receiver, amount).send();
+    await this.c.asobiCoinContract.methods.mint(receiver, amount).send();
   }
 
   generateGoodID() {
     return this.web3.utils.randomHex(32);
+  }
+
+  async getRegisterState(address) {
+    const registered = await this.c.userRegistryContract.methods.isUser(
+      address,
+    ).call();
+    let name = null;
+    if (registered) {
+      name = await this.c.userRegistryContract.methods.userName(
+        address,
+      ).call();
+    }
+    return {registered, name};
+  }
+
+  async registerUser(name) {
+    await this.c.userRegistryContract.methods.add(name).send();
+  }
+
+  async unregisterUser(name) {
+    await this.c.userRegistryContract.methods.remove().send();
+  }
+
+  async getFriends() {
+    const getFriend = async (index) => {
+      const address = await this.c.userRegistryContract.methods.users(
+        index
+      ).call();
+      const friend = {
+        id: address,
+        name: await this.c.userRegistryContract.methods.userName(
+          address,
+        ).call(),
+      };
+      return friend;
+    };
+    const numFriends = await this.c.userRegistryContract.methods.numUsers(
+    ).call();
+    const indices = range(numFriends);
+    const friends = await Promise.all(indices.map(getFriend));
+    return friends;
   }
 }

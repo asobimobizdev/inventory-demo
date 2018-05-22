@@ -59,7 +59,7 @@ export default {
   components: {
     draggable,
     "good-item": GoodItem,
-    "good-inspector": GoodInspector
+    "good-inspector": GoodInspector,
   },
   data() {
     return {};
@@ -85,13 +85,13 @@ export default {
         });
 
         this.$store.dispatch("selectedFriendId", friend.id);
-      }
+      },
     },
     goods: {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     goodsLoading() {
       return this.$store.state.goodsLoading;
@@ -100,19 +100,19 @@ export default {
       get() {
         return this.$store.getters.allFriendGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     friendGoodsLoading() {
       return this.$store.state.friendGoodsLoading;
     },
     selectedGood() {
       return this.$store.getters.selectedGood;
-    }
+    },
   },
   watch: {
     friends(friends) {
       this.checkSelectedFriend(friends);
-    }
+    },
   },
   methods: {
     checkSelectedFriend(friends) {
@@ -149,8 +149,8 @@ export default {
     isGoodSelected(good) {
       if (!this.$store.state.selectedGoodId || !good) return false;
       return good.id == this.$store.state.selectedGoodId;
-    }
-  }
+    },
+  },
 };
 </script>
 
