@@ -332,6 +332,10 @@ export default class Repository {
     await this.c.tradeContract.methods.accept().send();
   }
 
+  async removeGoodFromTrade(goodID) {
+    await this.c.tradeContract.methods.removeGood(goodID).send();
+  }
+
   async getTradeGoods() {
     const getGoodOwner = async (good) => {
       const trader = await this.c.tradeContract.methods.goodsTrader(

@@ -130,7 +130,7 @@ export default {
         context.commit("removeUnconfirmedTransaction", transaction, { root: true });
       }
     },
-    transfereGoodFromMyOffer(context, good) {
+    async transfereGoodFromMyOffer(context, good) {
       const transaction = {
         from: context.state.id,
         to: context.rootState.accountAddress,
@@ -139,16 +139,14 @@ export default {
 
       console.log("transfereGoodFromMyOffer", transaction);
 
-      // context.commit("addUnconfirmedTransaction", transaction, { root: true });
-      // try {
-      //   await repository.transferToTrade(
-      //     context.rootState.accountAddress,
-      //     good.id,
-      //   );
-      // } catch (e) {
-      //   transaction.confirmed = false;
-      //   context.commit("removeUnconfirmedTransaction", transaction, { root: true });
-      // }
+      context.commit("addUnconfirmedTransaction", transaction, { root: true });
+
+      try {
+        await repository.removeGoodFromTrade(good.id);
+      } catch (e) {
+        transaction.confirmed = false;
+        context.commit("removeUnconfirmedTransaction", transaction, { root: true });
+      }
     },
   },
   getters: {
