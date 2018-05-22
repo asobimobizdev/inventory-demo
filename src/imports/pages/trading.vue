@@ -113,6 +113,7 @@
           <el-button type="warning" v-if="accepted" round @click="withdrawTrade()">Withdraw</el-button>
           <el-button type="success" v-if="!accepted" round @click="confirmTrade()">Confirm Trade</el-button>
           <el-button type="success" v-if="accepted && otherAccepted" round @click="pullGoods()">Pull Goods</el-button>
+          <el-button type="success" v-if="pulled" round @click="closeTrade()">Close Trade</el-button>
         </div>
       </transition>
     </el-footer>
@@ -190,6 +191,7 @@ export default {
       "cancelTrade",
       "confirmTrade",
       "withdrawTrade",
+      "closeTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
