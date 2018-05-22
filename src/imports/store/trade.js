@@ -54,6 +54,7 @@ export default {
       );
       console.log("loadTrade", result);
       if (!result) {
+        context.commit("resetTrade", result);
         return;
       }
       context.commit("setTrade", result);
