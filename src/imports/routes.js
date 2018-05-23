@@ -9,11 +9,13 @@ import index from "./pages/index.vue";
 import friends from "./pages/friends.vue";
 import contract from "./pages/contract.vue";
 import trading from "./pages/trading.vue";
+import live from "./pages/live.vue";
 
 export default [
   { path: "/", name: "home", component: index, meta: { requiresWeb3: true } },
   { path: "/friends", name: "friends", component: friends, meta: { requiresWeb3: true } },
   { path: "/trading", name: "trading", component: trading, meta: { requiresWeb3: true } },
+  { path: "/live", name: "live", component: live, meta: { requiresWeb3: true } },
   { path: "/contract", name: "contract", component: contract, meta: { requiresWeb3: true } },
   { path: "*", name: "not-found", component: NotFound },
 ];
