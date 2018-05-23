@@ -362,4 +362,29 @@ export default class Repository {
       goodID,
     );
   }
+
+  // Events
+  tradeRegistryEvents() {
+    return this.c.tradeRegistryContractEvents.events.allEvents();
+  }
+
+  goodsTransferEvents() {
+    return this.c.goodsContractEvents.events.Transfer();
+  }
+
+  asobiCoinTransferEvents() {
+    return this.c.asobiCoinContractEvents.events.Transfer();
+  }
+
+  escrowPriceSetEvents() {
+    return this.c.escrowContractEvents.events.PriceSet();
+  }
+
+  userRegistryEvents() {
+    return this.c.userRegistryContractEvents.events.allEvents();
+  }
+
+  tradeEvents() {
+    return this.c.tradeContractEvents.events.allEvents();
+  }
 }

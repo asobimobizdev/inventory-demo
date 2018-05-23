@@ -69,7 +69,7 @@ export default {
         tradeGoods.filter((good) => !filter(good)),
       );
 
-      repository.c.tradeContractEvents.events.allEvents()
+      repository.tradeEvents()
         .on("data", (event) => {
           console.log("Trade event", event);
           context.dispatch("loadTrade");
