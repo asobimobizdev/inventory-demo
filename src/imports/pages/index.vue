@@ -7,8 +7,17 @@
           <h1>My Goods</h1>
         </div>
         <div class="collection grid" >
-          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMove" @end="onDrop">
-            <div class="item" v-for="(good,index) in goods" :key="index" @click="selectGood(good)">
+          <draggable
+            v-model='allGoods'
+            class="container"
+            id="goodsContainer"
+            :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
+            :move="checkMove"
+            @end="onDrop">
+            <div class="item"
+              v-for="(good,index) in allGoods"
+              :key="index"
+              @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
             </div>
@@ -16,7 +25,9 @@
         </div>
       </div>
 
-      <div class="goods-collection friend-goods" v-if="hasFriends" v-loading="friendGoodsLoading">
+      <div class="goods-collection friend-goods"
+          v-if="hasFriends"
+          v-loading="friendGoodsLoading">
         <div class="head">
           <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
             <el-option
@@ -28,8 +39,17 @@
           </el-select>
         </div>
         <div class="collection list" >
-          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveFromFriendGoods">
-            <div class="item" v-for="(good,index) in friendGoods" :key="index" @click="selectGood(good)">
+          <draggable
+            v-model='friendGoods'
+            class="container"
+            id="friendGoodsContainer"
+            :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
+            :move="checkMoveFromFriendGoods">
+            <div
+              class="item"
+              v-for="(good, index) in friendGoods"
+              :key="index"
+              @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
             </div>
@@ -72,6 +92,12 @@ export default {
     ...mapState([
       "goodsLoading",
     ]),
+    allGoods: {
+      get() {
+        return this.$store.getters.allGoods;
+      },
+      set(value) {},
+    },
     hasFriends() {
       return this.otherUsers.length > 0;
     },
@@ -90,12 +116,6 @@ export default {
 
         this.$store.dispatch("selectedFriendId", friend.id);
       },
-    },
-    goods: {
-      get() {
-        return this.$store.getters.allGoods;
-      },
-      set(value) {},
     },
     friendGoods: {
       get() {
@@ -138,7 +158,7 @@ export default {
       }
 
       const oldIndex = e.oldIndex;
-      const good = this.goods[oldIndex];
+      const good = this.allGoods[oldIndex];
 
       if (!good.confirmed) return;
 
