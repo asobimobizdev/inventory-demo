@@ -67,7 +67,7 @@ export default class Repository {
       return {
         from: returnValues.from,
         to: returnValues.to,
-        value: returnValues.value,
+        value: web3Utils.fromWei(returnValues.value),
       };
     });
     return events;
