@@ -40,14 +40,14 @@
         </div>
         <div class="collection list" >
           <draggable
-            v-model='friendGoods'
+            v-model='allFriendGoods'
             class="container"
             id="friendGoodsContainer"
             :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
             :move="checkMoveFromFriendGoods">
             <div
               class="item"
-              v-for="(good, index) in friendGoods"
+              v-for="(good, index) in allFriendGoods"
               :key="index"
               @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
@@ -117,7 +117,7 @@ export default {
         this.$store.dispatch("selectedFriendId", friend.id);
       },
     },
-    friendGoods: {
+    allFriendGoods: {
       get() {
         return this.$store.getters.allFriendGoods;
       },
