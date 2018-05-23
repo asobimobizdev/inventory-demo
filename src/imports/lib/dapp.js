@@ -3,6 +3,45 @@ import Web3 from "web3";
 const WEBSOCKET_NODE = "wss://rinkeby.infura.io/ws";
 const GAS_PRICE = "10"; // gwei
 
+class Contract {
+  constructor(web3Contract, web3EventContract) {
+    // Copy options
+    this.options = web3Contract.options;
+
+    // Copy methods
+    this.methods = web3Contract.methods;
+    for (let methodName in this.methods) {
+      Object.defineProperty(
+        this,
+        methodName,
+        {
+          get: () => {
+            return this.methods[methodName];
+          }
+        }
+      );
+    }
+
+    // Copy events
+    this.events = web3Contract.events;
+    for (let eventName in this.events) {
+      Object.defineProperty(
+        this,
+        eventName,
+        {
+          get: () => {
+            return this.events[eventName];
+          }
+        }
+      );
+    }
+  }
+
+  get address() {
+    return this.options.address;
+  }
+}
+
 export default class Dapp {
   constructor() {
     if (typeof window.web3 !== "undefined") {
@@ -35,10 +74,7 @@ export default class Dapp {
       };
       return new web3Instance.eth.Contract(contract.abi, address, options);
     }
-    return [
-      _get(this.web3),
-      _get(this.web3Event),
-    ];
+    return new Contract(_get(this.web3), _get(this.web3Event));
   }
 
   getContractAt(contract, address) {
