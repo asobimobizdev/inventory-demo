@@ -20,7 +20,7 @@
         <div class="head">
           <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
             <el-option
-              v-for="(friend, index) in friends"
+              v-for="(friend, index) in otherUsers"
               :key="index"
               :label="friend.name"
               :value="index">
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { mapActions, mapState, mapGetters } from "vuex";
 import draggable from "vuedraggable";
 import GoodItem from "./../components/GoodItem.vue";
 import GoodInspector from "./../components/GoodInspector.vue";
@@ -52,8 +53,8 @@ export default {
   mounted() {
     this.$store.dispatch("getOwnGoods", true);
 
-    if (this.friends.length > 0) {
-      this.checkSelectedFriend(this.friends);
+    if (this.otherUsers.length > 0) {
+      this.checkSelectedFriend(this.otherUsers);
     }
   },
   components: {
@@ -65,22 +66,20 @@ export default {
     return {};
   },
   computed: {
-    friends() {
-      return this.$store.getters.otherUsers;
-    },
+    ...mapGetters(["otherUsers"]),
     hasFriends() {
-      return this.$store.state.friends.length > 0;
+      return this.otherUsers.length > 0;
     },
     selectedFriendIndex: {
       get() {
         const id = this.$store.state.selectedFriendId;
-        const friendIndex = this.friends.findIndex(friend => {
+        const friendIndex = this.otherUsers.findIndex(friend => {
           return friend.id == id;
         });
         return friendIndex;
       },
       set(value) {
-        const friend = this.friends.find((friend, index) => {
+        const friend = this.otherUsers.find((friend, index) => {
           return index == value;
         });
 
