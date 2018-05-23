@@ -17,7 +17,7 @@ class Contract {
         {
           get: () => {
             return this.methods[methodName];
-          }
+          },
         }
       );
     }
@@ -31,7 +31,7 @@ class Contract {
         {
           get: () => {
             return this.events[eventName];
-          }
+          },
         }
       );
     }
