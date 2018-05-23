@@ -21,6 +21,7 @@ export default class Repository {
     this.dapp = dapp;
     this.web3 = dapp.web3;
     this.c = {};
+    this.e = {};
   }
 
   // General
@@ -40,7 +41,7 @@ export default class Repository {
   loadAsobiCoinContract() {
     [
       this.c.asobiCoinContract,
-      this.c.asobiCoinContractEvents,
+      this.e.asobiCoinContract,
     ] = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
   }
 
@@ -68,7 +69,7 @@ export default class Repository {
   loadGoodsContract() {
     [
       this.c.goodsContract,
-      this.c.goodsContractEvents,
+      this.e.goodsContract,
     ] = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
   }
 
@@ -158,7 +159,7 @@ export default class Repository {
   loadEscrowContract() {
     [
       this.c.escrowContract,
-      this.c.escrowContractEvents,
+      this.e.escrowContract,
     ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
@@ -200,7 +201,7 @@ export default class Repository {
   loadUserRegistryContract() {
     [
       this.c.userRegistryContract,
-      this.c.userRegistryContractEvents,
+      this.e.userRegistryContract,
     ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
   }
 
@@ -251,7 +252,7 @@ export default class Repository {
   loadTradeRegistryContract() {
     [
       this.c.tradeRegistryContract,
-      this.c.tradeRegistryContractEvents,
+      this.e.tradeRegistryContract,
     ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
   }
 
@@ -285,16 +286,13 @@ export default class Repository {
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
-    const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
+    const [tradeContract, events] = this.dapp.getContractAt(
       Trade,
       tradeAddress,
     );
 
-    this.c = {
-      ...this.c,
-      tradeContract,
-      tradeContractEvents,
-    };
+    this.c = {...this.c, tradeContract};
+    this.e = {...this.e, tradeContract: events};
     const [userA, userB] = await Promise.all([
       tradeContract.methods.traders(0).call(),
       tradeContract.methods.traders(1).call(),
@@ -365,26 +363,26 @@ export default class Repository {
 
   // Events
   tradeRegistryEvents() {
-    return this.c.tradeRegistryContractEvents.events.allEvents();
+    return this.e.tradeRegistryContract.events.allEvents();
   }
 
   goodsTransferEvents() {
-    return this.c.goodsContractEvents.events.Transfer();
+    return this.e.goodsContract.events.Transfer();
   }
 
   asobiCoinTransferEvents() {
-    return this.c.asobiCoinContractEvents.events.Transfer();
+    return this.e.asobiCoinContract.events.Transfer();
   }
 
   escrowPriceSetEvents() {
-    return this.c.escrowContractEvents.events.PriceSet();
+    return this.e.escrowContract.events.PriceSet();
   }
 
   userRegistryEvents() {
-    return this.c.userRegistryContractEvents.events.allEvents();
+    return this.e.userRegistryContract.events.allEvents();
   }
 
   tradeEvents() {
-    return this.c.tradeContractEvents.events.allEvents();
+    return this.e.tradeContract.events.allEvents();
   }
 }
