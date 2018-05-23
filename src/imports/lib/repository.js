@@ -57,6 +57,10 @@ export default class Repository {
     return await this.getBalance(address, this.c.asobiCoin);
   }
 
+  async getPastTransactions() {
+    return await this.c.asobiCoin.getPastEvents("Transfer");
+  }
+
   // Goods
   async createGoodsContract() {
     return await dapp.deployContract(Goods, []);
