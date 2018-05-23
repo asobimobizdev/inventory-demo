@@ -91,6 +91,7 @@ export default {
       "selectedGood",
     ]),
     ...mapState([
+      "friendGoodsLoading",
       "goodsLoading",
     ]),
     allGoods: {
@@ -123,9 +124,6 @@ export default {
         return this.$store.getters.allFriendGoods;
       },
       set(value) {},
-    },
-    friendGoodsLoading() {
-      return this.$store.state.friendGoodsLoading;
     },
   },
   watch: {
