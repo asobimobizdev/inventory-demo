@@ -32,6 +32,10 @@ export default class Repository {
     return await contract.balanceOf(address).call();
   }
 
+  async mint(receiver, value, contract) {
+    return await contract.mint(receiver, value).send();
+  }
+
   // AsobiCoin
   async createAsobiCoinContract() {
     return await dapp.deployContract(AsobiCoin, []);
@@ -51,10 +55,6 @@ export default class Repository {
 
   async getAsobiCoinBalance(address) {
     return await this.getBalance(address, this.c.asobiCoin);
-  }
-
-  async mint(receiver, value, contract) {
-    return await contract.mint(receiver, value).send();
   }
 
   // Goods
