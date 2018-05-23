@@ -23,53 +23,18 @@ export default class Repository {
     this.c = {};
   }
 
+  // General
+  async isAdmin(address, contract) {
+    return (await contract.methods.owner().call()) === address;
+  }
+
+  async getBalance(address, contract) {
+    return await contract.methods.balanceOf(address).call();
+  }
+
+  // AsobiCoin
   async createAsobiCoinContract() {
     return await dapp.deployContract(AsobiCoin, []);
-  }
-
-  async createGoodsContract() {
-    return await dapp.deployContract(Goods, []);
-  }
-
-  async createEscrowContract() {
-    return await dapp.deployContract(
-      Escrow, [
-        this.c.asobiCoinContract.options.address,
-        this.c.goodsContract.options.address,
-      ]
-    );
-  }
-
-  async createTradeRegistry() {
-    return await dapp.deployContract(TradeRegistry, []);
-  }
-
-  async createUserRegistry() {
-    return await dapp.deployContract(UserRegistry, []);
-  }
-
-  async createTrade(userA, userB) {
-    const trade = await this.dapp.deployContract(
-      Trade,
-      [
-        this.c.goodsContract.options.address,
-        [
-          userA,
-          userB,
-        ],
-      ],
-    );
-    await this.c.tradeRegistryContract.methods.add(
-      trade.options.address
-    ).send();
-    return trade;
-  }
-
-  loadGoodsContract() {
-    [
-      this.c.goodsContract,
-      this.c.goodsContractEvents,
-    ] = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
   }
 
   loadAsobiCoinContract() {
@@ -79,63 +44,48 @@ export default class Repository {
     ] = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
   }
 
-  loadEscrowContract() {
-    [
-      this.c.escrowContract,
-      this.c.escrowContractEvents,
-    ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
+  async createCoin(receiver, amount) {
+    await this.c.asobiCoinContract.methods.mint(receiver, amount).send();
   }
 
-  loadTradeRegistryContract() {
-    [
-      this.c.tradeRegistryContract,
-      this.c.tradeRegistryContractEvents,
-    ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
+  async isAsobiCoinAdmin(address) {
+    return await this.isAdmin(address, this.c.asobiCoinContract);
   }
 
-  loadUserRegistryContract() {
-    [
-      this.c.userRegistryContract,
-      this.c.userRegistryContractEvents,
-    ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
+  async getAsobiCoinBalance(address) {
+    return await this.getBalance(address, this.c.asobiCoinContract);
   }
 
-  async loadTrade(accountAddress) {
-    const tradeAddress = await this.c.tradeRegistryContract.methods.traderTrade(
-      accountAddress,
-    ).call();
-    if (tradeAddress == "0x0000000000000000000000000000000000000000") {
-      return null;
-    }
-    const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
-      Trade,
-      tradeAddress,
-    );
+  async mint(receiver, value, contract) {
+    return await contract.methods.mint(receiver, value).send();
+  }
 
-    this.c = {
-      ...this.c,
-      tradeContract,
-      tradeContractEvents,
-    };
-    const [userA, userB] = await Promise.all([
-      tradeContract.methods.traders(0).call(),
-      tradeContract.methods.traders(1).call(),
-    ]);
-    const otherUserID = userA == accountAddress ? userB : userA;
-    const [accepted, otherAccepted] = await Promise.all([
-      tradeContract.methods.traderAccepted(accountAddress).call(),
-      tradeContract.methods.traderAccepted(otherUserID).call(),
-    ]);
-    const pulled = await tradeContract.methods.traderPulledGoods(
-      accountAddress,
-    ).call();
-    return {
-      id: tradeAddress,
-      otherUserID,
-      pulled,
-      accepted,
-      otherAccepted,
-    };
+  // Goods
+  async createGoodsContract() {
+    return await dapp.deployContract(Goods, []);
+  }
+
+  loadGoodsContract() {
+    [
+      this.c.goodsContract,
+      this.c.goodsContractEvents,
+    ] = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
+  }
+
+  async createGood(receiver) {
+    await this.mint(receiver, this.generateGoodID(), this.c.goodsContract);
+  }
+
+  async getGoodsBalance(address) {
+    return await this.getBalance(address, this.c.goodsContract);
+  }
+
+  async isGoodsAdmin(address) {
+    return await this.isAdmin(address, this.c.goodsContract);
+  }
+
+  generateGoodID() {
+    return this.web3.utils.randomHex(32);
   }
 
   async getGoodsForAddress(address) {
@@ -169,14 +119,6 @@ export default class Repository {
     ).send();
   }
 
-  async transferToTrade(accountAddress, goodID) {
-    await this.transferGood(
-      accountAddress,
-      this.c.tradeContract.options.address,
-      goodID,
-    );
-  }
-
   async setGoodForSale(goodID, price, forSale) {
     const approved = await this.c.goodsContract.methods.getApproved(
       goodID,
@@ -201,6 +143,23 @@ export default class Repository {
       goodID,
       this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
     ).send();
+  }
+
+  // Escrow
+  async createEscrowContract() {
+    return await dapp.deployContract(
+      Escrow, [
+        this.c.asobiCoinContract.options.address,
+        this.c.goodsContract.options.address,
+      ]
+    );
+  }
+
+  loadEscrowContract() {
+    [
+      this.c.escrowContract,
+      this.c.escrowContractEvents,
+    ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
   async buyGood(goodID, buyer) {
@@ -233,44 +192,16 @@ export default class Repository {
     await this.c.escrowContract.methods.swap(goodID).send();
   }
 
-  async isAdmin(address, contract) {
-    return (await contract.methods.owner().call()) === address;
+  // User Registry
+  async createUserRegistry() {
+    return await dapp.deployContract(UserRegistry, []);
   }
 
-  async isAsobiCoinAdmin(address) {
-    return await this.isAdmin(address, this.c.asobiCoinContract);
-  }
-
-  async isGoodsAdmin(address) {
-    return await this.isAdmin(address, this.c.goodsContract);
-  }
-
-  async getBalance(address, contract) {
-    return await contract.methods.balanceOf(address).call();
-  }
-
-  async getGoodsBalance(address) {
-    return await this.getBalance(address, this.c.goodsContract);
-  }
-
-  async getAsobiCoinBalance(address) {
-    return await this.getBalance(address, this.c.asobiCoinContract);
-  }
-
-  async mint(receiver, value, contract) {
-    return await contract.methods.mint(receiver, value).send();
-  }
-
-  async createGood(receiver) {
-    await this.mint(receiver, this.generateGoodID(), this.c.goodsContract);
-  }
-
-  async createCoin(receiver, amount) {
-    await this.c.asobiCoinContract.methods.mint(receiver, amount).send();
-  }
-
-  generateGoodID() {
-    return this.web3.utils.randomHex(32);
+  loadUserRegistryContract() {
+    [
+      this.c.userRegistryContract,
+      this.c.userRegistryContractEvents,
+    ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
   }
 
   async getRegisterState(address) {
@@ -312,9 +243,77 @@ export default class Repository {
     return await Promise.all(indices.map(getFriend));
   }
 
+  // Trade Registry
+  async createTradeRegistry() {
+    return await dapp.deployContract(TradeRegistry, []);
+  }
+
+  loadTradeRegistryContract() {
+    [
+      this.c.tradeRegistryContract,
+      this.c.tradeRegistryContractEvents,
+    ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
+  }
+
   async closeTrade() {
     console.log("Removing trade from registry");
     await this.c.tradeRegistryContract.methods.remove().send();
+  }
+
+  // Trade
+  async createTrade(userA, userB) {
+    const trade = await this.dapp.deployContract(
+      Trade,
+      [
+        this.c.goodsContract.options.address,
+        [
+          userA,
+          userB,
+        ],
+      ],
+    );
+    await this.c.tradeRegistryContract.methods.add(
+      trade.options.address
+    ).send();
+    return trade;
+  }
+
+  async loadTrade(accountAddress) {
+    const tradeAddress = await this.c.tradeRegistryContract.methods.traderTrade(
+      accountAddress,
+    ).call();
+    if (tradeAddress == "0x0000000000000000000000000000000000000000") {
+      return null;
+    }
+    const [tradeContract, tradeContractEvents] = this.dapp.getContractAt(
+      Trade,
+      tradeAddress,
+    );
+
+    this.c = {
+      ...this.c,
+      tradeContract,
+      tradeContractEvents,
+    };
+    const [userA, userB] = await Promise.all([
+      tradeContract.methods.traders(0).call(),
+      tradeContract.methods.traders(1).call(),
+    ]);
+    const otherUserID = userA == accountAddress ? userB : userA;
+    const [accepted, otherAccepted] = await Promise.all([
+      tradeContract.methods.traderAccepted(accountAddress).call(),
+      tradeContract.methods.traderAccepted(otherUserID).call(),
+    ]);
+    const pulled = await tradeContract.methods.traderPulledGoods(
+      accountAddress,
+    ).call();
+    return {
+      id: tradeAddress,
+      otherUserID,
+      pulled,
+      accepted,
+      otherAccepted,
+    };
   }
 
   async cancelTrade() {
@@ -354,5 +353,13 @@ export default class Repository {
 
   async pullGoods() {
     await this.c.tradeContract.methods.getGoods().send();
+  }
+
+  async transferToTrade(accountAddress, goodID) {
+    await this.transferGood(
+      accountAddress,
+      this.c.tradeContract.options.address,
+      goodID,
+    );
   }
 }
