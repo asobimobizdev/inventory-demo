@@ -88,6 +88,7 @@ export default {
   computed: {
     ...mapGetters([
       "otherUsers",
+      "selectedGood",
     ]),
     ...mapState([
       "goodsLoading",
@@ -125,9 +126,6 @@ export default {
     },
     friendGoodsLoading() {
       return this.$store.state.friendGoodsLoading;
-    },
-    selectedGood() {
-      return this.$store.getters.selectedGood;
     },
   },
   watch: {
