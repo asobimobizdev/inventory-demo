@@ -66,7 +66,12 @@ export default {
     return {};
   },
   computed: {
-    ...mapGetters(["otherUsers"]),
+    ...mapGetters([
+      "otherUsers",
+    ]),
+    ...mapState([
+      "goodsLoading",
+    ]),
     hasFriends() {
       return this.otherUsers.length > 0;
     },
@@ -91,9 +96,6 @@ export default {
         return this.$store.getters.allGoods;
       },
       set(value) {},
-    },
-    goodsLoading() {
-      return this.$store.state.goodsLoading;
     },
     friendGoods: {
       get() {
