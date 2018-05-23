@@ -64,6 +64,14 @@ export default class Repository {
     ).map(this._convertAsobiCoinTransferEvent);
   }
 
+  asobiCoinTransferEvents(cb) {
+    return this.c.asobiCoin.Transfer()
+      .on("data", (event) => {
+        cb(this._convertAsobiCoinTransferEvent(event));
+      })
+      .on("error", console.log);
+  }
+
   _convertAsobiCoinTransferEvent({returnValues}) {
     return {
       from: returnValues.from,
@@ -367,10 +375,6 @@ export default class Repository {
 
   goodsTransferEvents() {
     return this.c.goods.Transfer();
-  }
-
-  asobiCoinTransferEvents() {
-    return this.c.asobiCoin.Transfer();
   }
 
   escrowPriceSetEvents() {

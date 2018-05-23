@@ -273,12 +273,10 @@ const createStore = () => {
 
       getAsobiCoinContract(context) {
         repository.loadAsobiCoinContract();
-        repository.asobiCoinTransferEvents()
-          .on("data", (event) => {
-            console.log("AsobiCoin Transfer event", event);
-            context.dispatch("getBalance");
-          })
-          .on("error", console.log);
+        repository.asobiCoinTransferEvents((event) => {
+          console.log("AsobiCoin Transfer event", event);
+          context.dispatch("getBalance");
+        });
       },
 
       getEscrowContract(context) {
