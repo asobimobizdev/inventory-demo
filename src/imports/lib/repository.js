@@ -59,18 +59,17 @@ export default class Repository {
   }
 
   async getPastAsobiCoinTransfers() {
-    const eventsRaw = await this.c.asobiCoin.getPastEvents(
-      "Transfer",
-      {fromBlock: 0},
-    );
-    const events = eventsRaw.map(({returnValues}) => {
-      return {
-        from: returnValues.from,
-        to: returnValues.to,
-        value: web3Utils.fromWei(returnValues.value),
-      };
-    });
-    return events;
+    return (
+      await this.c.asobiCoin.getPastEvents("Transfer", {fromBlock: 0})
+    ).map(this._convertAsobiCoinTransferEvent);
+  }
+
+  _convertAsobiCoinTransferEvent({returnValues}) {
+    return {
+      from: returnValues.from,
+      to: returnValues.to,
+      value: web3Utils.fromWei(returnValues.value),
+    };
   }
 
   // Goods
