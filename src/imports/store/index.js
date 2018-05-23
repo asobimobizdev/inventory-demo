@@ -247,7 +247,7 @@ const createStore = () => {
       getGoodsContract(context) {
         repository.loadGoodsContract();
 
-        repository.c.goodsContractEvents.events.Transfer()
+        repository.goodsTransferEvents()
           .on("data", async (data) => {
 
             const transaction = {
@@ -273,7 +273,7 @@ const createStore = () => {
 
       getAsobiCoinContract(context) {
         repository.loadAsobiCoinContract();
-        repository.c.asobiCoinContractEvents.events.Transfer()
+        repository.asobiCoinTransferEvents()
           .on("data", (event) => {
             console.log("AsobiCoin Transfer event", event);
             context.dispatch("getBalance");
@@ -283,7 +283,7 @@ const createStore = () => {
 
       getEscrowContract(context) {
         repository.loadEscrowContract();
-        repository.c.escrowContractEvents.events.PriceSet()
+        repository.escrowPriceSetEvents()
           .on("data", (event) => {
             console.log("Escrow PriceSet event", event);
             context.dispatch("getOwnGoods");
@@ -294,7 +294,7 @@ const createStore = () => {
 
       getUserRegistryContract(context) {
         repository.loadUserRegistryContract();
-        repository.c.userRegistryContractEvents.events.allEvents()
+        repository.userRegistryEvents()
           .on("data", (event) => {
             console.log("User Registry event", event);
             context.dispatch("getRegisterState");
@@ -305,7 +305,7 @@ const createStore = () => {
 
       getTradeRegistryContract(context) {
         repository.loadTradeRegistryContract();
-        repository.c.tradeRegistryContractEvents.events.allEvents()
+        repository.tradeRegistryEvents()
           .on("data", (event) => {
             console.log("Trade Registry event", event);
             context.dispatch("trade/loadTrade");
