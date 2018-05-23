@@ -90,12 +90,49 @@
       >.container
         >.item
           background-color #f0f0f0
+          color #333
           >.good
             position absolute
             top 0
             left 0
             bottom 0
             width 120px
+          >.info
+            position absolute
+            top 0
+            left 120px
+            bottom 0
+            right 0
+            padding 8px
+
+            display flex
+            flex-direction column
+            flex-wrap nowrap
+            justify-content flex-start
+            align-content stretch
+            align-items flex-start
+            >.spring
+              flex 1 1 auto
+            >.name
+              // background-color alpha(#f00,0.3)
+              height 24px
+              line-height 16px
+              white-space nowrap
+              overflow hidden
+              text-overflow ellipsis
+              width 100%
+              font-weight bold
+              border-bottom 1px solid rgba(#000 ,0.1)
+              padding-bottom 4px
+              
+            >.price
+              // background-color alpha(#f00,0.3)
+              font-weight bold
+              color darken(#409EFF, 10%)
+              font-size 18px
+              width 100%
+              text-align right
+
     &.grid
       >.container
         >.item

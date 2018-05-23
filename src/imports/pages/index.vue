@@ -52,6 +52,11 @@
               @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
+              <div class="info">
+                <div class="name">{{good.name}}</div>
+                <div class="spring"></div>
+                <div class="price" v-if="good.price > 0"><span class="value">{{good.price}}₳</span></div>
+              </div>
             </div>
           </draggable>
         </div>
