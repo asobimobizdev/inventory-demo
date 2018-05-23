@@ -1,9 +1,5 @@
 import { decorateGoodWithId, repository } from "./index";
 
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 const initialState = {
   id: null,
   otherUserID: null,
@@ -84,8 +80,6 @@ export default {
         context.rootState.accountAddress,
         otherUserID,
       );
-
-      await timeout(500);
 
       context.commit("setTrade", {
         id: Math.ceil(Math.random() * 10000000),

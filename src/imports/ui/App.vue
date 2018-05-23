@@ -18,6 +18,9 @@
         <el-menu-item index="/friends">
           <router-link :to="{ name: 'friends' }" exact>Friends</router-link>
         </el-menu-item>
+        <el-menu-item index="/live">
+          <router-link :to="{ name: 'live' }" exact>Live</router-link>
+        </el-menu-item>
       </el-menu>
       <div class="balance"><span class="label">Balance:</span> <span class="value">{{balance}}₳</span></div>
     </el-header>

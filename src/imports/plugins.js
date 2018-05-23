@@ -13,7 +13,5 @@ import "element-ui/lib/theme-chalk/index.css";
 
 Vue.use(Element, { locale });
 
-// import VueMeteorTracker from 'vue-meteor-tracker'
-// Vue.use(VueMeteorTracker)
-// Vue.config.meteor.freeze = true
-
+import VueAnimateNumber from "vue-animate-number";
+Vue.use(VueAnimateNumber);
