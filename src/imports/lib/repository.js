@@ -40,21 +40,21 @@ export default class Repository {
 
   loadAsobiCoinContract() {
     [
-      this.c.asobiCoinContract,
-      this.e.asobiCoinContract,
+      this.c.asobiCoin,
+      this.e.asobiCoin,
     ] = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
   }
 
   async createCoin(receiver, amount) {
-    await this.c.asobiCoinContract.methods.mint(receiver, amount).send();
+    await this.c.asobiCoin.methods.mint(receiver, amount).send();
   }
 
   async isAsobiCoinAdmin(address) {
-    return await this.isAdmin(address, this.c.asobiCoinContract);
+    return await this.isAdmin(address, this.c.asobiCoin);
   }
 
   async getAsobiCoinBalance(address) {
-    return await this.getBalance(address, this.c.asobiCoinContract);
+    return await this.getBalance(address, this.c.asobiCoin);
   }
 
   async mint(receiver, value, contract) {
@@ -68,21 +68,21 @@ export default class Repository {
 
   loadGoodsContract() {
     [
-      this.c.goodsContract,
-      this.e.goodsContract,
+      this.c.goods,
+      this.e.goods,
     ] = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
   }
 
   async createGood(receiver) {
-    await this.mint(receiver, this.generateGoodID(), this.c.goodsContract);
+    await this.mint(receiver, this.generateGoodID(), this.c.goods);
   }
 
   async getGoodsBalance(address) {
-    return await this.getBalance(address, this.c.goodsContract);
+    return await this.getBalance(address, this.c.goods);
   }
 
   async isGoodsAdmin(address) {
-    return await this.isAdmin(address, this.c.goodsContract);
+    return await this.isAdmin(address, this.c.goods);
   }
 
   generateGoodID() {
@@ -91,13 +91,13 @@ export default class Repository {
 
   async getGoodsForAddress(address) {
     const getGood = async (index) => {
-      const id = await this.c.goodsContract.methods.tokenOfOwnerByIndex(
+      const id = await this.c.goods.methods.tokenOfOwnerByIndex(
         address,
         index,
       ).call();
       const [forSale, price] = await Promise.all([
-        this.c.escrowContract.methods.isListed(id).call(),
-        this.c.escrowContract.methods.getPrice(id).call(),
+        this.c.escrow.methods.isListed(id).call(),
+        this.c.escrow.methods.getPrice(id).call(),
       ]);
       return {
         id: id,
@@ -106,14 +106,14 @@ export default class Repository {
         forSale: forSale,
       };
     };
-    const balance = await this.getGoodsBalance(address, this.c.goodsContract);
+    const balance = await this.getGoodsBalance(address, this.c.goods);
     const indices = range(balance);
     const items = await Promise.all(indices.map(getGood));
     return items;
   }
 
   async transferGood(from, to, goodID) {
-    await this.c.goodsContract.methods.safeTransferFrom(
+    await this.c.goods.methods.safeTransferFrom(
       from,
       to,
       goodID,
@@ -121,26 +121,26 @@ export default class Repository {
   }
 
   async setGoodForSale(goodID, price, forSale) {
-    const approved = await this.c.goodsContract.methods.getApproved(
+    const approved = await this.c.goods.methods.getApproved(
       goodID,
-    ).call() === this.c.escrowContract.options.address;
+    ).call() === this.c.escrow.options.address;
     if (!forSale) {
       if (approved) {
         console.log("Removing approval");
-        await this.c.goodsContract.methods.approve("0x0", goodID).send();
+        await this.c.goods.methods.approve("0x0", goodID).send();
       }
       return;
     }
     if (!approved) {
       console.log("Escrow contract not yet approved", approved);
-      await this.c.goodsContract.methods.approve(
-        this.c.escrowContract.options.address,
+      await this.c.goods.methods.approve(
+        this.c.escrow.options.address,
         goodID,
       ).send();
     } else {
       console.log("Escrow contract already approved");
     }
-    await this.c.escrowContract.methods.setPrice(
+    await this.c.escrow.methods.setPrice(
       goodID,
       this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
     ).send();
@@ -150,36 +150,36 @@ export default class Repository {
   async createEscrowContract() {
     return await dapp.deployContract(
       Escrow, [
-        this.c.asobiCoinContract.options.address,
-        this.c.goodsContract.options.address,
+        this.c.asobiCoin.options.address,
+        this.c.goods.options.address,
       ]
     );
   }
 
   loadEscrowContract() {
     [
-      this.c.escrowContract,
-      this.e.escrowContract,
+      this.c.escrow,
+      this.e.escrow,
     ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
   async buyGood(goodID, buyer) {
     // Check whether we have already approved spending
     const price = this.dapp.web3.utils.toBN(
-      await this.c.escrowContract.methods.getPrice(goodID).call()
+      await this.c.escrow.methods.getPrice(goodID).call()
     );
 
     const allowance = this.dapp.web3.utils.toBN(
-      await this.c.asobiCoinContract.methods.allowance(
+      await this.c.asobiCoin.methods.allowance(
         buyer,
-        this.c.escrowContract.options.address,
+        this.c.escrow.options.address,
       ).call()
     );
 
     // Approve spending
     if (allowance.lt(price)) {
-      await this.c.asobiCoinContract.methods.approve(
-        this.c.escrowContract.options.address,
+      await this.c.asobiCoin.methods.approve(
+        this.c.escrow.options.address,
         this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
       ).send();
     } else {
@@ -190,7 +190,7 @@ export default class Repository {
         price.toString(),
       );
     }
-    await this.c.escrowContract.methods.swap(goodID).send();
+    await this.c.escrow.methods.swap(goodID).send();
   }
 
   // User Registry
@@ -200,18 +200,18 @@ export default class Repository {
 
   loadUserRegistryContract() {
     [
-      this.c.userRegistryContract,
-      this.e.userRegistryContract,
+      this.c.userRegistry,
+      this.e.userRegistry,
     ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
   }
 
   async getRegisterState(address) {
-    const registered = await this.c.userRegistryContract.methods.isUser(
+    const registered = await this.c.userRegistry.methods.isUser(
       address,
     ).call();
     let name = null;
     if (registered) {
-      name = await this.c.userRegistryContract.methods.userName(
+      name = await this.c.userRegistry.methods.userName(
         address,
       ).call();
     }
@@ -219,27 +219,27 @@ export default class Repository {
   }
 
   async registerUser(name) {
-    await this.c.userRegistryContract.methods.add(name).send();
+    await this.c.userRegistry.methods.add(name).send();
   }
 
   async unregisterUser(name) {
-    await this.c.userRegistryContract.methods.remove().send();
+    await this.c.userRegistry.methods.remove().send();
   }
 
   async getFriends() {
     const getFriend = async (index) => {
-      const address = await this.c.userRegistryContract.methods.users(
+      const address = await this.c.userRegistry.methods.users(
         index
       ).call();
       return {
         id: address,
-        name: await this.c.userRegistryContract.methods.userName(
+        name: await this.c.userRegistry.methods.userName(
           address,
         ).call(),
       };
     };
     const indices = range(
-      await this.c.userRegistryContract.methods.numUsers().call()
+      await this.c.userRegistry.methods.numUsers().call()
     );
     return await Promise.all(indices.map(getFriend));
   }
@@ -251,14 +251,14 @@ export default class Repository {
 
   loadTradeRegistryContract() {
     [
-      this.c.tradeRegistryContract,
-      this.e.tradeRegistryContract,
+      this.c.tradeRegistry,
+      this.e.tradeRegistry,
     ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
   }
 
   async closeTrade() {
     console.log("Removing trade from registry");
-    await this.c.tradeRegistryContract.methods.remove().send();
+    await this.c.tradeRegistry.methods.remove().send();
   }
 
   // Trade
@@ -266,43 +266,43 @@ export default class Repository {
     const trade = await this.dapp.deployContract(
       Trade,
       [
-        this.c.goodsContract.options.address,
+        this.c.goods.options.address,
         [
           userA,
           userB,
         ],
       ],
     );
-    await this.c.tradeRegistryContract.methods.add(
+    await this.c.tradeRegistry.methods.add(
       trade.options.address
     ).send();
     return trade;
   }
 
   async loadTrade(accountAddress) {
-    const tradeAddress = await this.c.tradeRegistryContract.methods.traderTrade(
+    const tradeAddress = await this.c.tradeRegistry.methods.traderTrade(
       accountAddress,
     ).call();
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
-    const [tradeContract, events] = this.dapp.getContractAt(
+    const [trade, events] = this.dapp.getContractAt(
       Trade,
       tradeAddress,
     );
 
-    this.c = {...this.c, tradeContract};
-    this.e = {...this.e, tradeContract: events};
+    this.c = {...this.c, trade};
+    this.e = {...this.e, trade: events};
     const [userA, userB] = await Promise.all([
-      tradeContract.methods.traders(0).call(),
-      tradeContract.methods.traders(1).call(),
+      trade.methods.traders(0).call(),
+      trade.methods.traders(1).call(),
     ]);
     const otherUserID = userA == accountAddress ? userB : userA;
     const [accepted, otherAccepted] = await Promise.all([
-      tradeContract.methods.traderAccepted(accountAddress).call(),
-      tradeContract.methods.traderAccepted(otherUserID).call(),
+      trade.methods.traderAccepted(accountAddress).call(),
+      trade.methods.traderAccepted(otherUserID).call(),
     ]);
-    const pulled = await tradeContract.methods.traderPulledGoods(
+    const pulled = await trade.methods.traderPulledGoods(
       accountAddress,
     ).call();
     return {
@@ -315,10 +315,10 @@ export default class Repository {
   }
 
   async cancelTrade() {
-    const isActive = await this.c.tradeContract.methods.isActive().call();
+    const isActive = await this.c.trade.methods.isActive().call();
     if (isActive) {
       console.log("Trade is still active");
-      await this.c.tradeContract.methods.cancel().send();
+      await this.c.trade.methods.cancel().send();
     } else {
       console.log("Trade is not active, skipping cancelling");
     }
@@ -326,16 +326,16 @@ export default class Repository {
 
   async confirmTrade() {
     console.log("Accepting trade");
-    await this.c.tradeContract.methods.accept().send();
+    await this.c.trade.methods.accept().send();
   }
 
   async removeGoodFromTrade(goodID) {
-    await this.c.tradeContract.methods.removeGood(goodID).send();
+    await this.c.trade.methods.removeGood(goodID).send();
   }
 
   async getTradeGoods() {
     const getGoodOwner = async (good) => {
-      const trader = await this.c.tradeContract.methods.goodsTrader(
+      const trader = await this.c.trade.methods.goodsTrader(
         good.id,
       ).call();
       return {
@@ -344,45 +344,45 @@ export default class Repository {
       };
     };
     const goodsRaw = await this.getGoodsForAddress(
-      this.c.tradeContract.options.address,
+      this.c.trade.options.address,
     );
     return Promise.all(goodsRaw.map(getGoodOwner));
   }
 
   async pullGoods() {
-    await this.c.tradeContract.methods.getGoods().send();
+    await this.c.trade.methods.getGoods().send();
   }
 
   async transferToTrade(accountAddress, goodID) {
     await this.transferGood(
       accountAddress,
-      this.c.tradeContract.options.address,
+      this.c.trade.options.address,
       goodID,
     );
   }
 
   // Events
   tradeRegistryEvents() {
-    return this.e.tradeRegistryContract.events.allEvents();
+    return this.e.tradeRegistry.events.allEvents();
   }
 
   goodsTransferEvents() {
-    return this.e.goodsContract.events.Transfer();
+    return this.e.goods.events.Transfer();
   }
 
   asobiCoinTransferEvents() {
-    return this.e.asobiCoinContract.events.Transfer();
+    return this.e.asobiCoin.events.Transfer();
   }
 
   escrowPriceSetEvents() {
-    return this.e.escrowContract.events.PriceSet();
+    return this.e.escrow.events.PriceSet();
   }
 
   userRegistryEvents() {
-    return this.e.userRegistryContract.events.allEvents();
+    return this.e.userRegistry.events.allEvents();
   }
 
   tradeEvents() {
-    return this.e.tradeContract.events.allEvents();
+    return this.e.trade.events.allEvents();
   }
 }
