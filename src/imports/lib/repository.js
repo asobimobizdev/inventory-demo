@@ -1,3 +1,4 @@
+import web3Utils from "web3-utils";
 import { dapp } from "./dapp.js";
 
 import { Goods } from "../../../contracts/Goods.sol";
@@ -94,7 +95,7 @@ export default class Repository {
   }
 
   generateGoodID() {
-    return this.web3.utils.randomHex(32);
+    return web3Utils.randomHex(32);
   }
 
   async getGoodsForAddress(address) {
@@ -110,7 +111,7 @@ export default class Repository {
       return {
         id: id,
         confirmed: true,
-        price: this.web3.utils.fromWei(price),
+        price: web3Utils.fromWei(price),
         forSale: forSale,
       };
     };
@@ -150,7 +151,7 @@ export default class Repository {
     }
     await this.c.escrow.setPrice(
       goodID,
-      this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
+      web3Utils.toWei(price, "ether"),
     ).send();
   }
 
@@ -170,11 +171,11 @@ export default class Repository {
 
   async buyGood(goodID, buyer) {
     // Check whether we have already approved spending
-    const price = this.dapp.web3.utils.toBN(
+    const price = web3Utils.toBN(
       await this.c.escrow.getPrice(goodID).call()
     );
 
-    const allowance = this.dapp.web3.utils.toBN(
+    const allowance = web3Utils.toBN(
       await this.c.asobiCoin.allowance(
         buyer,
         this.c.escrow.options.address,
@@ -185,7 +186,7 @@ export default class Repository {
     if (allowance.lt(price)) {
       await this.c.asobiCoin.approve(
         this.c.escrow.options.address,
-        this.dapp.web3.utils.toWei(price, "ether"), // TODO Justus 2018-05-09
+        web3Utils.toWei(price, "ether"),
       ).send();
     } else {
       console.log(
