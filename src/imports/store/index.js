@@ -290,6 +290,7 @@ const createStore = () => {
             context.dispatch("getSelectedFriendGoods");
           })
           .on("error", console.log);
+        repository.getPastAsobiCoinTransfers().then(console.log);
       },
 
       getUserRegistryContract(context) {
