@@ -4,14 +4,12 @@ const WEBSOCKET_NODE = "wss://rinkeby.infura.io/ws";
 const GAS_PRICE = "10"; // gwei
 
 class Contract {
-  constructor(web3Contract) {
-    this.web3Contract = web3Contract;
-
+  constructor(web3Contract, web3EventContract) {
     // Copy options
-    this.options = this.web3Contract.options;
+    this.options = web3Contract.options;
 
     // Copy methods
-    this.methods = this.web3Contract.methods;
+    this.methods = web3Contract.methods;
     for (let methodName in this.methods) {
       Object.defineProperty(
         this,
@@ -25,7 +23,7 @@ class Contract {
     }
 
     // Copy events
-    this.events = this.web3Contract.events;
+    this.events = web3Contract.events;
     for (let eventName in this.events) {
       Object.defineProperty(
         this,
@@ -74,17 +72,9 @@ export default class Dapp {
         gasPrice: web3Instance.utils.toWei(GAS_PRICE, "gwei"),
         data: contract.bytecode,
       };
-      const web3Contract = new web3Instance.eth.Contract(
-        contract.abi,
-        address,
-        options,
-      );
-      return new Contract(web3Contract);
+      return new web3Instance.eth.Contract(contract.abi, address, options);
     }
-    return [
-      _get(this.web3),
-      _get(this.web3Event),
-    ];
+    return new Contract(_get(this.web3), _get(this.web3Event));
   }
 
   getContractAt(contract, address) {

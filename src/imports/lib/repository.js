@@ -21,7 +21,6 @@ export default class Repository {
     this.dapp = dapp;
     this.web3 = dapp.web3;
     this.c = {};
-    this.e = {};
   }
 
   // General
@@ -39,10 +38,7 @@ export default class Repository {
   }
 
   loadAsobiCoinContract() {
-    [
-      this.c.asobiCoin,
-      this.e.asobiCoin,
-    ] = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
+    this.c.asobiCoin = this.dapp.getContractAt(AsobiCoin, ASOBI_COIN_ADDRESS);
   }
 
   async createCoin(receiver, amount) {
@@ -67,10 +63,7 @@ export default class Repository {
   }
 
   loadGoodsContract() {
-    [
-      this.c.goods,
-      this.e.goods,
-    ] = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
+    this.c.goods = this.dapp.getContractAt(Goods, GOODS_ADDRESS);
   }
 
   async createGood(receiver) {
@@ -157,10 +150,7 @@ export default class Repository {
   }
 
   loadEscrowContract() {
-    [
-      this.c.escrow,
-      this.e.escrow,
-    ] = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
+    this.c.escrow = this.dapp.getContractAt(Escrow, ESCROW_ADDRESS);
   }
 
   async buyGood(goodID, buyer) {
@@ -199,10 +189,10 @@ export default class Repository {
   }
 
   loadUserRegistryContract() {
-    [
-      this.c.userRegistry,
-      this.e.userRegistry,
-    ] = this.dapp.getContractAt(UserRegistry, USER_REGISTRY_ADDRESS);
+    this.c.userRegistry = this.dapp.getContractAt(
+      UserRegistry,
+      USER_REGISTRY_ADDRESS,
+    );
   }
 
   async getRegisterState(address) {
@@ -250,10 +240,9 @@ export default class Repository {
   }
 
   loadTradeRegistryContract() {
-    [
-      this.c.tradeRegistry,
-      this.e.tradeRegistry,
-    ] = this.dapp.getContractAt(TradeRegistry, TRADE_REGISTRY_ADDRESS);
+    this.c.tradeRegistry = this.dapp.getContractAt(
+      TradeRegistry, TRADE_REGISTRY_ADDRESS,
+    );
   }
 
   async closeTrade() {
@@ -286,23 +275,18 @@ export default class Repository {
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
-    const [trade, events] = this.dapp.getContractAt(
-      Trade,
-      tradeAddress,
-    );
+    this.c.trade = this.dapp.getContractAt(Trade, tradeAddress);
 
-    this.c = {...this.c, trade};
-    this.e = {...this.e, trade: events};
     const [userA, userB] = await Promise.all([
-      trade.traders(0).call(),
-      trade.traders(1).call(),
+      this.c.trade.traders(0).call(),
+      this.c.trade.traders(1).call(),
     ]);
     const otherUserID = userA == accountAddress ? userB : userA;
     const [accepted, otherAccepted] = await Promise.all([
-      trade.traderAccepted(accountAddress).call(),
-      trade.traderAccepted(otherUserID).call(),
+      this.c.trade.traderAccepted(accountAddress).call(),
+      this.c.trade.traderAccepted(otherUserID).call(),
     ]);
-    const pulled = await trade.traderPulledGoods(
+    const pulled = await this.c.trade.traderPulledGoods(
       accountAddress,
     ).call();
     return {
@@ -363,26 +347,26 @@ export default class Repository {
 
   // Events
   tradeRegistryEvents() {
-    return this.e.tradeRegistry.allEvents();
+    return this.c.tradeRegistry.allEvents();
   }
 
   goodsTransferEvents() {
-    return this.e.goods.Transfer();
+    return this.c.goods.Transfer();
   }
 
   asobiCoinTransferEvents() {
-    return this.e.asobiCoin.Transfer();
+    return this.c.asobiCoin.Transfer();
   }
 
   escrowPriceSetEvents() {
-    return this.e.escrow.PriceSet();
+    return this.c.escrow.PriceSet();
   }
 
   userRegistryEvents() {
-    return this.e.userRegistry.allEvents();
+    return this.c.userRegistry.allEvents();
   }
 
   tradeEvents() {
-    return this.e.trade.allEvents();
+    return this.c.trade.allEvents();
   }
 }
