@@ -7,8 +7,17 @@
           <h1>My Goods</h1>
         </div>
         <div class="collection grid" >
-          <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMove" @end="onDrop">
-            <div class="item" v-for="(good,index) in goods" :key="index" @click="selectGood(good)">
+          <draggable
+            v-model='allGoods'
+            class="container"
+            id="goodsContainer"
+            :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
+            :move="checkMove"
+            @end="onDrop">
+            <div class="item"
+              v-for="(good,index) in allGoods"
+              :key="index"
+              @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
             </div>
@@ -16,11 +25,13 @@
         </div>
       </div>
 
-      <div class="goods-collection friend-goods" v-if="hasFriends" v-loading="friendGoodsLoading">
+      <div class="goods-collection friend-goods"
+          v-if="hasFriends"
+          v-loading="friendGoodsLoading">
         <div class="head">
           <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
             <el-option
-              v-for="(friend, index) in friends"
+              v-for="(friend, index) in otherUsers"
               :key="index"
               :label="friend.name"
               :value="index">
@@ -28,8 +39,17 @@
           </el-select>
         </div>
         <div class="collection list" >
-          <draggable v-model='friendGoods' class="container" id="friendGoodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveFromFriendGoods">
-            <div class="item" v-for="(good,index) in friendGoods" :key="index" @click="selectGood(good)">
+          <draggable
+            v-model='allFriendGoods'
+            class="container"
+            id="friendGoodsContainer"
+            :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
+            :move="checkMoveFromFriendGoods">
+            <div
+              class="item"
+              v-for="(good, index) in allFriendGoods"
+              :key="index"
+              @click="selectGood(good)">
               <good-item v-bind="good" :active="isGoodSelected(good)">
               </good-item>
             </div>
@@ -44,6 +64,7 @@
 </template>
 
 <script>
+import { mapActions, mapState, mapGetters } from "vuex";
 import draggable from "vuedraggable";
 import GoodItem from "./../components/GoodItem.vue";
 import GoodInspector from "./../components/GoodInspector.vue";
@@ -52,8 +73,8 @@ export default {
   mounted() {
     this.$store.dispatch("getOwnGoods", true);
 
-    if (this.friends.length > 0) {
-      this.checkSelectedFriend(this.friends);
+    if (this.otherUsers.length > 0) {
+      this.checkSelectedFriend(this.otherUsers);
     }
   },
   components: {
@@ -65,48 +86,44 @@ export default {
     return {};
   },
   computed: {
-    friends() {
-      return this.$store.getters.otherUsers;
+    ...mapGetters([
+      "otherUsers",
+      "selectedGood",
+    ]),
+    ...mapState([
+      "friendGoodsLoading",
+      "goodsLoading",
+    ]),
+    allGoods: {
+      get() {
+        return this.$store.getters.allGoods;
+      },
+      set(value) {},
     },
     hasFriends() {
-      return this.$store.state.friends.length > 0;
+      return this.otherUsers.length > 0;
     },
     selectedFriendIndex: {
       get() {
         const id = this.$store.state.selectedFriendId;
-        const friendIndex = this.friends.findIndex(friend => {
+        const friendIndex = this.otherUsers.findIndex(friend => {
           return friend.id == id;
         });
         return friendIndex;
       },
       set(value) {
-        const friend = this.friends.find((friend, index) => {
+        const friend = this.otherUsers.find((friend, index) => {
           return index == value;
         });
 
         this.$store.dispatch("selectedFriendId", friend.id);
       },
     },
-    goods: {
-      get() {
-        return this.$store.getters.allGoods;
-      },
-      set(value) {},
-    },
-    goodsLoading() {
-      return this.$store.state.goodsLoading;
-    },
-    friendGoods: {
+    allFriendGoods: {
       get() {
         return this.$store.getters.allFriendGoods;
       },
       set(value) {},
-    },
-    friendGoodsLoading() {
-      return this.$store.state.friendGoodsLoading;
-    },
-    selectedGood() {
-      return this.$store.getters.selectedGood;
     },
   },
   watch: {
@@ -137,7 +154,7 @@ export default {
       }
 
       const oldIndex = e.oldIndex;
-      const good = this.goods[oldIndex];
+      const good = this.allGoods[oldIndex];
 
       if (!good.confirmed) return;
 

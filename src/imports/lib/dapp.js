@@ -23,7 +23,7 @@ class Contract {
     }
 
     // Copy events
-    this.events = web3Contract.events;
+    this.events = web3EventContract.events;
     for (let eventName in this.events) {
       Object.defineProperty(
         this,
@@ -35,6 +35,9 @@ class Contract {
         }
       );
     }
+    this.getPastEvents = web3EventContract.getPastEvents.bind(
+      web3EventContract,
+    );
   }
 
   get address() {

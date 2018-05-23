@@ -32,6 +32,10 @@ export default class Repository {
     return await contract.balanceOf(address).call();
   }
 
+  async mint(receiver, value, contract) {
+    return await contract.mint(receiver, value).send();
+  }
+
   // AsobiCoin
   async createAsobiCoinContract() {
     return await dapp.deployContract(AsobiCoin, []);
@@ -53,8 +57,19 @@ export default class Repository {
     return await this.getBalance(address, this.c.asobiCoin);
   }
 
-  async mint(receiver, value, contract) {
-    return await contract.mint(receiver, value).send();
+  async getPastAsobiCoinTransfers() {
+    const eventsRaw = await this.c.asobiCoin.getPastEvents(
+      "Transfer",
+      {fromBlock: 0},
+    );
+    const events = eventsRaw.map(({returnValues}) => {
+      return {
+        from: returnValues.from,
+        to: returnValues.to,
+        value: returnValues.value,
+      };
+    });
+    return events;
   }
 
   // Goods
