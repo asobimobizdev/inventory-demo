@@ -19,12 +19,14 @@
     </header>
     <div class="spring"></div>
     <main>
+      <div class="spting"></div>
       <transition-group class="content" tag="div" name="list">
         <div class="item" v-for="transaction in filteredTransactions" :key="transaction.id">
           <span class="amount"><i class="el-icon-plus"></i> {{transaction.amount}}₳</span>
           <span class="name">{{transaction.fromName}}</span>
         </div>
       </transition-group>
+      <div class="spting"></div>
     </main>
     <footer>
       <el-select
@@ -70,7 +72,7 @@ export default {
     };
 
     while (this.loop) {
-      const delay = Math.random() * 1000 + 100;
+      const delay = Math.random() * 1000 + 1000;
       await sleep(delay);
 
       if (!this.friends || this.friends.length < 1) continue;
@@ -158,7 +160,8 @@ export default {
         color primaryColor
 
     >main
-      background-color alpha(#000,0.2)
+      background: linear-gradient(to bottom, hsl(230, 80%, 60%) 0%, hsl(210, 60%, 70%) 50%,  hsl(350, 80%, 90%) 90%, hsl(10, 100%, 60%))
+      // background  hsl(218, 67%, 60%)
       flex 1 1 auto
       min-height 120px
       position absolute
@@ -170,12 +173,14 @@ export default {
       overflow hidden
       overflow-y auto
 
-      // display: flex
-      // flex-direction: column
-      // flex-wrap: nowrap
-      // justify-content: center
-      // align-content: center
-      // align-items: center
+      display: flex
+      flex-direction: row
+      flex-wrap: nowrap
+      justify-content: center
+      align-content: flex-start
+      align-items: flex-start
+
+      // background-color alpha(#f00,0.3)
 
       >.content
         display: flex
@@ -237,11 +242,13 @@ export default {
   margin-right 10px
 
 .list-enter-active, .list-leave-active
-  transition all 1s
+  transition all 3000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
 
 .list-enter, .list-leave-to
   opacity 0
-  transform translateX(30px)
+  transform translateY(-30px) scale(0.5)
 
+.list-move
+  transition: transform 1000ms cubic-bezier(0.000, 1.650, 0.380, 1.000)
 
 </style>
