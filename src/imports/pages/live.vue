@@ -21,11 +21,21 @@
     <main>
       <div class="spting"></div>
       <transition-group class="content" tag="div" name="list">
-        <div class="item" v-for="transaction in filteredTransactions" :key="transaction.id">
-          <span class="amount"><i class="el-icon-plus"></i> {{transaction.value}}₳</span>
+        <div
+          class="item"
+          v-for="transfer in filteredTransfers"
+          :key="transfer.transactionHash">
+          <span class="amount">
+            <i class="el-icon-plus"></i>
+            {{ transfer.value | fromWei }}₳
+          </span>
           <div class="info">
-            <span class="name">{{transaction.fromName}}</span>
-            <span class="timestamp">{{ transaction.timestamp }}</span>
+            <span class="name">
+              From {{ transfer.fromFriend.name }} - To {{ transfer.toFriend.name }}
+            </span>
+            <span class="blockNumber">
+              {{ transfer.blockNumber }}
+            </span>
           </div>
         </div>
       </transition-group>
@@ -55,68 +65,59 @@
 <script>
 import { sleep } from "../lib/utils";
 import { mapActions, mapState, mapGetters } from "vuex";
-import web3 from "web3";
 import { clearTimeout } from "timers";
+import web3Utils from "web3-utils";
 
 export default {
   data() {
     return {
       usersFilter: [],
-      loop: true
+      loop: true,
     };
   },
   async mounted() {
-    const randomUser = () => {
-      const len = this.friends.length;
-      const rndInx = Math.floor(Math.random() * len);
-      const user = this.friends[rndInx];
-      return user;
-    };
-
-    const fakeTestEvent = () => {
-      const delay = Math.random() * 1000 + 10;
-      this.fakeTestEventTimeIntervalId = setTimeout(fakeTestEvent, delay);
-
-      if (!this.friends || this.friends.length < 1) return;
-
-      const user = randomUser();
-      if (!user) return;
-
-      const transaction = {
-        id: web3.utils.randomHex(32),
-        from: user.id,
-        to: this.$store.state.accountAddress,
-        timestamp: new Date(),
-        fromName: user.name,
-        value: Math.round(Math.random() * 10 + 1)
-      };
-      this.$store.commit("addTransaction", transaction);
-    };
-
-    fakeTestEvent();
+    this.$store.dispatch("live/getTransfers");
   },
   computed: {
     ...mapState(["friends", "balance"]),
-    filteredTransactions() {
-      if (this.usersFilter.length == 0) return this.$store.state.transactions;
-      return this.$store.state.transactions.filter(transaction => {
-        return (
-          this.usersFilter.find(userID => userID == transaction.from) != null
+    filteredTransfers() {
+      let result;
+      if (this.usersFilter.length == 0) {
+        result = this.$store.state.live.transfers;
+      } else {
+        result = this.$store.state.live.transfers.filter(
+          transfer => this.usersFilter.find(
+            userID => userID == transfer.from
+          ) != null
         );
+      }
+      return result.map((event) => {
+        return {
+          ...event,
+          fromFriend: this.$store.state.friends.find((f) => {
+            return f.id == event.from;
+          }) || {name: "Unknown"},
+          toFriend: this.$store.state.friends.find((f) => {
+            return f.id == event.to;
+          }) || {name: "Unknown"},
+        };
       });
-    }
+    },
+  },
+  filters: {
+    fromWei: (value) => web3Utils.fromWei(value).toString(),
   },
   methods: {
     formatter(num) {
       return num.toFixed(0);
-    }
+    },
   },
   watch: {
     balance(newValue, oldValue) {
       this.$refs.balance.reset(oldValue, newValue);
       this.$refs.balance.start();
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -229,7 +230,7 @@ export default {
             border-radius 20px
             line-height 20px
           >.infd
-            >.timestamp
+            >.blockNumber
               color #ddd
 
     >footer

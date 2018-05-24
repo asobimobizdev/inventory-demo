@@ -1,5 +1,5 @@
 {
-  "name": "meteor-vuex-example",
+  "name": "asobicoin",
   "private": true,
   "scripts": {
     "dev": "HMR_URL=$(hostname) HMR_PORT=3030 meteor run",
