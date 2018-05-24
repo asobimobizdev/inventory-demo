@@ -60,7 +60,7 @@ export default {
       balance: 4000,
       transactions: [],
       usersFilter: [],
-      loop: true
+      loop: true,
     };
   },
   async mounted() {
@@ -84,7 +84,7 @@ export default {
         id: web3.utils.randomHex(32),
         from: user.id,
         fromName: user.name,
-        amount: Math.round(Math.random() * 10 + 1)
+        amount: Math.round(Math.random() * 10 + 1),
       };
       this.balance += transaction.amount;
       this.pushTransaction(transaction);
@@ -99,7 +99,7 @@ export default {
           this.usersFilter.find(userID => userID == transaction.from) != null
         );
       });
-    }
+    },
   },
   methods: {
     formatter(num) {
@@ -108,14 +108,14 @@ export default {
     pushTransaction(transaction) {
       console.log(transaction);
       this.transactions = [transaction, ...this.transactions];
-    }
+    },
   },
   watch: {
     balance(newValue, oldValue) {
       this.$refs.balance.reset(oldValue, newValue);
       this.$refs.balance.start();
-    }
-  }
+    },
+  },
 };
 </script>
 
