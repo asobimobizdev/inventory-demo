@@ -60,7 +60,7 @@ export default {
       balance: 4000,
       transactions: [],
       usersFilter: [],
-      loop: true,
+      loop: true
     };
   },
   async mounted() {
@@ -84,7 +84,7 @@ export default {
         id: web3.utils.randomHex(32),
         from: user.id,
         fromName: user.name,
-        amount: Math.round(Math.random() * 10 + 1),
+        amount: Math.round(Math.random() * 10 + 1)
       };
       this.balance += transaction.amount;
       this.pushTransaction(transaction);
@@ -99,7 +99,7 @@ export default {
           this.usersFilter.find(userID => userID == transaction.from) != null
         );
       });
-    },
+    }
   },
   methods: {
     formatter(num) {
@@ -108,14 +108,14 @@ export default {
     pushTransaction(transaction) {
       console.log(transaction);
       this.transactions = [transaction, ...this.transactions];
-    },
+    }
   },
   watch: {
     balance(newValue, oldValue) {
       this.$refs.balance.reset(oldValue, newValue);
       this.$refs.balance.start();
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -160,7 +160,8 @@ export default {
         color primaryColor
 
     >main
-      background-color alpha(#000,0.2)
+      background: linear-gradient(to bottom, hsl(230, 80%, 60%) 0%, hsl(210, 60%, 70%) 50%,  hsl(350, 80%, 90%) 90%, hsl(10, 100%, 60%))
+      // background  hsl(218, 67%, 60%)
       flex 1 1 auto
       min-height 120px
       position absolute
