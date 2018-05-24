@@ -15,3 +15,6 @@ Vue.use(Element, { locale });
 
 import VueAnimateNumber from "vue-animate-number";
 Vue.use(VueAnimateNumber);
+
+import VueFilterDateFormat from "vue-filter-date-format";
+Vue.use(VueFilterDateFormat);

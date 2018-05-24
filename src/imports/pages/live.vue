@@ -22,8 +22,11 @@
       <div class="spting"></div>
       <transition-group class="content" tag="div" name="list">
         <div class="item" v-for="transaction in filteredTransactions" :key="transaction.id">
-          <span class="amount"><i class="el-icon-plus"></i> {{transaction.amount}}₳</span>
-          <span class="name">{{transaction.fromName}}</span>
+          <span class="amount"><i class="el-icon-plus"></i> {{transaction.value}}₳</span>
+          <div class="info">
+            <span class="name">{{transaction.fromName}}</span>
+            <span class="timestamp">{{ transaction.timestamp }}</span>
+          </div>
         </div>
       </transition-group>
       <div class="spting"></div>
@@ -53,14 +56,13 @@
 import { sleep } from "../lib/utils";
 import { mapActions, mapState, mapGetters } from "vuex";
 import web3 from "web3";
+import { clearTimeout } from "timers";
 
 export default {
   data() {
     return {
-      balance: 4000,
-      transactions: [],
       usersFilter: [],
-      loop: true,
+      loop: true
     };
   },
   async mounted() {
@@ -71,51 +73,50 @@ export default {
       return user;
     };
 
-    while (this.loop) {
-      const delay = Math.random() * 1000 + 1000;
-      await sleep(delay);
+    const fakeTestEvent = () => {
+      const delay = Math.random() * 1000 + 10;
+      this.fakeTestEventTimeIntervalId = setTimeout(fakeTestEvent, delay);
 
-      if (!this.friends || this.friends.length < 1) continue;
+      if (!this.friends || this.friends.length < 1) return;
 
       const user = randomUser();
-      if (!user) continue;
+      if (!user) return;
 
       const transaction = {
         id: web3.utils.randomHex(32),
         from: user.id,
+        to: this.$store.state.accountAddress,
+        timestamp: new Date(),
         fromName: user.name,
-        amount: Math.round(Math.random() * 10 + 1),
+        value: Math.round(Math.random() * 10 + 1)
       };
-      this.balance += transaction.amount;
-      this.pushTransaction(transaction);
-    }
+      this.$store.commit("addTransaction", transaction);
+    };
+
+    fakeTestEvent();
   },
   computed: {
-    ...mapState(["friends"]),
+    ...mapState(["friends", "balance"]),
     filteredTransactions() {
-      if (this.usersFilter.length == 0) return this.transactions;
-      return this.transactions.filter(transaction => {
+      if (this.usersFilter.length == 0) return this.$store.state.transactions;
+      return this.$store.state.transactions.filter(transaction => {
         return (
           this.usersFilter.find(userID => userID == transaction.from) != null
         );
       });
-    },
+    }
   },
   methods: {
     formatter(num) {
       return num.toFixed(0);
-    },
-    pushTransaction(transaction) {
-      console.log(transaction);
-      this.transactions = [transaction, ...this.transactions];
-    },
+    }
   },
   watch: {
     balance(newValue, oldValue) {
       this.$refs.balance.reset(oldValue, newValue);
       this.$refs.balance.start();
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -227,6 +228,9 @@ export default {
             padding-left 10px
             border-radius 20px
             line-height 20px
+          >.infd
+            >.timestamp
+              color #ddd
 
     >footer
       display: flex
