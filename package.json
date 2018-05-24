@@ -24,6 +24,7 @@
     "simple-peer": "^9.0.0",
     "vue": "^2.5.13",
     "vue-animate-number": "^0.4.2",
+    "vue-filter-date-format": "^1.0.1",
     "vue-meteor-tracker": "^1.2.3",
     "vue-router": "^3.0.1",
     "vue-supply": "^0.3.0",

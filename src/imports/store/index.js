@@ -44,6 +44,7 @@ const createStore = () => {
       unconfirmedTransactions: {},
       selectedGoodId: null,
       balance: 0,
+      transactions: [],
     },
     mutations: {
       ["dapp/initialized"](state, isInit) {
@@ -125,7 +126,6 @@ const createStore = () => {
         state.selectedGoodId = id;
       },
       ["balance"](state, balance) {
-        console.log("ASB Balance:", balance);
         state.balance = dapp.web3.utils.fromWei(balance);
       },
       ["setGoodForSale"](state, { id, forSale, price, confirmed }) {
@@ -149,6 +149,12 @@ const createStore = () => {
       },
       ["trades"](state, trades) {
         state.trades = trades;
+      },
+      ["transactions"](state, transactions) {
+        state.transactions = transactions;
+      },
+      ["addTransaction"](state, transaction) {
+        state.transactions = [transaction, ...state.transactions];
       },
     },
     actions: {
