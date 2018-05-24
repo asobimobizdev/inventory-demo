@@ -19,12 +19,12 @@
     </header>
     <div class="spring"></div>
     <main>
-      <div class="content">
+      <transition-group class="content" tag="div" name="list">
         <div class="item" v-for="transaction in filteredTransactions" :key="transaction.id">
+          <span class="amount"><i class="el-icon-plus"></i> {{transaction.amount}}₳</span>
           <span class="name">{{transaction.fromName}}</span>
-          <span class="amount"><div icon=""><i class="el-icon-plus"></i> {{transaction.amount}}₳</span>
         </div>
-      </div>
+      </transition-group>
     </main>
     <footer>
       <el-select
@@ -170,22 +170,30 @@ export default {
       overflow hidden
       overflow-y auto
 
+      // display: flex
+      // flex-direction: column
+      // flex-wrap: nowrap
+      // justify-content: center
+      // align-content: center
+      // align-items: center
+
       >.content
         display: flex
         flex-direction: column
         flex-wrap: nowrap
         justify-content: center
         align-content: center
-        align-items: center
+        align-items: flex-start
         min-height 100%
         padding-bottom 120px
+        // background-color alpha(#f00,0.3)
 
         >.item
           background-color alpha(#fff,0.9)
           height 60px
+          min-height 60px
           margin 10px
-          padding 8px 30px
-          padding-right 16px
+          padding 8px
           border-radius 30px
           font-size 24px
           line-height 24px
@@ -203,8 +211,8 @@ export default {
           >*
             margin-right 24px
 
-            &:last-child
-              margin-right 0px
+            // &:last-child
+            //   margin-right 0px
 
           >.amount
             color #fff
@@ -213,6 +221,7 @@ export default {
             padding 8px 20px
             padding-left 10px
             border-radius 20px
+            line-height 20px
 
     >footer
       display: flex
@@ -222,5 +231,17 @@ export default {
       align-content: center
       align-items: stretch
       padding 24px
+
+.list-item
+  display inline-block
+  margin-right 10px
+
+.list-enter-active, .list-leave-active
+  transition all 1s
+
+.list-enter, .list-leave-to
+  opacity 0
+  transform translateX(30px)
+
 
 </style>
