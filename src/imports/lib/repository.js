@@ -72,11 +72,13 @@ export default class Repository {
       .on("error", console.log);
   }
 
-  _convertAsobiCoinTransferEvent({returnValues}) {
+  _convertAsobiCoinTransferEvent({transactionHash, blockNumber, returnValues}) {
     return {
+      transactionHash,
+      blockNumber,
       from: returnValues.from,
       to: returnValues.to,
-      value: web3Utils.fromWei(returnValues.value),
+      value: returnValues.value,
     };
   }
 

@@ -5,6 +5,7 @@ import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
 import { Wallets } from "./../api/collections";
 import trade from "./trade";
+import live from "./live";
 
 window.Wallets = Wallets;
 
@@ -23,6 +24,7 @@ const createStore = () => {
     strict: process.env.NODE_ENV !== "production",
     modules: {
       trade,
+      live,
     },
     state: {
       dappInit: false,
@@ -146,12 +148,6 @@ const createStore = () => {
       },
       ["trades"](state, trades) {
         state.trades = trades;
-      },
-      ["transactions"](state, transactions) {
-        state.transactions = transactions;
-      },
-      ["addTransaction"](state, transaction) {
-        state.transactions = [transaction, ...state.transactions];
       },
     },
     actions: {
@@ -291,7 +287,6 @@ const createStore = () => {
             context.dispatch("getSelectedFriendGoods");
           })
           .on("error", console.log);
-        repository.getPastAsobiCoinTransfers().then(console.log);
       },
 
       getUserRegistryContract(context) {
