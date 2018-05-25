@@ -11,15 +11,14 @@ jobs:
           - v1-dependencies-{{ checksum "package.json" }}
       - run:
           command: npm install
-          working_directory: ~/asobicoin
       - run:
           command: npm run lint
       - run:
           command: npm run solium-lint
-          working_directory: ~/asobicoin
       - run:
           command: npm run truffle-test
-          working_directory: ~/asobicoin
+      - run:
+          command: npm run generate
       - save_cache:
           paths:
             - ~/asobicoin/node_modules

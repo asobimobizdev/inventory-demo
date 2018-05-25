@@ -34,13 +34,13 @@ module.exports = {
           loader: "eslint-loader",
           exclude: /(node_modules)/,
         });
-        config.module.rules.push({
-          enforce: "pre",
-          test: /\.sol$/,
-          // loader: 'solcLoader',
-          loader: path.resolve(__dirname, "lib/solcLoader.js"),
-        });
       }
+      config.module.rules.push({
+        enforce: "pre",
+        test: /\.sol$/,
+        // loader: 'solcLoader',
+        loader: path.resolve(__dirname, "lib/solcLoader.js"),
+      });
     },
   },
   mode: "spa",
