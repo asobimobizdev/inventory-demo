@@ -2,67 +2,78 @@
   <section class="host">
     <div class="content">
 
-      <div class="goods-collection my-goods" v-loading="goodsLoading">
+      <div
+        v-loading="goodsLoading"
+        class="goods-collection my-goods">
         <div class="head">
           <h1>My Goods</h1>
         </div>
         <div class="collection grid" >
           <draggable
-            v-model='allGoods'
-            class="container"
             id="goodsContainer"
+            v-model="allGoods"
             :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
             :move="checkMove"
+            class="container"
             @end="onDrop">
-            <div class="item"
+            <div
               v-for="(good,index) in allGoods"
               :key="index"
+              class="item"
               @click="selectGood(good)">
-              <good-item v-bind="good" :active="isGoodSelected(good)">
-              </good-item>
+              <good-item
+                v-bind="good"
+                :active="isGoodSelected(good)"/>
             </div>
           </draggable>
         </div>
       </div>
 
-      <div class="goods-collection friend-goods"
-          v-if="hasFriends"
-          v-loading="friendGoodsLoading">
+      <div
+        v-loading="friendGoodsLoading"
+        v-if="hasFriends"
+        class="goods-collection friend-goods">
         <div class="head">
-          <el-select v-model="selectedFriendIndex" placeholder="Select a Friend">
+          <el-select
+            v-model="selectedFriendIndex"
+            placeholder="Select a Friend">
             <el-option
               v-for="(friend, index) in otherUsers"
               :key="index"
               :label="friend.name"
-              :value="index">
-            </el-option>
+              :value="index"/>
           </el-select>
         </div>
         <div class="collection list" >
           <draggable
-            v-model='allFriendGoods'
-            class="container"
             id="friendGoodsContainer"
+            v-model="allFriendGoods"
             :options="{group:'goods', scroll: true, forceFallback:true, sort:false }"
-            :move="checkMoveFromFriendGoods">
+            :move="checkMoveFromFriendGoods"
+            class="container">
             <div
-              class="item"
               v-for="(good, index) in allFriendGoods"
               :key="index"
+              class="item"
               @click="selectGood(good)">
-              <good-item v-bind="good" :active="isGoodSelected(good)">
-              </good-item>
+              <good-item
+                v-bind="good"
+                :active="isGoodSelected(good)"/>
               <div class="info">
-                <div class="name">{{good.name}}</div>
-                <div class="spring"></div>
-                <div class="price" v-if="good.price > 0"><span class="value">{{good.price}}₳</span></div>
+                <div class="name">{{ good.name }}</div>
+                <div class="spring"/>
+                <div
+                  v-if="good.price > 0"
+                  class="price"><span class="value">{{ good.price }}₳</span></div>
               </div>
             </div>
           </draggable>
         </div>
       </div>
 
-      <good-inspector class="good-inspector" :good="selectedGood"></good-inspector>
+      <good-inspector
+        :good="selectedGood"
+        class="good-inspector"/>
 
     </div>
   </section>
@@ -76,19 +87,12 @@ import GoodInspector from "./../components/GoodInspector.vue";
 import dappMixin from "@/mixins/dapp";
 
 export default {
-  mixins: [dappMixin],
-  mounted() {
-    this.$store.dispatch("getOwnGoods", true);
-
-    if (this.otherUsers.length > 0) {
-      this.checkSelectedFriend(this.otherUsers);
-    }
-  },
   components: {
     draggable,
     "good-item": GoodItem,
-    "good-inspector": GoodInspector
+    "good-inspector": GoodInspector,
   },
+  mixins: [dappMixin],
   data() {
     return {};
   },
@@ -99,7 +103,7 @@ export default {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     hasFriends() {
       return this.otherUsers.length > 0;
@@ -118,18 +122,25 @@ export default {
         });
 
         this.$store.dispatch("selectedFriendId", friend.id);
-      }
+      },
     },
     allFriendGoods: {
       get() {
         return this.$store.getters.allFriendGoods;
       },
-      set(value) {}
-    }
+      set(value) {},
+    },
   },
   watch: {
     friends(friends) {
       this.checkSelectedFriend(friends);
+    },
+  },
+  mounted() {
+    this.$store.dispatch("getOwnGoods", true);
+
+    if (this.otherUsers.length > 0) {
+      this.checkSelectedFriend(this.otherUsers);
     }
   },
   methods: {
@@ -167,8 +178,8 @@ export default {
     isGoodSelected(good) {
       if (!this.$store.state.selectedGoodId || !good) return false;
       return good.id == this.$store.state.selectedGoodId;
-    }
-  }
+    },
+  },
 };
 </script>
 

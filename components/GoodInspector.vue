@@ -1,40 +1,68 @@
 <template>
-<div class="good-inspector" :class="{closed : !open}">
-  <div class="drawer">
-    <transition>
-    <div class="content" v-if="good">
-      <good-item class="good-item" v-bind="good" :active="true" :preview="true" />
+  <div
+    :class="{closed : !open}"
+    class="good-inspector">
+    <div class="drawer">
+      <transition>
+        <div
+          v-if="good"
+          class="content">
+          <good-item
+            v-bind="good"
+            :active="true"
+            :preview="true"
+            class="good-item" />
 
-      <div class="infos">
+          <div class="infos">
 
-        <h1>{{good.name}}</h1>
+            <h1>{{ good.name }}</h1>
 
-        <div class="main">
-          <div v-if="good.isOwned">
-            <span class="label">Price:</span>
-            <el-input-number :disabled="good.forSale" v-model="price" controls-position="right" @change="priceChanged()" :min="1" ></el-input-number>
-            <el-switch
-              v-model="goodForSale"
-              active-text="For Sale"
-              :disabled="!good.confirmed"
-              />
+            <div class="main">
+              <div v-if="good.isOwned">
+                <span class="label">Price:</span>
+                <el-input-number
+                  :disabled="good.forSale"
+                  v-model="price"
+                  :min="1"
+                  controls-position="right"
+                  @change="priceChanged()" />
+                <el-switch
+                  v-model="goodForSale"
+                  :disabled="!good.confirmed"
+                  active-text="For Sale"
+                />
+              </div>
+              <div
+                v-else
+                class="buy">
+                <span
+                  v-if="hasPrice"
+                  class="label" >Price:</span> <span
+                    v-if="hasPrice"
+                    class="price">{{ good.price }}₳</span>
+                <el-button
+                  v-if="good.forSale"
+                  type="primary"
+                  round
+                  @click="buyGood(good)">BUY</el-button>
+              </div>
+            </div>
+
+            <div class="footer">{{ good.id }}</div >
+
           </div>
-          <div class="buy" v-else>
-            <span class="label" v-if="hasPrice" >Price:</span> <span v-if="hasPrice" class="price">{{good.price}}₳</span>
-            <el-button v-if="good.forSale" @click="buyGood(good)" type="primary" round>BUY</el-button>
-          </div>
+
+          <el-button
+            class="close-button"
+            type="danger"
+            icon="el-icon-close"
+            circle
+            @click="close()"/>
+
         </div>
-
-        <div class="footer">{{good.id}}</div >
-
-      </div>
-
-      <el-button class="close-button" type="danger" icon="el-icon-close" circle @click="close()"></el-button>
-
+      </transition>
     </div>
-    </transition>
   </div>
-</div>
 </template>
 
 <script>
@@ -45,7 +73,7 @@ export default {
     "good-item": GoodItem,
   },
   props: {
-    good: Object,
+    good: {type: Object, default: null},
   },
   computed: {
     open() {

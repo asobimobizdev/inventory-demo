@@ -1,65 +1,67 @@
 <template>
-<section class="host">
-  <div class="content">
+  <section class="host">
+    <div class="content">
 
-    <header>
-      <span class="label">
-        Balance
-      </span>
-      <span class="value">
-        <animate-number
-          ref="balance"
-          duration="1000"
-          :from="balance"
-          :to="balance"
-          easing="easeOutQuad"
-          :formatter="formatter"
-        ></animate-number>₳
-      </span>
-    </header>
-    <div class="spring"></div>
-    <main>
-      <div class="spting"></div>
-      <transition-group class="content" tag="div" name="list">
-        <div
-          class="item"
-          v-for="transfer in filteredTransfers"
-          :key="transfer.transactionHash">
-          <span class="amount">
-            <i class="el-icon-plus"></i>
-            {{ transfer.value | fromWei }}₳
-          </span>
-          <div class="info">
-            <span class="name">
-              From {{ transfer.fromFriend.name }} - To {{ transfer.toFriend.name }}
+      <header>
+        <span class="label">
+          Balance
+        </span>
+        <span class="value">
+          <animate-number
+            ref="balance"
+            :from="balance"
+            :to="balance"
+            :formatter="formatter"
+            duration="1000"
+            easing="easeOutQuad"
+          />₳
+        </span>
+      </header>
+      <div class="spring"/>
+      <main>
+        <div class="spting"/>
+        <transition-group
+          class="content"
+          tag="div"
+          name="list">
+          <div
+            v-for="transfer in filteredTransfers"
+            :key="transfer.transactionHash"
+            class="item">
+            <span class="amount">
+              <i class="el-icon-plus"/>
+              {{ transfer.value | fromWei }}₳
             </span>
-            <span class="blockNumber">
-              {{ transfer.blockNumber }}
-            </span>
+            <div class="info">
+              <span class="name">
+                From {{ transfer.fromFriend.name }} - To {{ transfer.toFriend.name }}
+              </span>
+              <span class="blockNumber">
+                {{ transfer.blockNumber }}
+              </span>
+            </div>
           </div>
-        </div>
-      </transition-group>
-      <div class="spting"></div>
-    </main>
-    <footer>
-      <el-select
-        v-model="usersFilter"
-        multiple
-        filterable
-        allow-create
-        default-first-option
-        placeholder="Filter users">
-        <el-option
-          v-for="user in friends"
-          :key="user.id"
-          :label="user.name"
-          :value="user.id">
-        </el-option>
-      </el-select>
-    </footer>
+        </transition-group>
+        <div class="spting"/>
+      </main>
+      <footer>
+        <el-select
+          v-model="usersFilter"
+          multiple
+          filterable
+          allow-create
+          default-first-option
+          placeholder="Filter users">
+          <el-option
+            v-for="user in friends"
+            :key="user.id"
+            :label="user.name"
+            :value="user.id"/>
+        </el-select>
+      </footer>
 
-  </div>
-</section>
+    </div>
+  </section>
 </template>
 
 <script>
@@ -70,15 +72,15 @@ import web3Utils from "web3-utils";
 import dappMixin from "@/mixins/dapp";
 
 export default {
+  filters: {
+    fromWei: value => web3Utils.fromWei(value).toString(),
+  },
   mixins: [dappMixin],
   data() {
     return {
       usersFilter: [],
-      loop: true
+      loop: true,
     };
-  },
-  async mounted() {
-    this.$store.dispatch("live/getTransfers");
   },
   computed: {
     ...mapState(["friends", "balance"]),
@@ -100,25 +102,25 @@ export default {
           }) || { name: "Unknown" },
           toFriend: this.$store.state.friends.find(f => {
             return f.id == event.to;
-          }) || { name: "Unknown" }
+          }) || { name: "Unknown" },
         };
       });
-    }
-  },
-  filters: {
-    fromWei: value => web3Utils.fromWei(value).toString()
-  },
-  methods: {
-    formatter(num) {
-      return num.toFixed(0);
-    }
+    },
   },
   watch: {
     balance(newValue, oldValue) {
       this.$refs.balance.reset(oldValue, newValue);
       this.$refs.balance.start();
-    }
-  }
+    },
+  },
+  async mounted() {
+    this.$store.dispatch("live/getTransfers");
+  },
+  methods: {
+    formatter(num) {
+      return num.toFixed(0);
+    },
+  },
 };
 </script>
 

@@ -2,7 +2,7 @@
   <el-container class="host">
     <el-header class="main-header">
       <nuxt-link to="/">
-        <div class="logo"></div>
+        <div class="logo"/>
       </nuxt-link>
       <el-menu
         :router="true"
@@ -22,7 +22,7 @@
           <nuxt-link to="/live">Live</nuxt-link>
         </el-menu-item>
       </el-menu>
-      <div class="balance"><span class="label">Balance:</span> <span class="value">{{balance}}₳</span></div>
+      <div class="balance"><span class="label">Balance:</span> <span class="value">{{ balance }}₳</span></div>
     </el-header>
 
     <nuxt class="content"/>
@@ -32,7 +32,6 @@
 
 <script>
 export default {
-  created() {},
   data() {
     return {};
   },
@@ -42,8 +41,9 @@ export default {
     },
     balance() {
       return this.$store.state.balance;
-    }
-  }
+    },
+  },
+  created() {},
 };
 </script>
 

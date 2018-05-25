@@ -5,15 +5,15 @@ module.exports = {
    ** Headers of the page
    */
   head: {
-    title: 'asobi-playground',
+    title: "asobi-playground",
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Asobimo blockchain playground' }
+      { charset: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { hid: "description", name: "description", content: "Asobimo blockchain playground" },
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+    ],
   },
   /*
    ** Customize the progress bar color
@@ -29,7 +29,7 @@ module.exports = {
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
-          enforce: 'pre',
+          enforce: "pre",
           test: /\.(js|vue)$/,
           loader: "eslint-loader",
           exclude: /(node_modules)/,
@@ -38,17 +38,17 @@ module.exports = {
           enforce: "pre",
           test: /\.sol$/,
           // loader: 'solcLoader',
-          loader: path.resolve(__dirname, 'lib/solcLoader.js'),
+          loader: path.resolve(__dirname, "lib/solcLoader.js"),
         });
       }
-    }
+    },
   },
-  mode: 'spa',
+  mode: "spa",
   css: [
-    '@/assets/css/main.styl',
+    "@/assets/css/main.styl",
   ],
 
   plugins: [
-    '@/plugins/plugins.js',
+    "@/plugins/plugins.js",
   ],
-}
+};

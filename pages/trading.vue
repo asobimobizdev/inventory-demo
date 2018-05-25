@@ -1,124 +1,190 @@
 <template>
-<el-container class="host">
-  <el-aside>
-    <!-- <goods-collection class="my-goods" :goods="goods" title="My Goods"/> -->
+  <el-container class="host">
+    <el-aside>
+      <!-- <goods-collection class="my-goods" :goods="goods" title="My Goods"/> -->
 
-    <div class="goods-collection my-goods" v-loading="goodsLoading">
-      <div class="head">
-        <h1>My Goods</h1>
+      <div
+        v-loading="goodsLoading"
+        class="goods-collection my-goods">
+        <div class="head">
+          <h1>My Goods</h1>
+        </div>
+        <div class="collection grid" >
+          <draggable
+            id="myGoods"
+            v-model="goods"
+            :options="{group:'goods',scroll: true, forceFallback:true, sort:false }"
+            :move="checkMoveOfMyGoods"
+            class="container"
+            @end="onMyGoodsDrop">
+            <div
+              v-for="(good,index) in goods"
+              :key="index"
+              class="item" >
+              <good-item
+                v-bind="good"
+                :active="false"/>
+            </div>
+          </draggable>
+        </div>
       </div>
-      <div class="collection grid" >
-        <draggable v-model='goods' class="container" id="myGoods" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
-          <div class="item" v-for="(good,index) in goods" :key="index" >
-            <good-item v-bind="good" :active="false">
-            </good-item>
+
+
+    </el-aside>
+
+    <el-container class="trande-container">
+      <el-header>
+        <transition :name="toolBarSlideAnimationType">
+          <div
+            v-if="!hasTrade"
+            key="user-list"
+            class="content center">
+            <h1>Users list</h1>
           </div>
-        </draggable>
-      </div>
-    </div>
+          <div
+            v-else
+            key="trade-view"
+            class="content center">
+            <h1>Trade</h1>
+          </div>
+        </transition>
+      </el-header>
+      <el-main >
 
-
-  </el-aside>
-
-  <el-container class="trande-container">
-    <el-header>
-      <transition :name="toolBarSlideAnimationType">
-        <div class="content center" v-if="!hasTrade" key="user-list">
-          <h1>Users list</h1>
-        </div>
-        <div class="content center" v-else key="trade-view">
-          <h1>Trade</h1>
-        </div>
-      </transition>
-    </el-header>
-    <el-main >
-
-      <transition :name="slideAnimationType">
-        <div class="content user-list" v-if="!hasTrade" key="user-list">
-          <el-table
-            ref="usersTable"
-            :data="otherUsers"
-            class="table"
-            highlight-current-row
-            @current-change="userTableSelectionChanged"
-            current-row-key="id"
-            @mounted="userTableMounted"
+        <transition :name="slideAnimationType">
+          <div
+            v-if="!hasTrade"
+            key="user-list"
+            class="content user-list">
+            <el-table
+              ref="usersTable"
+              :data="otherUsers"
+              class="table"
+              highlight-current-row
+              current-row-key="id"
+              @current-change="userTableSelectionChanged"
+              @mounted="userTableMounted"
             >
-            <el-table-column
-              prop="name"
-              label="Name"
-              width="300px">
-            </el-table-column>
-            <el-table-column
-              prop="id"
-              label="Address"
-              >
-            </el-table-column>
-          </el-table>
-        </div>
-        <div class="content" v-else key="trade-view">
-          <!-- <goods-collection class="my-offer" :goods="myOffer" title="My Offer"/> -->
-
-          <div class="goods-collection my-offer" v-loading="goodsLoading">
-            <div class="head">
-              <h1>
-                My Offer
-                <small v-if="otherAccepted">
-                  (Accepted)
-                </small>
-              </h1>
-            </div>
-            <div class="collection grid" >
-              <draggable v-model='goods' class="container" id="myOffer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMoveOfMyGoods" @end="onMyGoodsDrop">
-                <div class="item" v-for="(good,index) in myOffer" :key="index" >
-                  <good-item v-bind="good" :active="false">
-                  </good-item>
-                </div>
-              </draggable>
-            </div>
+              <el-table-column
+                prop="name"
+                label="Name"
+                width="300px"/>
+              <el-table-column
+                prop="id"
+                label="Address"
+              />
+            </el-table>
           </div>
+          <div
+            v-else
+            key="trade-view"
+            class="content">
+            <!-- <goods-collection class="my-offer" :goods="myOffer" title="My Offer"/> -->
 
-          <!-- <goods-collection class="user-offer" :goods="otherOffer" :title="otherUser.name + ' Offer'"/> -->
-
-          <div class="goods-collection other-offer" v-loading="goodsLoading">
-            <div class="head">
-              <h1>
-                {{otherUser.name}} Offer
-                <small v-if="accepted">
-                  (Accepted)
-                </small>
-              </h1>
+            <div
+              v-loading="goodsLoading"
+              class="goods-collection my-offer">
+              <div class="head">
+                <h1>
+                  My Offer
+                  <small v-if="otherAccepted">
+                    (Accepted)
+                  </small>
+                </h1>
+              </div>
+              <div class="collection grid" >
+                <draggable
+                  id="myOffer"
+                  v-model="goods"
+                  :options="{group:'goods',scroll: true, forceFallback:true, sort:false }"
+                  :move="checkMoveOfMyGoods"
+                  class="container"
+                  @end="onMyGoodsDrop">
+                  <div
+                    v-for="(good,index) in myOffer"
+                    :key="index"
+                    class="item" >
+                    <good-item
+                      v-bind="good"
+                      :active="false"/>
+                  </div>
+                </draggable>
+              </div>
             </div>
-            <div class="collection grid" >
-              <div class="container">
-                <div class="item" v-for="(good,index) in otherOffer" :key="index" >
-                  <good-item v-bind="good" :active="false">
-                  </good-item>
+
+            <!-- <goods-collection class="user-offer" :goods="otherOffer" :title="otherUser.name + ' Offer'"/> -->
+
+            <div
+              v-loading="goodsLoading"
+              class="goods-collection other-offer">
+              <div class="head">
+                <h1>
+                  {{ otherUser.name }} Offer
+                  <small v-if="accepted">
+                    (Accepted)
+                  </small>
+                </h1>
+              </div>
+              <div class="collection grid" >
+                <div class="container">
+                  <div
+                    v-for="(good,index) in otherOffer"
+                    :key="index"
+                    class="item" >
+                    <good-item
+                      v-bind="good"
+                      :active="false"/>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </transition>
+        </transition>
 
-    </el-main>
+      </el-main>
 
-    <el-footer>
-      <transition :name="toolBarSlideAnimationType">
-        <div class="content center" v-if="!hasTrade" key="user-list">
-          <el-button type="primary" round @click="startTradeWithSelectedUser()" v-if="selectedFriendId">Start Trade</el-button>
-        </div>
-        <div class="content center trade-view" v-else key="trade-view">
-          <el-button type="danger" v-if="!accepted" round @click="cancelTrade()">Cancel Trade</el-button>
-          <el-button type="success" v-if="!accepted" round @click="confirmTrade()">Confirm Trade</el-button>
-          <el-button type="success" v-if="accepted && otherAccepted && !pulled" round @click="pullGoods()">Pull Goods</el-button>
-          <el-button type="success" v-if="pulled" round @click="closeTrade()">Close Trade</el-button>
-        </div>
-      </transition>
-    </el-footer>
+      <el-footer>
+        <transition :name="toolBarSlideAnimationType">
+          <div
+            v-if="!hasTrade"
+            key="user-list"
+            class="content center">
+            <el-button
+              v-if="selectedFriendId"
+              type="primary"
+              round
+              @click="startTradeWithSelectedUser()">Start Trade</el-button>
+          </div>
+          <div
+            v-else
+            key="trade-view"
+            class="content center trade-view">
+            <el-button
+              v-if="!accepted"
+              type="danger"
+              round
+              @click="cancelTrade()">Cancel Trade</el-button>
+            <el-button
+              v-if="!accepted"
+              type="success"
+              round
+              @click="confirmTrade()">Confirm Trade</el-button>
+            <el-button
+              v-if="accepted && otherAccepted && !pulled"
+              type="success"
+              round
+              @click="pullGoods()">Pull Goods</el-button>
+            <el-button
+              v-if="pulled"
+              type="success"
+              round
+              @click="closeTrade()">Close Trade</el-button>
+          </div>
+        </transition>
+      </el-footer>
+    </el-container>
+
   </el-container>
-
- </el-container>
 </template>
 
 <script>
@@ -129,18 +195,12 @@ import draggable from "vuedraggable";
 import dappMixin from "@/mixins/dapp";
 
 export default {
-  mixins: [dappMixin],
   components: {
     draggable,
     "goods-collection": GoodsCollection,
-    "good-item": GoodItem
+    "good-item": GoodItem,
   },
-  mounted() {
-    this.$store.dispatch("getOwnGoods", true);
-    if (this.selectedUser) {
-      this.$refs.usersTable.setCurrentRow(this.selectedUser);
-    }
-  },
+  mixins: [dappMixin],
   computed: {
     ...mapState(["selectedFriendId", "goodsLoading"]),
     ...mapGetters(["otherUsers"]),
@@ -153,7 +213,7 @@ export default {
       get() {
         return this.$store.getters.allGoods;
       },
-      set(value) {}
+      set(value) {},
     },
     myOffer: {
       get() {
@@ -161,7 +221,7 @@ export default {
       },
       set(value) {
         console.log("selectedMyOffer", value);
-      }
+      },
     },
     otherOffer: {
       get() {
@@ -169,13 +229,24 @@ export default {
       },
       set(value) {
         // console.log("selectedMyOffer", value);
-      }
+      },
     },
     slideAnimationType() {
       return this.hasTrade ? "slide-left" : "slide-right";
     },
     toolBarSlideAnimationType() {
       return this.hasTrade ? "tool-bar-slide-left" : "tool-bar-slide-right";
+    },
+  },
+  watch: {
+    selectedUser(user) {
+      this.$refs.usersTable.setCurrentRow(user);
+    },
+  },
+  mounted() {
+    this.$store.dispatch("getOwnGoods", true);
+    if (this.selectedUser) {
+      this.$refs.usersTable.setCurrentRow(this.selectedUser);
     }
   },
   methods: {
@@ -185,7 +256,7 @@ export default {
       "confirmTrade",
       "pullGoods",
       "startTradeWithSelectedUser",
-      "withdrawTrade"
+      "withdrawTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);
@@ -212,13 +283,8 @@ export default {
         if (!good.confirmed) return;
         this.$store.dispatch("trade/transfereGoodFromMyOffer", good);
       }
-    }
+    },
   },
-  watch: {
-    selectedUser(user) {
-      this.$refs.usersTable.setCurrentRow(user);
-    }
-  }
 };
 </script>
 

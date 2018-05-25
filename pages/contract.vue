@@ -1,19 +1,34 @@
 <template>
   <el-main class="full-centered-content">
     <el-card class="create-contract-box full-centered-content">
-      <el-button @click="createGoodsContract()" type="primary" round >Create Goods Contract</el-button>
+      <el-button 
+        type="primary" 
+        round 
+        @click="createGoodsContract()" >Create Goods Contract</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button @click="createAsobiCoinContract()" type="primary" round >Create Asobi Coin Contract</el-button>
+      <el-button 
+        type="primary" 
+        round 
+        @click="createAsobiCoinContract()" >Create Asobi Coin Contract</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button @click="createEscrowContract()" type="primary" round >Create Escrow Contract</el-button>
+      <el-button 
+        type="primary" 
+        round 
+        @click="createEscrowContract()" >Create Escrow Contract</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button @click="createTradeRegistry()" type="primary" round >Create Trade Registry</el-button>
+      <el-button 
+        type="primary" 
+        round 
+        @click="createTradeRegistry()" >Create Trade Registry</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button @click="createUserRegistry()" type="primary" round >Create User Registry</el-button>
+      <el-button 
+        type="primary" 
+        round 
+        @click="createUserRegistry()" >Create User Registry</el-button>
     </el-card>
   </el-main>
 </template>
@@ -41,8 +56,8 @@ export default {
     },
     createUserRegistry() {
       this.$store.dispatch("createUserRegistry");
-    }
-  }
+    },
+  },
 };
 </script>
 

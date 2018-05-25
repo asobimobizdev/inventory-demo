@@ -1,4 +1,4 @@
-import { dapp } from "@/lib/dapp"
+import { dapp } from "@/lib/dapp";
 
 export default {
   async fetch({ store, params }) {
@@ -16,5 +16,5 @@ export default {
       store.dispatch("trade/loadTrade"),
     ]);
     store.commit("dapp/initialized", true);
-  }
-}
+  },
+};

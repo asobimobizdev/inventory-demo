@@ -1,11 +1,20 @@
 <template>
-<div class="good" :class="{ 'has-drawer': hasDrawer, 'active': active, 'preview': preview }" v-loading="!confirmed">
-  <div class="icon" :style="styleForIcon"></div>
-  <div class="drawer" v-if="hasDrawer">
-    <slot></slot>
+  <div
+    v-loading="!confirmed"
+    :class="{ 'has-drawer': hasDrawer, 'active': active, 'preview': preview }"
+    class="good">
+    <div
+      :style="styleForIcon"
+      class="icon"/>
+    <div
+      v-if="hasDrawer"
+      class="drawer">
+      <slot/>
+    </div>
+    <div
+      :class="{ 'hidden':!forSale }"
+      class="for-sale-ribbon" >FOR SALE</div>
   </div>
-  <div class="for-sale-ribbon"  :class="{ 'hidden':!forSale }" >FOR SALE</div>
-</div>
 </template>
 
 <script>
@@ -13,9 +22,9 @@ import seedParams from "../lib/seedParams";
 
 export default {
   props: {
-    id: String,
-    confirmed: Boolean,
-    forSale: Boolean,
+    id: {type: String, default: null},
+    confirmed: {type: Boolean, default: false },
+    forSale: {type: Boolean, default: false },
     hasDrawer: { type: Boolean, default: false },
     active: { type: Boolean, default: false },
     preview: { type: Boolean, default: false },

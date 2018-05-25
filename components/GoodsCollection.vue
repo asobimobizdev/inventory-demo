@@ -1,17 +1,31 @@
 <template>
-<div class="goods-collection" v-loading="loading">
-  <div class="head">
-    <h1>{{title}}</h1>
+  <div 
+    v-loading="loading" 
+    class="goods-collection">
+    <div class="head">
+      <h1>{{ title }}</h1>
+    </div>
+    <div class="collection grid" >
+      <draggable 
+        id="goodsContainer" 
+        v-model="goods" 
+        :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" 
+        :move="checkMove" 
+        class="container" 
+        @end="onDrop">
+        <div 
+          v-loading="!good.confirmed" 
+          v-for="(good,index) in goods" 
+          :key="index" 
+          class="item" 
+          @click="selectGood(good)">
+          <good-item 
+            v-bind="good" 
+            :active="isGoodSelected(good)"/>
+        </div>
+      </draggable>
+    </div>
   </div>
-  <div class="collection grid" >
-    <draggable v-model='goods' class="container" id="goodsContainer" :options="{group:'goods',scroll: true, forceFallback:true, sort:false }" :move="checkMove" @end="onDrop">
-      <div class="item" v-for="(good,index) in goods" :key="index" v-loading="!good.confirmed" @click="selectGood(good)">
-        <good-item v-bind="good" :active="isGoodSelected(good)">
-        </good-item>
-      </div>
-    </draggable>
-  </div>
-</div>
 </template>
 
 <script>
