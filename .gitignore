@@ -1,3 +1,14 @@
-node_modules/
+# Solidity
 build/
-.meteor/local/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log
+
+# Nuxt build
+.nuxt
+
+# Nuxt generate
+dist
