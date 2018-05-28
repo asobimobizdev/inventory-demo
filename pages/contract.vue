@@ -1,33 +1,33 @@
 <template>
   <el-main class="full-centered-content">
     <el-card class="create-contract-box full-centered-content">
-      <el-button 
-        type="primary" 
-        round 
+      <el-button
+        type="primary"
+        round
         @click="createGoodsContract()" >Create Goods Contract</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button 
-        type="primary" 
-        round 
+      <el-button
+        type="primary"
+        round
         @click="createAsobiCoinContract()" >Create Asobi Coin Contract</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button 
-        type="primary" 
-        round 
+      <el-button
+        type="primary"
+        round
         @click="createEscrowContract()" >Create Escrow Contract</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button 
-        type="primary" 
-        round 
+      <el-button
+        type="primary"
+        round
         @click="createTradeRegistry()" >Create Trade Registry</el-button>
     </el-card>
     <el-card class="create-contract-box full-centered-content">
-      <el-button 
-        type="primary" 
-        round 
+      <el-button
+        type="primary"
+        round
         @click="createUserRegistry()" >Create User Registry</el-button>
     </el-card>
   </el-main>
