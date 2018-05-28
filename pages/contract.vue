@@ -35,6 +35,7 @@
 
 <script>
 import dappMixin from "@/mixins/dapp";
+import { mapActions } from "vuex";
 
 export default {
   mixins: [dappMixin],
@@ -42,21 +43,13 @@ export default {
     return {};
   },
   methods: {
-    createGoodsContract() {
-      this.$store.dispatch("createGoodsContract");
-    },
-    createAsobiCoinContract() {
-      this.$store.dispatch("createAsobiCoinContract");
-    },
-    createEscrowContract() {
-      this.$store.dispatch("createEscrowContract");
-    },
-    createTradeRegistry() {
-      this.$store.dispatch("createTradeRegistry");
-    },
-    createUserRegistry() {
-      this.$store.dispatch("createUserRegistry");
-    },
+    ...mapActions([
+      "createGoodsContract",
+      "createAsobiCoinContract",
+      "createEscrowContract",
+      "createTradeRegistry",
+      "createUserRegistry",
+    ]),
   },
 };
 </script>
