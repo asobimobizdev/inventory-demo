@@ -76,7 +76,7 @@ export default {
       const otherUserID = context.rootState.selectedFriendId;
       if (!otherUserID) return;
 
-      const trade = await repository.createTrade(
+      await repository.createTrade(
         context.rootState.accountAddress,
         otherUserID,
       );
