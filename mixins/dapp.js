@@ -9,12 +9,17 @@ export default {
     store.dispatch("getEscrowContract");
     store.dispatch("getTradeRegistryContract");
     store.dispatch("getUserRegistryContract");
-    await Promise.all([
-      store.dispatch("getBalance"),
-      store.dispatch("getFriends"),
-      store.dispatch("getRegisterState"),
-      store.dispatch("trade/loadTrade"),
-    ]);
+    try {
+      await Promise.all([
+        store.dispatch("getBalance"),
+        store.dispatch("getFriends"),
+        store.dispatch("getRegisterState"),
+        store.dispatch("trade/loadTrade"),
+      ]);
+    } catch(e) {
+      console.log(e);
+      window.alert("Contracts not deployed");
+    }
     store.commit("dapp/initialized", true);
   },
 };
