@@ -220,24 +220,22 @@ const createStore = () => {
         }
       },
 
-      async createAsobiCoinContract(context) {
-        await repository.createAsobiCoinContract();
-      },
-
-      async createGoodsContract(context) {
-        await repository.createGoodsContract();
-      },
-
-      async createEscrowContract(context) {
-        await repository.createEscrowContract();
-      },
-
-      async createTradeRegistry(context) {
-        await repository.createTradeRegistry();
-      },
-
-      async createUserRegistry(context) {
-        await repository.createUserRegistry();
+      async createContracts(context) {
+        const [coin, goods, tradeRegistry, userRegistry] = await Promise.all([
+          repository.createAsobiCoinContract(),
+          repository.createGoodsContract(),
+          repository.createTradeRegistry(),
+          repository.createUserRegistry(),
+        ]);
+        const escrow = await repository.createEscrowContract(coin, goods);
+        const result = {
+          coin,
+          goods,
+          escrow,
+          tradeRegistry,
+          userRegistry,
+        };
+        console.log(result)
       },
 
       getGoodsContract(context) {
