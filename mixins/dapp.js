@@ -18,7 +18,7 @@ export default {
       ]);
     } catch(e) {
       console.log(e);
-      window.alert("Contracts not deployed");
+      console.error("Contracts not deployed");
     }
     store.commit("dapp/initialized", true);
   },
