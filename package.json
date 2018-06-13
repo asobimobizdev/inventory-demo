@@ -5,16 +5,16 @@
   "author": "josh@hizen.io",
   "private": true,
   "scripts": {
-    "dev": "HOST=0.0.0.0 PORT=3000 nuxt",
     "build": "nuxt build",
-    "start": "nuxt start",
+    "dev": "HOST=0.0.0.0 PORT=3000 nuxt",
     "generate": "nuxt generate",
-    "precommit": "npm run lint",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext .js,.vue --ignore-path .gitignore . --fix",
-    "truffle-compile": "truffle compile",
-    "truffle-test": "truffle test",
-    "solium-lint": "solium --dir contracts"
+    "precommit": "npm run lint",
+    "solium-lint": "solium --dir contracts",
+    "start": "nuxt start",
+    "truffle-compile": "darq-truffle compile",
+    "truffle-test": "darq-truffle test"
   },
   "dependencies": {
     "bignumber.js": "^7.0.1",
@@ -35,6 +35,8 @@
   "devDependencies": {
     "assert-rejected": "^1.1.1",
     "babel-eslint": "^8.2.1",
+    "darq-truffle": "^4.1.4-next.10",
+    "dependo": "^0.2.0",
     "eslint": "^4.15.0",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
@@ -42,6 +44,7 @@
     "eth-gas-reporter": "^0.1.7",
     "solium": "^1.1.7",
     "solium-plugin-zeppelin": "git+https://github.com/OpenZeppelin/solium-plugin-zeppelin.git#aec043c90d158210a6baa95b5247fa2dedd8775e",
+    "stats-js": "^1.0.0-alpha1",
     "truffle": "^4.1.8",
     "truffle-test-helpers": "0.0.5",
     "web3-utils": "^1.0.0-beta.34"
