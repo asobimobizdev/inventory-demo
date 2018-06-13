@@ -1,85 +1,104 @@
 pragma solidity ^0.4.23;
 
-import "contracts/AsobiCoin.sol";
-import "contracts/Goods.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol";
 
 
 /**
-  * @title Escrow contract that allows atomic swaps of AsobiCoin and Goods
+  * @title Escrow contract that allows atomic swaps of ERC20 and ERC721
   */
-contract Escrow {
+contract Escrow is ERC721Receiver {
 
     event Swapped(
-        address _buyer,
-        address _seller,
-        uint256 _goodID,
+        address indexed _buyer,
+        address indexed _seller,
+        uint256 indexed _tokenId,
         uint256 _price
     );
-    event PriceSet(address _seller, uint256 _goodID, uint256 _price);
+    event Listed(
+        address indexed _seller,
+        uint256 indexed _tokenId,
+        uint256 _price
+    );
 
-    AsobiCoin asobiCoin;
-    Goods goods;
+    ERC20 asobiCoin;
+    ERC721 erc721;
 
-    mapping(uint256 => uint256) goodPrices;
+    mapping(uint256 => uint256) public priceOf;
+    mapping(uint256 => address) public sellerOf;
 
-    constructor(AsobiCoin _asobiCoin, Goods _goods) public {
+    constructor(ERC20 _asobiCoin, ERC721 _erc721) public {
         asobiCoin = _asobiCoin;
-        goods = _goods;
-    }
-
-    /**
-     * @dev Set the price for a good
-     * @param goodID the good to set the price for
-     * @param price the price to set
-     */
-    function setPrice(uint256 goodID, uint256 price) external {
-        address seller = msg.sender;
-        require(goods.ownerOf(goodID) == seller);
-        require(price > 0);
-
-        goodPrices[goodID] = price;
-        emit PriceSet(seller, goodID, price);
+        erc721 = _erc721;
     }
 
     /**
       * @dev Initiate an escrow swap
-      @ @param goodID the good to swap
+      @ @param _tokenId the good to swap
       */
-    function swap(uint256 goodID) external {
-        require(isListed(goodID));
+    function swap(uint256 _tokenId) external {
+        require(isListed(_tokenId));
 
+        address seller = sellerOf[_tokenId];
         // solium-disable-next-line security/no-tx-origin
         address buyer = tx.origin;
-        address seller = goods.ownerOf(goodID);
-        uint256 price = getPrice(goodID);
+        uint256 _price = priceOf[_tokenId];
 
-        require(asobiCoin.transferFrom(buyer, seller, price));
-        goods.transferFrom(seller, buyer, goodID);
+        require(asobiCoin.transferFrom(buyer, seller, _price));
+        erc721.transferFrom(address(this), buyer, _tokenId);
+
+        delete priceOf[_tokenId];
+        delete sellerOf[_tokenId];
 
         emit Swapped(
             buyer,
             seller,
-            goodID,
-            price
+            _tokenId,
+            _price
         );
     }
 
     /**
-      * @dev Determine whether an item is listed
-      * @param goodID The id of the good to check
-      * @return Return true if item is listed
-      */
-    function isListed(uint256 goodID) public view returns (bool) {
-        return goodPrices[goodID] > 0 &&
-            goods.getApproved(goodID) == address(this);
+     * @dev List a good using a ERC721 receiver hook
+     * @param _seller the good seller
+     * @param _tokenId the good id to list
+     * @param _data contains the pricing data as the first 32 bytes
+     */
+    function onERC721Received(address _seller, uint256 _tokenId, bytes _data)
+        public
+        returns (bytes4)
+        {
+        uint256 _price = toUint256(_data);
+        require(_price > 0);
+
+        priceOf[_tokenId] = _price;
+        sellerOf[_tokenId] = _seller;
+        emit Listed(_seller, _tokenId, _price);
+
+        return ERC721_RECEIVED;
     }
 
     /**
-      * @dev Get the price for an item
-      * @dev goodID The id of the good to check
-      * @return Return the price in AsobiCoin as uint256
+      * @dev Determine whether an item is listed
+      * @param _tokenId The id of the good to check
+      * @return Return true if item is listed
       */
-    function getPrice(uint256 goodID) public view returns (uint256) {
-        return goodPrices[goodID];
+    function isListed(uint256 _tokenId) public view returns (bool) {
+        return sellerOf[_tokenId] != address(0);
+    }
+
+    /**
+      * @dev Convert a 32 byte array to uint256
+      * @param input 32 byte array
+      */
+    function toUint256(bytes input) internal pure returns (uint256) {
+        uint256 converted;
+        uint256 digit;
+        for (uint256 index = 0; index < 32; index++) {
+            digit = uint256(input[31 - index]);
+            converted += digit * 256**index;
+        }
+        return converted;
     }
 }

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "zeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol";
 
 import "contracts/Goods.sol";
 

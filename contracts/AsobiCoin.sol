@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
-import "zeppelin-solidity/contracts/token/ERC827/ERC827Token.sol";
-import "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC827/ERC827Token.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 
 
 /**
