@@ -339,6 +339,7 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
+          console.error(e);
           // p2pManager.removeUnconfirmedTransaction(
           //   context.state.accountAddress,
           //   address,
@@ -386,6 +387,7 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
           );
         } catch (e) {
           context.commit("setGoodForSale", oldGoodState);
+          console.error(e);
         }
       },
 
@@ -409,6 +411,7 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
+          console.error(e);
           // p2pManager.removeUnconfirmedTransaction(
           //   transaction.from,
           //   transaction.to,

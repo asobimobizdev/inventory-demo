@@ -122,6 +122,7 @@ export default {
       } catch (e) {
         transaction.confirmed = false;
         context.commit("removeUnconfirmedTransaction", transaction, { root: true });
+        console.error(e);
       }
     },
     async transfereGoodFromMyOffer(context, good) {
@@ -140,6 +141,7 @@ export default {
       } catch (e) {
         transaction.confirmed = false;
         context.commit("removeUnconfirmedTransaction", transaction, { root: true });
+        console.error(e);
       }
     },
   },
