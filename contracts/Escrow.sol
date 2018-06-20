@@ -29,6 +29,8 @@ contract Escrow is ERC721Receiver {
     mapping(uint256 => address) public sellerOf;
 
     constructor(ERC20 _asobiCoin, ERC721 _erc721) public {
+        require(_asobiCoin != address(0));
+        require(_erc721 != address(0));
         asobiCoin = _asobiCoin;
         erc721 = _erc721;
     }

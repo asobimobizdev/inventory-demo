@@ -14,7 +14,7 @@ contract("Escrow", accounts => {
   const sellerOptions = { from: seller };
 
   const price = 256;
-  0x0000000000000000000000000000000000000000000000000000000000000100;
+  // 0x0000000000000000000000000000000000000000000000000000000000000100;
   const priceHex = web3Utils.padLeft(
     web3Utils.toHex(price),
     64,
@@ -37,6 +37,15 @@ contract("Escrow", accounts => {
 
     await asobiCoin.mint(buyer, price);
     await goods.mint(seller, goodID);
+  });
+
+  describe("0 addresses", () => {
+    it("needs a valid asobiCoin address", async () => {
+      await assertRejected(Escrow.new(0, goods.address));
+    });
+    it("needs a valid goods address", async () => {
+      await assertRejected(Escrow.new(asobiCoin.address, 0));
+    });
   });
 
   describe("listing", () => {
