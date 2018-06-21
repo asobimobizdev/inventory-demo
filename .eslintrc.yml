@@ -31,7 +31,8 @@ rules:
   semi:
     - warn
     - always
-  no-console: warn
+  no-console:
+    - off
   comma-dangle:
     - warn
     - always-multiline
