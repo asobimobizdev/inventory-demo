@@ -33,13 +33,13 @@
     "zeppelin-solidity": "~1.8.0"
   },
   "devDependencies": {
+    "assert-rejected": "^1.1.1",
     "babel-eslint": "^8.2.1",
     "eslint": "^4.15.0",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-vue": "^4.0.0",
-    "assert-rejected": "^1.1.1",
-    "eth-gas-reporter": "^0.1.2",
+    "eth-gas-reporter": "^0.1.7",
     "solium": "^1.1.7",
     "solium-plugin-zeppelin": "git+https://github.com/OpenZeppelin/solium-plugin-zeppelin.git#aec043c90d158210a6baa95b5247fa2dedd8775e",
     "truffle": "^4.1.8",

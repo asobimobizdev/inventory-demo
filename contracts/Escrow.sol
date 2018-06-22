@@ -48,7 +48,8 @@ contract Escrow {
     function swap(uint256 goodID) external {
         require(isListed(goodID));
 
-        address buyer = msg.sender;
+        // solium-disable-next-line security/no-tx-origin
+        address buyer = tx.origin;
         address seller = goods.ownerOf(goodID);
         uint256 price = getPrice(goodID);
 
