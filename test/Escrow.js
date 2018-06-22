@@ -99,8 +99,13 @@ contract("Escrow", accounts => {
       );
     });
     it("swaps when the buyer initiates", async () => {
-      await asobiCoin.approve(escrow.address, price, buyerOptions);
-      await escrow.swap(goodID, buyerOptions);
+      const data = escrow.contract.methods.swap(goodID).encodeABI();
+      await asobiCoin.approveAndCall(
+        escrow.address,
+        price,
+        data,
+        buyerOptions,
+      );
 
       assert.equal(await goods.ownerOf(goodID), buyer);
       assert.equal(await asobiCoin.balanceOf(seller), price);
