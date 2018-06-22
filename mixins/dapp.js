@@ -2,6 +2,10 @@ import { dapp } from "@/lib/dapp";
 
 export default {
   async fetch({ store, params }) {
+    if (store.state.dappInit) {
+      console.log("Already initialized");
+      return;
+    }
     try {
       await dapp.asyncInitialize();
       store.commit("accountAddress", dapp.defaultAccount);
