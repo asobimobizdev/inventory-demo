@@ -1,4 +1,3 @@
-NETWORK_ID: 4
 WEBSOCKET_NODE: wss://rinkeby.infura.io/_ws
 GAS_PRICE: "10"
 
