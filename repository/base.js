@@ -9,6 +9,10 @@ export default class BaseRepository {
     return this.dapp.defaultAccount;
   }
 
+  get networkIdentifier() {
+    return this.dapp.networkID;
+  }
+
   async initialize() {
     throw new Error("Not Implemented");
   }

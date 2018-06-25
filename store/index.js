@@ -235,7 +235,9 @@ const createStore = () => {
           tradeRegistry,
           userRegistry,
         };
+        const networkIdentifier = repository.networkIdentifier;
         console.log(`
+  "${networkIdentifier}":
     AsobiCoin: "${coin}"
     Goods: "${goods}"
     Escrow: "${escrow}"
