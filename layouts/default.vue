@@ -21,6 +21,9 @@
         <el-menu-item index="/live">
           <nuxt-link to="/live">Live</nuxt-link>
         </el-menu-item>
+        <el-menu-item index="/shop">
+          <nuxt-link to="/shop">Shop</nuxt-link>
+        </el-menu-item>
       </el-menu>
       <div class="balance"><span class="label">Balance:</span> <span class="value">{{ balance }}₳</span></div>
     </el-header>

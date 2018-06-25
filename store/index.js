@@ -285,6 +285,10 @@ const createStore = () => {
           .on("error", console.log);
       },
 
+      getShopContract(context) {
+        repository.loadShopContract();
+      },
+
       getUserRegistryContract(context) {
         repository.loadUserRegistryContract();
         repository.userRegistryEvents()
@@ -406,6 +410,10 @@ const createStore = () => {
           friend.id,
           dapp.web3.utils.toWei(amount, "ether"),
         );
+      },
+
+      async buyAsobiCoinAndGoods(context) {
+        await repository.buyAsobiCoinAndGoods();
       },
     },
     getters: {

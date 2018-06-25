@@ -24,6 +24,10 @@ export default class Repository extends BaseRepository {
     return await dapp.deployContract(Shop, [asobiCoin, goods]);
   }
 
+  loadShopContract() {
+    this.shop = this.dapp.getContractAt(Shop);
+  }
+
   async transferOwnershipsToShop(asobiCoin, goods, shop) {
     const coinContract = this.dapp.getContract(AsobiCoin, asobiCoin);
     const goodsContract = this.dapp.getContract(Goods, goods);
@@ -33,6 +37,10 @@ export default class Repository extends BaseRepository {
       coinContract.transferOwnership(shop).send(),
       goodsContract.transferOwnership(shop).send(),
     ]);
+  }
+
+  async buyAsobiCoinAndGoods() {
+    await this.shop.buy().send();
   }
 
   // AsobiCoin

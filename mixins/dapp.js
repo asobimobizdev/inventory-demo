@@ -12,6 +12,7 @@ export default {
     store.dispatch("getGoodsContract");
     store.dispatch("getAsobiCoinContract");
     store.dispatch("getEscrowContract");
+    store.dispatch("getShopContract");
     store.dispatch("getTradeRegistryContract");
     store.dispatch("getUserRegistryContract");
     try {
