@@ -75,7 +75,7 @@ contract("Escrow", accounts => {
     });
   });
 
-  describe("swap", () => {
+  describe("when listed", () => {
     beforeEach(async () => {
       // approve the escrow to transfer the good
       await goods.safeTransferFrom(
