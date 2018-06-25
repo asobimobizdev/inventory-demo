@@ -32,29 +32,29 @@ export default class Repository extends BaseRepository {
   }
 
   loadAsobiCoinContract() {
-    this.c.asobiCoin = this.dapp.getContractAt(AsobiCoin);
+    this.asobiCoin = this.dapp.getContractAt(AsobiCoin);
   }
 
   async createCoin(receiver, amount) {
-    await this.c.asobiCoin.mint(receiver, amount).send();
+    await this.asobiCoin.mint(receiver, amount).send();
   }
 
   async isAsobiCoinAdmin(address) {
-    return await this.isAdmin(address, this.c.asobiCoin);
+    return await this.isAdmin(address, this.asobiCoin);
   }
 
   async getAsobiCoinBalance(address) {
-    return await this.getBalance(address, this.c.asobiCoin);
+    return await this.getBalance(address, this.asobiCoin);
   }
 
   async getPastAsobiCoinTransfers() {
     return (
-      await this.c.asobiCoin.getPastEvents("Transfer", { fromBlock: 0 })
+      await this.asobiCoin.getPastEvents("Transfer", { fromBlock: 0 })
     ).map(this._convertAsobiCoinTransferEvent);
   }
 
   asobiCoinTransferEvents(cb) {
-    return this.c.asobiCoin.Transfer()
+    return this.asobiCoin.Transfer()
       .on("data", (event) => {
         cb(this._convertAsobiCoinTransferEvent(event));
       })
@@ -77,19 +77,19 @@ export default class Repository extends BaseRepository {
   }
 
   loadGoodsContract() {
-    this.c.goods = this.dapp.getContractAt(Goods);
+    this.goods = this.dapp.getContractAt(Goods);
   }
 
   async createGood(receiver) {
-    await this.mint(receiver, this.generateGoodID(), this.c.goods);
+    await this.mint(receiver, this.generateGoodID(), this.goods);
   }
 
   async getGoodsBalance(address) {
-    return await this.getBalance(address, this.c.goods);
+    return await this.getBalance(address, this.goods);
   }
 
   async isGoodsAdmin(address) {
-    return await this.isAdmin(address, this.c.goods);
+    return await this.isAdmin(address, this.goods);
   }
 
   generateGoodID() {
@@ -98,25 +98,25 @@ export default class Repository extends BaseRepository {
 
   async getGoodsForAddress(address) {
     const getGood = async (index) => {
-      const id = await this.c.goods.tokenOfOwnerByIndex(
+      const id = await this.goods.tokenOfOwnerByIndex(
         address,
         index,
       ).call();
-      const price = await this.c.escrow.priceOf(id).call();
+      const price = await this.escrow.priceOf(id).call();
       return {
         id: id,
         confirmed: true,
         price: web3Utils.fromWei(price),
       };
     };
-    const balance = await this.getGoodsBalance(address, this.c.goods);
+    const balance = await this.getGoodsBalance(address, this.goods);
     const indices = range(balance);
     const items = await Promise.all(indices.map(getGood));
     return items;
   }
 
   async transferGood(from, to, goodID) {
-    await this.c.goods.safeTransferFrom(
+    await this.goods.safeTransferFrom(
       from,
       to,
       goodID,
@@ -126,9 +126,9 @@ export default class Repository extends BaseRepository {
   async setGoodForSale(goodID, price, forSale) {
     const priceWei = web3Utils.toWei(price, "ether");
     const priceHex = web3Utils.padLeft(web3Utils.toHex(priceWei), 64);
-    await this.c.goods.safeTransferFrom(
+    await this.goods.safeTransferFrom(
       this.defaultAccount,
-      this.c.escrow.address,
+      this.escrow.address,
       goodID,
       priceHex,
     ).send();
@@ -140,26 +140,26 @@ export default class Repository extends BaseRepository {
   }
 
   loadEscrowContract() {
-    this.c.escrow = this.dapp.getContractAt(Escrow);
+    this.escrow = this.dapp.getContractAt(Escrow);
   }
 
   async buyGood(goodID, buyer) {
     // Check whether we have already approved spending
     const price = web3Utils.toBN(
-      await this.c.escrow.getPrice(goodID).call(),
+      await this.escrow.getPrice(goodID).call(),
     );
 
     const allowance = web3Utils.toBN(
-      await this.c.asobiCoin.allowance(
+      await this.asobiCoin.allowance(
         buyer,
-        this.c.escrow.options.address,
+        this.escrow.options.address,
       ).call(),
     );
 
     // Approve spending
     if (allowance.lt(price)) {
-      await this.c.asobiCoin.approve(
-        this.c.escrow.options.address,
+      await this.asobiCoin.approve(
+        this.escrow.options.address,
         web3Utils.toWei(price, "ether"),
       ).send();
     } else {
@@ -170,7 +170,7 @@ export default class Repository extends BaseRepository {
         price.toString(),
       );
     }
-    await this.c.escrow.swap(goodID).send();
+    await this.escrow.swap(goodID).send();
   }
 
   // User Registry
@@ -179,16 +179,16 @@ export default class Repository extends BaseRepository {
   }
 
   loadUserRegistryContract() {
-    this.c.userRegistry = this.dapp.getContractAt(UserRegistry);
+    this.userRegistry = this.dapp.getContractAt(UserRegistry);
   }
 
   async getRegisterState(address) {
-    const registered = await this.c.userRegistry.isUser(
+    const registered = await this.userRegistry.isUser(
       address,
     ).call();
     let name = null;
     if (registered) {
-      name = await this.c.userRegistry.userName(
+      name = await this.userRegistry.userName(
         address,
       ).call();
     }
@@ -196,27 +196,27 @@ export default class Repository extends BaseRepository {
   }
 
   async registerUser(name) {
-    await this.c.userRegistry.add(name).send();
+    await this.userRegistry.add(name).send();
   }
 
   async unregisterUser(name) {
-    await this.c.userRegistry.remove().send();
+    await this.userRegistry.remove().send();
   }
 
   async getFriends() {
     const getFriend = async (index) => {
-      const address = await this.c.userRegistry.users(
+      const address = await this.userRegistry.users(
         index,
       ).call();
       return {
         id: address,
-        name: await this.c.userRegistry.userName(
+        name: await this.userRegistry.userName(
           address,
         ).call(),
       };
     };
     const indices = range(
-      await this.c.userRegistry.numUsers().call(),
+      await this.userRegistry.numUsers().call(),
     );
     return await Promise.all(indices.map(getFriend));
   }
@@ -227,12 +227,12 @@ export default class Repository extends BaseRepository {
   }
 
   loadTradeRegistryContract() {
-    this.c.tradeRegistry = this.dapp.getContractAt(TradeRegistry);
+    this.tradeRegistry = this.dapp.getContractAt(TradeRegistry);
   }
 
   async closeTrade() {
     console.log("Removing trade from registry");
-    await this.c.tradeRegistry.remove().send();
+    await this.tradeRegistry.remove().send();
   }
 
   // Trade
@@ -240,37 +240,37 @@ export default class Repository extends BaseRepository {
     const trade = await this.dapp.deployContract(
       Trade,
       [
-        this.c.goods.options.address,
+        this.goods.options.address,
         [
           userA,
           userB,
         ],
       ],
     );
-    await this.c.tradeRegistry.add(
+    await this.tradeRegistry.add(
       trade.options.address,
     ).send();
   }
 
   async loadTrade(accountAddress) {
-    const tradeAddress = await this.c.tradeRegistry.traderTrade(
+    const tradeAddress = await this.tradeRegistry.traderTrade(
       accountAddress,
     ).call();
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
-    this.c.trade = this.dapp.getContractAt(Trade);
+    this.trade = this.dapp.getContractAt(Trade);
 
     const [userA, userB] = await Promise.all([
-      this.c.trade.traders(0).call(),
-      this.c.trade.traders(1).call(),
+      this.trade.traders(0).call(),
+      this.trade.traders(1).call(),
     ]);
     const otherUserID = userA == accountAddress ? userB : userA;
     const [accepted, otherAccepted] = await Promise.all([
-      this.c.trade.traderAccepted(accountAddress).call(),
-      this.c.trade.traderAccepted(otherUserID).call(),
+      this.trade.traderAccepted(accountAddress).call(),
+      this.trade.traderAccepted(otherUserID).call(),
     ]);
-    const pulled = await this.c.trade.traderPulledGoods(
+    const pulled = await this.trade.traderPulledGoods(
       accountAddress,
     ).call();
     return {
@@ -283,10 +283,10 @@ export default class Repository extends BaseRepository {
   }
 
   async cancelTrade() {
-    const isActive = await this.c.trade.isActive().call();
+    const isActive = await this.trade.isActive().call();
     if (isActive) {
       console.log("Trade is still active");
-      await this.c.trade.cancel().send();
+      await this.trade.cancel().send();
     } else {
       console.log("Trade is not active, skipping cancelling");
     }
@@ -294,16 +294,16 @@ export default class Repository extends BaseRepository {
 
   async confirmTrade() {
     console.log("Accepting trade");
-    await this.c.trade.accept().send();
+    await this.trade.accept().send();
   }
 
   async removeGoodFromTrade(goodID) {
-    await this.c.trade.removeGood(goodID).send();
+    await this.trade.removeGood(goodID).send();
   }
 
   async getTradeGoods() {
     const getGoodOwner = async (good) => {
-      const trader = await this.c.trade.goodsTrader(
+      const trader = await this.trade.goodsTrader(
         good.id,
       ).call();
       return {
@@ -312,41 +312,41 @@ export default class Repository extends BaseRepository {
       };
     };
     const goodsRaw = await this.getGoodsForAddress(
-      this.c.trade.options.address,
+      this.trade.options.address,
     );
     return Promise.all(goodsRaw.map(getGoodOwner));
   }
 
   async pullGoods() {
-    await this.c.trade.getGoods().send();
+    await this.trade.getGoods().send();
   }
 
   async transferToTrade(accountAddress, goodID) {
     await this.transferGood(
       accountAddress,
-      this.c.trade.options.address,
+      this.trade.options.address,
       goodID,
     );
   }
 
   // Events
   tradeRegistryEvents() {
-    return this.c.tradeRegistry.allEvents();
+    return this.tradeRegistry.allEvents();
   }
 
   goodsTransferEvents() {
-    return this.c.goods.Transfer();
+    return this.goods.Transfer();
   }
 
   escrowListedEvents() {
-    return this.c.escrow.Listed();
+    return this.escrow.Listed();
   }
 
   userRegistryEvents() {
-    return this.c.userRegistry.allEvents();
+    return this.userRegistry.allEvents();
   }
 
   tradeEvents() {
-    return this.c.trade.allEvents();
+    return this.trade.allEvents();
   }
 }
