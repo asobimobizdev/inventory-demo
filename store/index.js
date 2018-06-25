@@ -227,13 +227,20 @@ const createStore = () => {
           repository.createTradeRegistry(),
           repository.createUserRegistry(),
         ]);
-        const escrow = await repository.createEscrowContract(coin, goods);
+        const [escrow, shop] = await Promise.all([
+          repository.createEscrowContract(coin, goods),
+          repository.createShopContract(coin, goods),
+        ]);
+
+        await repository.transferOwnershipsToShop(coin, goods, shop);
+
         const networkIdentifier = repository.networkIdentifier;
         console.log(`
   "${networkIdentifier}":
     AsobiCoin: "${coin}"
     Escrow: "${escrow}"
     Goods: "${goods}"
+    Shop: "${shop}"
     TradeRegistry: "${tradeRegistry}"
     UserRegistry: "${userRegistry}"
 `,

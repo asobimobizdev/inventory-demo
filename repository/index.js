@@ -4,6 +4,7 @@ import web3Utils from "web3-utils";
 import { AsobiCoin } from "@/contracts/AsobiCoin.sol";
 import { Escrow } from "@/contracts/Escrow.sol";
 import { Goods } from "@/contracts/Goods.sol";
+import { Shop } from "@/contracts/Shop.sol";
 import { Trade } from "@/contracts/Trade.sol";
 import { TradeRegistry } from "@/contracts/TradeRegistry.sol";
 import { UserRegistry } from "@/contracts/UserRegistry.sol";
@@ -24,6 +25,22 @@ export default class Repository extends BaseRepository {
 
   async mint(receiver, value, contract) {
     return await contract.mint(receiver, value).send();
+  }
+
+  // Shop
+  async createShopContract(asobiCoin, goods) {
+    return await dapp.deployContract(Shop, [asobiCoin, goods]);
+  }
+
+  async transferOwnershipsToShop(asobiCoin, goods, shop) {
+    const coinContract = this.dapp.getContract(AsobiCoin, asobiCoin);
+    const goodsContract = this.dapp.getContract(Goods, goods);
+    // const shopContract = repostiory.dapp.getContract(Shop, shop);
+
+    await Promise.all([
+      coinContract.transferOwnership(shop).send(),
+      goodsContract.transferOwnership(shop).send(),
+    ]);
   }
 
   // AsobiCoin
