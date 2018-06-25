@@ -1,7 +1,6 @@
 import { dapp } from "@/lib/dapp.js";
 import web3Utils from "web3-utils";
 
-import * as config from "@/lib/config.yaml";
 import { AsobiCoin } from "@/contracts/AsobiCoin.sol";
 import { Escrow } from "@/contracts/Escrow.sol";
 import { Goods } from "@/contracts/Goods.sol";
@@ -38,9 +37,7 @@ export default class Repository {
   }
 
   loadAsobiCoinContract() {
-    this.c.asobiCoin = this.dapp.getContractAt(
-      AsobiCoin, config.ASOBI_COIN_ADDRESS
-    );
+    this.c.asobiCoin = this.dapp.getContractAt(AsobiCoin);
   }
 
   async createCoin(receiver, amount) {
@@ -85,7 +82,7 @@ export default class Repository {
   }
 
   loadGoodsContract() {
-    this.c.goods = this.dapp.getContractAt(Goods, config.GOODS_ADDRESS);
+    this.c.goods = this.dapp.getContractAt(Goods);
   }
 
   async createGood(receiver) {
@@ -167,7 +164,7 @@ export default class Repository {
   }
 
   loadEscrowContract() {
-    this.c.escrow = this.dapp.getContractAt(Escrow, config.ESCROW_ADDRESS);
+    this.c.escrow = this.dapp.getContractAt(Escrow);
   }
 
   async buyGood(goodID, buyer) {
@@ -206,10 +203,7 @@ export default class Repository {
   }
 
   loadUserRegistryContract() {
-    this.c.userRegistry = this.dapp.getContractAt(
-      UserRegistry,
-      config.USER_REGISTRY_ADDRESS,
-    );
+    this.c.userRegistry = this.dapp.getContractAt(UserRegistry);
   }
 
   async getRegisterState(address) {
@@ -257,9 +251,7 @@ export default class Repository {
   }
 
   loadTradeRegistryContract() {
-    this.c.tradeRegistry = this.dapp.getContractAt(
-      TradeRegistry, config.TRADE_REGISTRY_ADDRESS,
-    );
+    this.c.tradeRegistry = this.dapp.getContractAt(TradeRegistry);
   }
 
   async closeTrade() {
@@ -291,7 +283,7 @@ export default class Repository {
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
-    this.c.trade = this.dapp.getContractAt(Trade, tradeAddress);
+    this.c.trade = this.dapp.getContractAt(Trade);
 
     const [userA, userB] = await Promise.all([
       this.c.trade.traders(0).call(),
