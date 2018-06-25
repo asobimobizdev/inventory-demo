@@ -149,7 +149,7 @@ export default class Repository extends BaseRepository {
 
   // Escrow
   async createEscrowContract(coin, goods) {
-    return await dapp.deployContract(Escrow, [coin.address, goods.address]);
+    return await dapp.deployContract(Escrow, [coin, goods]);
   }
 
   loadEscrowContract() {
