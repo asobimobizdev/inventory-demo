@@ -7,17 +7,12 @@ import { Goods } from "@/contracts/Goods.sol";
 import { Trade } from "@/contracts/Trade.sol";
 import { TradeRegistry } from "@/contracts/TradeRegistry.sol";
 import { UserRegistry } from "@/contracts/UserRegistry.sol";
+import BaseRepository from "@/repository/base";
 
 const range = n => Array.from({ length: n }, (value, key) => key);
 
 
-export default class Repository {
-  constructor(dapp) {
-    this.dapp = dapp;
-    this.web3 = dapp.web3;
-    this.c = {};
-  }
-
+export default class Repository extends BaseRepository {
   // General
   async isAdmin(address, contract) {
     return (await contract.owner().call()) === address;
