@@ -1,7 +1,7 @@
 import { dapp } from "@/lib/dapp.js";
 import web3Utils from "web3-utils";
 
-import * as config from "@/lib/config.js";
+import * as config from "@/lib/config.yaml";
 import { AsobiCoin } from "@/contracts/AsobiCoin.sol";
 import { Escrow } from "@/contracts/Escrow.sol";
 import { Goods } from "@/contracts/Goods.sol";
