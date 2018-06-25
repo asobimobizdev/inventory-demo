@@ -17,6 +17,7 @@ extends:
 - plugin:vue/recommended
 plugins:
 - vue
+- sort-imports-es6-autofix
 rules:
   indent:
     - error
@@ -36,3 +37,13 @@ rules:
     - always-multiline
   no-unused-vars:
     - warn
+    - args: none
+  max-len:
+    - warn
+    - 80
+    - ignoreStrings: true
+  sort-imports-es6-autofix/sort-imports-es6:
+    - warn
+    - ignoreCase: false
+      ignoreMemberSort: false
+      memberSyntaxSortOrder: ["none", "all", "multiple", "single"]

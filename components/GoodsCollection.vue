@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
 import GoodItem from "./../components/GoodItem.vue";
+import draggable from "vuedraggable";
 
 export default {
   components: {

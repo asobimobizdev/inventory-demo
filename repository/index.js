@@ -1,13 +1,13 @@
-import web3Utils from "web3-utils";
 import { dapp } from "@/lib/dapp.js";
+import web3Utils from "web3-utils";
 
-import { Goods } from "@/contracts/Goods.sol";
+import * as config from "@/lib/config.js";
 import { AsobiCoin } from "@/contracts/AsobiCoin.sol";
 import { Escrow } from "@/contracts/Escrow.sol";
+import { Goods } from "@/contracts/Goods.sol";
+import { Trade } from "@/contracts/Trade.sol";
 import { TradeRegistry } from "@/contracts/TradeRegistry.sol";
 import { UserRegistry } from "@/contracts/UserRegistry.sol";
-import { Trade } from "@/contracts/Trade.sol";
-import * as config from "@/lib/config.js";
 
 const range = n => Array.from({ length: n }, (value, key) => key);
 

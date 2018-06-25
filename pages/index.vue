@@ -80,11 +80,11 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapGetters } from "vuex";
-import draggable from "vuedraggable";
-import GoodItem from "./../components/GoodItem.vue";
+import { mapActions, mapGetters, mapState } from "vuex";
 import GoodInspector from "./../components/GoodInspector.vue";
+import GoodItem from "./../components/GoodItem.vue";
 import dappMixin from "@/mixins/dapp";
+import draggable from "vuedraggable";
 
 export default {
   components: {

@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import dappMixin from "@/mixins/dapp";
 import { mapActions } from "vuex";
+import dappMixin from "@/mixins/dapp";
 
 export default {
   mixins: [dappMixin],
