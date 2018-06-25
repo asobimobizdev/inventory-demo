@@ -362,8 +362,8 @@ export default class Repository {
     return this.c.goods.Transfer();
   }
 
-  escrowPriceSetEvents() {
-    return this.c.escrow.PriceSet();
+  escrowListedEvents() {
+    return this.c.escrow.Listed();
   }
 
   userRegistryEvents() {

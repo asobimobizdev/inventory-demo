@@ -281,9 +281,9 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
 
       getEscrowContract(context) {
         repository.loadEscrowContract();
-        repository.escrowPriceSetEvents()
+        repository.escrowListedEvents()
           .on("data", (event) => {
-            console.log("Escrow PriceSet event", event);
+            console.log("Escrow Listed event", event);
             context.dispatch("getOwnGoods");
             context.dispatch("getSelectedFriendGoods");
           })
