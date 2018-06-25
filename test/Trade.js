@@ -9,9 +9,9 @@ contract("Trade", accounts => {
   const traderA = accounts[1];
   const traderB = accounts[2];
   const thirdPerson = accounts[3];
-  const traderAOptions = {from: traderA};
-  const traderBOptions = {from: traderB};
-  const thirdPersonOptions = {from: thirdPerson};
+  const traderAOptions = { from: traderA };
+  const traderBOptions = { from: traderB };
+  const thirdPersonOptions = { from: thirdPerson };
 
   const good1 = 1;
   const good2 = 2;

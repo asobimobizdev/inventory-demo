@@ -40,6 +40,11 @@ rules:
       imports: always-multiline
       exports: always-multiline
       arrays: always-multiline
+  object-curly-spacing:
+    - warn
+    - always
+    - arraysInObjects: true
+      objectsInObjects: true
   no-unused-vars:
     - warn
     - args: none

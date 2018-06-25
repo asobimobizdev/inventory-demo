@@ -10,8 +10,8 @@ const Escrow = artifacts.require("contracts/Escrow.sol");
 contract("Escrow", accounts => {
   const buyer = accounts[1];
   const seller = accounts[2];
-  const buyerOptions = {from: buyer};
-  const sellerOptions = {from: seller};
+  const buyerOptions = { from: buyer };
+  const sellerOptions = { from: seller };
 
   const price = 256;
   0x0000000000000000000000000000000000000000000000000000000000000100;

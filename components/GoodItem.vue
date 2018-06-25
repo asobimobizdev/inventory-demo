@@ -22,9 +22,9 @@ import seedParams from "../lib/seedParams";
 
 export default {
   props: {
-    id: {type: String, default: null},
-    confirmed: {type: Boolean, default: false },
-    forSale: {type: Boolean, default: false },
+    id: { type: String, default: null },
+    confirmed: { type: Boolean, default: false },
+    forSale: { type: Boolean, default: false },
     hasDrawer: { type: Boolean, default: false },
     active: { type: Boolean, default: false },
     preview: { type: Boolean, default: false },

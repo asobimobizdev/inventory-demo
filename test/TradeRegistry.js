@@ -8,9 +8,9 @@ contract("TradeRegistry", accounts => {
   const traderA = accounts[1];
   const traderB = accounts[2];
   const traderC = accounts[3];
-  const traderAOptions = {from: traderA};
-  const traderBOptions = {from: traderB};
-  const traderCOptions = {from: traderC};
+  const traderAOptions = { from: traderA };
+  const traderBOptions = { from: traderB };
+  const traderCOptions = { from: traderC };
 
   let trade;
   let registry;

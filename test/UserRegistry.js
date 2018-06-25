@@ -8,9 +8,9 @@ contract("UserRegistry", accounts => {
   const accountA = accounts[1];
   const accountB = accounts[2];
   const accountC = accounts[3];
-  const accountAOptions = {from: accountA};
-  const accountBOptions = {from: accountB};
-  const accountCOptions = {from: accountC};
+  const accountAOptions = { from: accountA };
+  const accountBOptions = { from: accountB };
+  const accountCOptions = { from: accountC };
 
   let userRegistry;
 

@@ -8,9 +8,9 @@ contract("AsobiCoin", accounts => {
   const account = accounts[0];
   const otherAccount = accounts[1];
   const thirdAccount = accounts[2];
-  const options = {from: account};
-  const otherOptions = {from: otherAccount};
-  const thirdOptions = {from: thirdAccount};
+  const options = { from: account };
+  const otherOptions = { from: otherAccount };
+  const thirdOptions = { from: thirdAccount };
 
   const coinAmount = 100;
 
