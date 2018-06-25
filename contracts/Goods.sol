@@ -22,13 +22,4 @@ contract Goods is Ownable, ERC721Token {
     function mint(address _to, uint256 _tokenId) onlyOwner public {
         super._mint(_to, _tokenId);
     }
-
-    /**
-      * @dev Destroy a good
-      * @dev Can only be called by the contract owner
-      * @param _tokenId The ID of the good
-      */
-    function burn(uint256 _tokenId) onlyOwner public {
-        super._burn(ownerOf(_tokenId), _tokenId);
-    }
 }
