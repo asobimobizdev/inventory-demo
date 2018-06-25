@@ -102,16 +102,29 @@ export default class Repository extends BaseRepository {
         address,
         index,
       ).call();
-      const price = await this.escrow.priceOf(id).call();
       return {
         id: id,
         confirmed: true,
-        price: web3Utils.fromWei(price),
       };
     };
     const balance = await this.getGoodsBalance(address, this.goods);
     const indices = range(balance);
-    const items = await Promise.all(indices.map(getGood));
+    let items = await Promise.all(indices.map(getGood));
+    if (address !== this.escrow.address) {
+      const escrowGoods = (await this.getEscrowGoods()).filter((good) => {
+        return good.seller === address;
+      }).map((good) => {
+        return {
+          ...good,
+          forSale: true,
+          confirmed: true,
+        };
+      });
+      items = [
+        ...items,
+        ...escrowGoods,
+      ];
+    }
     return items;
   }
 
@@ -141,6 +154,22 @@ export default class Repository extends BaseRepository {
 
   loadEscrowContract() {
     this.escrow = this.dapp.getContractAt(Escrow);
+  }
+
+  async getEscrowGoods() {
+    const augmentGood = async (good) => {
+      const [price, seller] = await Promise.all([
+        this.escrow.priceOf(good.id).call(),
+        this.escrow.sellerOf(good.id).call(),
+      ]);
+      return {
+        ...good,
+        seller,
+        price,
+      };
+    };
+    const goods = await this.getGoodsForAddress(this.escrow.address);
+    return Promise.all(goods.map(augmentGood));
   }
 
   async buyGood(goodID, buyer) {
