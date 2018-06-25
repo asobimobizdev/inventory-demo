@@ -107,15 +107,11 @@ export default class Repository {
         address,
         index,
       ).call();
-      const [forSale, price] = await Promise.all([
-        this.c.escrow.isListed(id).call(),
-        this.c.escrow.getPrice(id).call(),
-      ]);
+      const price = await this.c.escrow.priceOf(id).call();
       return {
         id: id,
         confirmed: true,
         price: web3Utils.fromWei(price),
-        forSale: forSale,
       };
     };
     const balance = await this.getGoodsBalance(address, this.c.goods);
