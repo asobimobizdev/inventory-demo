@@ -13,11 +13,11 @@ contract("Trade", accounts => {
   const traderBOptions = { from: traderB };
   const thirdPersonOptions = { from: thirdPerson };
 
-  const good1 = 1;
-  const good2 = 2;
-  const good3 = 3;
-  const good4 = 4;
-  const good5 = 5;
+  const good1 = 0;
+  const good2 = 1;
+  const good3 = 2;
+  const good4 = 3;
+  const good5 = 4;
 
   let goods;
   let trade;
@@ -97,11 +97,11 @@ contract("Trade", accounts => {
 
   describe("goods", () => {
     beforeEach(async () => {
-      await goods.mint(traderA, good1);
-      await goods.mint(traderB, good2);
-      await goods.mint(traderB, good3);
-      await goods.mint(traderA, good4);
-      await goods.mint(thirdPerson, good5);
+      await goods.mint(traderA);
+      await goods.mint(traderB);
+      await goods.mint(traderB);
+      await goods.mint(traderA);
+      await goods.mint(thirdPerson);
     });
 
     it("won't let trader A add after accepting", async () => {

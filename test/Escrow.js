@@ -24,7 +24,7 @@ contract("Escrow", accounts => {
     64,
   );
 
-  const goodID = 100;
+  const goodID = 0;
 
   let asobiCoin;
   let goods;
@@ -36,7 +36,7 @@ contract("Escrow", accounts => {
     escrow = await Escrow.new(asobiCoin.address, goods.address);
 
     await asobiCoin.mint(buyer, price);
-    await goods.mint(seller, goodID);
+    await goods.mint(seller);
   });
 
   describe("0 addresses", () => {

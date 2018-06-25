@@ -81,7 +81,7 @@ export default class Repository extends BaseRepository {
   }
 
   async createGood(receiver) {
-    await this.mint(receiver, this.generateGoodID(), this.goods);
+    await this.mint(receiver, this.goods);
   }
 
   async getGoodsBalance(address) {
