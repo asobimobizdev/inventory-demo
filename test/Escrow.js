@@ -58,6 +58,8 @@ contract("Escrow", accounts => {
         sellerOptions,
       );
       assert.isTrue(await escrow.isListed(goodID));
+      assert.equal(await escrow.priceOf(goodID), price);
+      assert.equal(await escrow.sellerOf(goodID), seller);
     });
 
     it("won't let the owner set the price to 0", async () => {
@@ -70,20 +72,6 @@ contract("Escrow", accounts => {
           sellerOptions,
         ),
       );
-    });
-  });
-
-  describe("isListed", () => {
-    it("knows who listed", async () => {
-      await goods.safeTransferFrom(
-        seller,
-        escrow.address,
-        goodID,
-        priceHex,
-        sellerOptions,
-      );
-      assert.equal(await escrow.priceOf(goodID), price);
-      assert.equal(await escrow.sellerOf(goodID), seller);
     });
   });
 
