@@ -87,6 +87,11 @@ contract("Escrow", accounts => {
       );
     });
 
+    it("allows the seller to unlist their item", async () => {
+      await escrow.unlist(goodID, sellerOptions);
+      assert.equal(await goods.ownerOf(goodID), seller);
+    });
+
     it("swaps when the buyer initiates", async () => {
       const data = escrow.contract.methods.swap(goodID).encodeABI();
       await asobiCoin.approveAndCall(
