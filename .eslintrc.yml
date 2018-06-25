@@ -35,7 +35,11 @@ rules:
     - off
   comma-dangle:
     - warn
-    - always-multiline
+    - functions: always-multiline
+      objects: always-multiline
+      imports: always-multiline
+      exports: always-multiline
+      arrays: always-multiline
   no-unused-vars:
     - warn
     - args: none

@@ -91,7 +91,7 @@ export default {
       } else {
         result = this.$store.state.live.transfers.filter(
           transfer =>
-            this.usersFilter.find(userID => userID == transfer.from) != null
+            this.usersFilter.find(userID => userID == transfer.from) != null,
         );
       }
       return result.map(event => {

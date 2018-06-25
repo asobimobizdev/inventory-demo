@@ -17,11 +17,11 @@ contract("Escrow", accounts => {
   0x0000000000000000000000000000000000000000000000000000000000000100;
   const priceHex = web3Utils.padLeft(
     web3Utils.toHex(price),
-    64
+    64,
   );
   const zeroPriceHex = web3Utils.padLeft(
     web3Utils.toHex(0),
-    64
+    64,
   );
 
   const goodID = 100;
@@ -59,7 +59,7 @@ contract("Escrow", accounts => {
           goodID,
           zeroPriceHex,
           sellerOptions,
-        )
+        ),
       );
     });
   });

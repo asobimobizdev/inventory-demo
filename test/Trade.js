@@ -111,8 +111,8 @@ contract("Trade", accounts => {
           traderA,
           trade.address,
           good1,
-          traderAOptions
-        )
+          traderAOptions,
+        ),
       );
     });
 
@@ -131,7 +131,7 @@ contract("Trade", accounts => {
           traderA,
           trade.address,
           good1,
-          traderAOptions
+          traderAOptions,
         );
       });
 
@@ -236,7 +236,7 @@ contract("Trade", accounts => {
           await assertRejected(
             goods.safeTransferFrom(
               traderA, trade.address, good4, traderAOptions,
-            )
+            ),
           );
         });
       });

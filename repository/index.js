@@ -166,14 +166,14 @@ export default class Repository {
   async buyGood(goodID, buyer) {
     // Check whether we have already approved spending
     const price = web3Utils.toBN(
-      await this.c.escrow.getPrice(goodID).call()
+      await this.c.escrow.getPrice(goodID).call(),
     );
 
     const allowance = web3Utils.toBN(
       await this.c.asobiCoin.allowance(
         buyer,
         this.c.escrow.options.address,
-      ).call()
+      ).call(),
     );
 
     // Approve spending
@@ -226,7 +226,7 @@ export default class Repository {
   async getFriends() {
     const getFriend = async (index) => {
       const address = await this.c.userRegistry.users(
-        index
+        index,
       ).call();
       return {
         id: address,
@@ -236,7 +236,7 @@ export default class Repository {
       };
     };
     const indices = range(
-      await this.c.userRegistry.numUsers().call()
+      await this.c.userRegistry.numUsers().call(),
     );
     return await Promise.all(indices.map(getFriend));
   }
@@ -268,7 +268,7 @@ export default class Repository {
       ],
     );
     await this.c.tradeRegistry.add(
-      trade.options.address
+      trade.options.address,
     ).send();
   }
 

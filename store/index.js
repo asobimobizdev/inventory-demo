@@ -240,7 +240,7 @@ export const ASOBI_COIN_ADDRESS = "${coin}";
 export const GOODS_ADDRESS = "${goods}";
 export const ESCROW_ADDRESS = "${escrow}";
 export const TRADE_REGISTRY_ADDRESS = "${tradeRegistry}";
-export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
+export const USER_REGISTRY_ADDRESS = "${userRegistry}";`,
         );
       },
 
