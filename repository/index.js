@@ -124,28 +124,13 @@ export default class Repository extends BaseRepository {
   }
 
   async setGoodForSale(goodID, price, forSale) {
-    const approved = await this.c.goods.getApproved(
+    const priceWei = web3Utils.toWei(price, "ether");
+    const priceHex = web3Utils.padLeft(web3Utils.toHex(priceWei), 64);
+    await this.c.goods.safeTransferFrom(
+      this.defaultAccount,
+      this.c.escrow.address,
       goodID,
-    ).call() === this.c.escrow.options.address;
-    if (!forSale) {
-      if (approved) {
-        console.log("Removing approval");
-        await this.c.goods.approve("0x0", goodID).send();
-      }
-      return;
-    }
-    if (!approved) {
-      console.log("Escrow contract not yet approved", approved);
-      await this.c.goods.approve(
-        this.c.escrow.options.address,
-        goodID,
-      ).send();
-    } else {
-      console.log("Escrow contract already approved");
-    }
-    await this.c.escrow.setPrice(
-      goodID,
-      web3Utils.toWei(price, "ether"),
+      priceHex,
     ).send();
   }
 
