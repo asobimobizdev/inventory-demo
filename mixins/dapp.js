@@ -2,7 +2,12 @@ import { dapp } from "@/lib/dapp";
 
 export default {
   async fetch({ store, params }) {
-    await dapp.asyncInitialize();
+    try {
+      await dapp.asyncInitialize();
+    } catch(e) {
+      console.error("Network issue", e);
+      return;
+    }
     store.commit("accountAddress", dapp.defaultAccount);
     store.dispatch("getGoodsContract");
     store.dispatch("getAsobiCoinContract");
@@ -17,8 +22,7 @@ export default {
         store.dispatch("trade/loadTrade"),
       ]);
     } catch(e) {
-      console.log(e);
-      console.error("Contracts not deployed");
+      console.error("Could not access contracts", e);
     }
     store.commit("dapp/initialized", true);
   },
