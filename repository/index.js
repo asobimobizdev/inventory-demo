@@ -1,5 +1,5 @@
 import web3Utils from "web3-utils";
-import { dapp } from "./dapp.js";
+import { dapp } from "@/lib/dapp.js";
 
 import { Goods } from "@/contracts/Goods.sol";
 import { AsobiCoin } from "@/contracts/AsobiCoin.sol";

@@ -1,6 +1,6 @@
 import Vuex from "vuex";
-import { dapp } from "../lib/dapp";
-import Repository from "../lib/repository";
+import { dapp } from "@/lib/dapp";
+import Repository from "@/repository";
 // import { p2pManager } from "../lib/p2p.js";
 import seedParams from "../lib/seedParams";
 import trade from "./trade";
