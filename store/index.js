@@ -232,8 +232,8 @@ const createStore = () => {
         console.log(`
   "${networkIdentifier}":
     AsobiCoin: "${coin}"
-    Goods: "${goods}"
     Escrow: "${escrow}"
+    Goods: "${goods}"
     TradeRegistry: "${tradeRegistry}"
     UserRegistry: "${userRegistry}"
 `,
