@@ -25,8 +25,6 @@ const createStore = () => {
     },
     state: {
       dappInit: false,
-      isGoodsAdmin: false,
-      isAsobiCoinAdmin: false,
       accountAddress: null,
       goods: [],
       goodsLoading: false,
@@ -45,12 +43,6 @@ const createStore = () => {
     mutations: {
       ["dapp/initialized"](state, isInit) {
         state.dappInit = isInit;
-      },
-      ["isGoodsAdmin"](state, isGoodsAdmin) {
-        state.isGoodsAdmin = isGoodsAdmin;
-      },
-      ["isAsobiCoinAdmin"](state, isAsobiCoinAdmin) {
-        state.isAsobiCoinAdmin = isAsobiCoinAdmin;
       },
       ["goods"](state, goods) {
         goods = goods.map(good => {
@@ -350,20 +342,6 @@ const createStore = () => {
           // );
         }
 
-      },
-
-      async checkGoodsAdmin(context) {
-        const isOwner = await repository.isGoodsAdmin(
-          context.state.accountAddress,
-        );
-        context.commit("isGoodsAdmin", isOwner);
-      },
-
-      async checkAsobiCoinAdmin(context) {
-        const isOwner = await repository.isAsobiCoinAdmin(
-          context.state.accountAddress,
-        );
-        context.commit("isAsobiCoinAdmin", isOwner);
       },
 
       async createGoodFor(context, address) {

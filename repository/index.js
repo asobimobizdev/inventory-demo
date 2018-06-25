@@ -15,16 +15,8 @@ const range = n => Array.from({ length: n }, (value, key) => key);
 
 export default class Repository extends BaseRepository {
   // General
-  async isAdmin(address, contract) {
-    return (await contract.owner().call()) === address;
-  }
-
   async getBalance(address, contract) {
     return await contract.balanceOf(address).call();
-  }
-
-  async mint(receiver, value, contract) {
-    return await contract.mint(receiver, value).send();
   }
 
   // Shop
@@ -50,14 +42,6 @@ export default class Repository extends BaseRepository {
 
   loadAsobiCoinContract() {
     this.asobiCoin = this.dapp.getContractAt(AsobiCoin);
-  }
-
-  async createCoin(receiver, amount) {
-    await this.asobiCoin.mint(receiver, amount).send();
-  }
-
-  async isAsobiCoinAdmin(address) {
-    return await this.isAdmin(address, this.asobiCoin);
   }
 
   async getAsobiCoinBalance(address) {
@@ -97,16 +81,8 @@ export default class Repository extends BaseRepository {
     this.goods = this.dapp.getContractAt(Goods);
   }
 
-  async createGood(receiver) {
-    await this.mint(receiver, this.goods);
-  }
-
   async getGoodsBalance(address) {
     return await this.getBalance(address, this.goods);
-  }
-
-  async isGoodsAdmin(address) {
-    return await this.isAdmin(address, this.goods);
   }
 
   generateGoodID() {
