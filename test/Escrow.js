@@ -86,6 +86,7 @@ contract("Escrow", accounts => {
         sellerOptions,
       );
     });
+
     it("swaps when the buyer initiates", async () => {
       const data = escrow.contract.methods.swap(goodID).encodeABI();
       await asobiCoin.approveAndCall(
