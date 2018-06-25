@@ -334,7 +334,6 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`,
             context.state.accountAddress,
             address,
             goodID,
-            repository.c.goodsContract,
           );
         } catch (e) {
           transaction.confirmed = false;
