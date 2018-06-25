@@ -228,13 +228,6 @@ const createStore = () => {
           repository.createUserRegistry(),
         ]);
         const escrow = await repository.createEscrowContract(coin, goods);
-        const result = {
-          coin,
-          goods,
-          escrow,
-          tradeRegistry,
-          userRegistry,
-        };
         const networkIdentifier = repository.networkIdentifier;
         console.log(`
   "${networkIdentifier}":
