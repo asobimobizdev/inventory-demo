@@ -94,20 +94,26 @@ const createStore = () => {
       ["accountAddress"](state, address) {
         state.accountAddress = address;
       },
-      ["addUnconfirmedTransaction"](state, transaction) {
+      ["addUnconfirmedTransaction"](state, goodID) {
         // TODO(Giosue) refactor me
-        const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
         state.unconfirmedTransactions = {
-          [tID]: transaction,
+          [goodID]: {
+            id: goodID,
+            confirmed: false,
+          },
           ...state.unconfirmedTransactions,
         };
       },
-      ["removeUnconfirmedTransaction"](state, transaction) {
-        // TODO(Giosue) refactor me
-        const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
-        if (!state.unconfirmedTransactions[tID]) return;
-        delete state.unconfirmedTransactions[tID];
-        state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+      ["removeUnconfirmedTransaction"](state, goodID) {
+        if (!state.unconfirmedTransactions[goodID]) {
+          throw new Error(
+            `Could not find ${goodID} in ${state.unconfirmedTransactions}`,
+          );
+        }
+        delete state.unconfirmedTransactions[goodID];
+        state.unconfirmedTransactions = {
+          ...state.unconfirmedTransactions,
+        };
       },
       ["selectedGoodId"](state, id) {
         state.selectedGoodId = id;
@@ -242,23 +248,15 @@ const createStore = () => {
         repository.loadGoodsContract();
 
         repository.goodsTransferEvents()
-          .on("data", async (data) => {
-
-            const transaction = {
-              from: data.returnValues._from,
-              to: data.returnValues._to,
-              goodID: data.returnValues._tokenId,
-              confirmed: true,
-            };
-
-            console.log("Good Transaction", transaction);
+          .on("data", async (event) => {
+            console.log("Good Transaction", event);
+            const goodID = event.returnValues._tokenId;
+            context.commit("removeUnconfirmedTransaction", goodID);
 
             await Promise.all([
               context.dispatch("getOwnGoods"),
               context.dispatch("getSelectedFriendGoods"),
             ]);
-
-            context.commit("removeUnconfirmedTransaction", transaction);
           })
           .on("error", console.log);
       },
@@ -312,13 +310,7 @@ const createStore = () => {
 
         const goodID = good.id;
 
-        const transaction = {
-          from: context.state.accountAddress,
-          to: address,
-          goodID: good.id,
-        };
-
-        context.commit("addUnconfirmedTransaction", transaction);
+        context.commit("addUnconfirmedTransaction", goodID);
 
         try {
           await repository.transferGood(
@@ -327,8 +319,7 @@ const createStore = () => {
             goodID,
           );
         } catch (e) {
-          transaction.confirmed = false;
-          context.commit("removeUnconfirmedTransaction", transaction);
+          context.commit("removeUnconfirmedTransaction", goodID);
           console.error("transferGoodToSelectedFriend", e);
         }
 
@@ -362,20 +353,12 @@ const createStore = () => {
       },
 
       async buyGood(context, { id }) {
-
-        const transaction = {
-          from: context.state.selectedFriendId,
-          to: context.state.accountAddress,
-          goodID: id,
-        };
-
-        context.commit("addUnconfirmedTransaction", transaction);
+        context.commit("addUnconfirmedTransaction", id);
 
         try {
           await repository.buyGood(id);
         } catch (e) {
-          transaction.confirmed = false;
-          context.commit("removeUnconfirmedTransaction", transaction);
+          context.commit("removeUnconfirmedTransaction", id);
           console.error("buyGood", e);
         }
       },
@@ -423,13 +406,8 @@ const createStore = () => {
         const unconfirmedGoods = [];
         const goodsToRemove = {};
 
-        for (let tID in state.unconfirmedTransactions) {
-          transaction = state.unconfirmedTransactions[tID];
-
-          if (transaction.from == state.accountAddress || transaction.to != state.accountAddress) {
-            goodsToRemove[transaction.goodID] = transaction.goodID;
-            continue;
-          }
+        for (let goodID in state.unconfirmedTransactions) {
+          transaction = state.unconfirmedTransactions[goodID];
 
           unconfirmedGoods.push({
             id: transaction.goodID,
@@ -455,8 +433,8 @@ const createStore = () => {
         });
         if (!friend) return;
 
-        for (let tID in state.unconfirmedTransactions) {
-          transaction = state.unconfirmedTransactions[tID];
+        for (let goodID in state.unconfirmedTransactions) {
+          transaction = state.unconfirmedTransactions[goodID];
           if (transaction.from == friend.id) {
             goodsToRemove[transaction.goodID] = transaction.goodID;
             continue;
@@ -464,9 +442,8 @@ const createStore = () => {
           if (transaction.to != friend.id) continue;
 
           unconfirmedGoods.push({
-            id: transaction.goodID,
-            confirmed: false,
             ...decorateGoodWithId(transaction.goodID),
+            id: transaction.goodID,
           });
         }
 
