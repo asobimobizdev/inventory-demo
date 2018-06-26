@@ -106,6 +106,7 @@ export default class Repository extends BaseRepository {
       return {
         id: id,
         confirmed: true,
+        price: "0",
       };
     };
     const balance = await this.getGoodsBalance(address, this.goods);
@@ -166,7 +167,7 @@ export default class Repository extends BaseRepository {
       return {
         ...good,
         seller,
-        price,
+        price: web3Utils.fromWei(price),
       };
     };
     const goods = await this.getGoodsForAddress(this.escrow.address);
