@@ -1,7 +1,6 @@
 import { dapp } from "@/lib/dapp";
 import Repository from "@/repository";
 import Vuex from "vuex";
-// import { p2pManager } from "../lib/p2p.js";
 import live from "./live";
 import seedParams from "../lib/seedParams";
 import trade from "./trade";
@@ -143,7 +142,6 @@ const createStore = () => {
       selectedFriendId(context, id) {
         context.commit("selectedFriendId", id);
         context.dispatch("getSelectedFriendGoods", true);
-        // p2pManager.subscribe(id, context);
       },
 
       async getFriends(context) {
@@ -263,8 +261,6 @@ const createStore = () => {
             context.commit("removeUnconfirmedTransaction", transaction);
           })
           .on("error", console.log);
-
-        // p2pManager.subscribe(context.state.accountAddress, context);
       },
 
       getAsobiCoinContract(context) {
@@ -323,11 +319,6 @@ const createStore = () => {
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
-        // p2pManager.addUnconfirmedTransaction(
-        //   context.state.accountAddress,
-        //   address,
-        //   goodID,
-        // );
 
         try {
           await repository.transferGood(
@@ -339,12 +330,6 @@ const createStore = () => {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
           console.error(e);
-          // p2pManager.removeUnconfirmedTransaction(
-          //   context.state.accountAddress,
-          //   address,
-          //   goodID,
-          //   false,
-          // );
         }
 
       },
@@ -385,11 +370,6 @@ const createStore = () => {
         };
 
         context.commit("addUnconfirmedTransaction", transaction);
-        // p2pManager.addUnconfirmedTransaction(
-        //   transaction.from,
-        //   transaction.to,
-        //   transaction.goodID,
-        // );
 
         try {
           await repository.buyGood(id);
@@ -397,12 +377,6 @@ const createStore = () => {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
           console.error(e);
-          // p2pManager.removeUnconfirmedTransaction(
-          //   transaction.from,
-          //   transaction.to,
-          //   transaction.goodID,
-          //   false,
-          // );
         }
       },
 
