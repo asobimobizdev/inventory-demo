@@ -27,20 +27,10 @@ export default {
       state = { ...state, ...initialState };
     },
     ["setMyGoods"](state, goods) {
-      state.myGoods = goods.map((good) => {
-        return {
-          ...good,
-          ...decorateGoodWithId(good.id),
-        };
-      });
+      state.myGoods = goods.map((good) => decorateGoodWithId(good));
     },
     ["setOtherGoods"](state, goods) {
-      state.otherGoods = goods.map((good) => {
-        return {
-          ...good,
-          ...decorateGoodWithId(good.id),
-        };
-      });
+      state.otherGoods = goods.map((good) => decorateGoodWithId(good));
     },
   },
   actions: {
@@ -108,40 +98,33 @@ export default {
       // ??
     },
     async transfereGoodToMyOffer(context, good) {
-      const transaction = {
-        from: context.rootState.accountAddress,
-        to: context.state.id,
-        goodID: good.id,
-      };
-      context.commit("addUnconfirmedTransaction", transaction, { root: true });
+      const goodID = good.id;
+
+      console.log("transfereGoodToMyOffer", goodID);
+
+      context.commit("addUnconfirmedTransaction", goodID, { root: true });
       try {
         await repository.transferToTrade(
           context.rootState.accountAddress,
-          good.id,
+          goodID,
         );
       } catch (e) {
-        transaction.confirmed = false;
-        context.commit("removeUnconfirmedTransaction", transaction, { root: true });
-        console.error(e);
+        context.commit("removeUnconfirmedTransaction", goodID, { root: true });
+        console.error("transfereGoodToMyOffer", e);
       }
     },
     async transfereGoodFromMyOffer(context, good) {
-      const transaction = {
-        from: context.state.id,
-        to: context.rootState.accountAddress,
-        goodID: good.id,
-      };
+      const goodID = good.id;
 
-      console.log("transfereGoodFromMyOffer", transaction);
+      console.log("transfereGoodFromMyOffer", goodID);
 
-      context.commit("addUnconfirmedTransaction", transaction, { root: true });
+      context.commit("addUnconfirmedTransaction", goodID, { root: true });
 
       try {
-        await repository.removeGoodFromTrade(good.id);
+        await repository.removeGoodFromTrade(goodID);
       } catch (e) {
-        transaction.confirmed = false;
-        context.commit("removeUnconfirmedTransaction", transaction, { root: true });
-        console.error(e);
+        context.commit("removeUnconfirmedTransaction", goodID, { root: true });
+        console.error("transfereGoodFromMyOffer", e);
       }
     },
   },
@@ -154,19 +137,9 @@ export default {
       const unconfirmedGoods = [];
       const goodsToRemove = {};
 
-      for (let tID in rootState.unconfirmedTransactions) {
-        transaction = rootState.unconfirmedTransactions[tID];
-        if (transaction.from == state.id) {
-          goodsToRemove[transaction.goodID] = transaction.goodID;
-          continue;
-        }
-        if (transaction.to != state.id) continue;
-
-        unconfirmedGoods.push({
-          id: transaction.goodID,
-          confirmed: false,
-          ...decorateGoodWithId(transaction.goodID),
-        });
+      for (let goodID in rootState.unconfirmedTransactions) {
+        transaction = rootState.unconfirmedTransactions[goodID];
+        unconfirmedGoods.push(decorateGoodWithId(transaction));
       }
 
       const goods = state.myGoods.filter(good => {

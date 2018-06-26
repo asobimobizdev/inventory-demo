@@ -5,12 +5,13 @@ import live from "./live";
 import seedParams from "../lib/seedParams";
 import trade from "./trade";
 
-export function decorateGoodWithId(id) {
-  let good = {};
-  good.seed = seedParams.seedFromString(id);
-  good.name = seedParams.nameForSeed(good.seed);
-  good.thumbPath = seedParams.assetsThumbPathWithSeed(good.seed);
-  return good;
+export function decorateGoodWithId(good) {
+  return {
+    ...good,
+    seed: seedParams.seedFromString(good.id),
+    name: seedParams.nameForSeed(good.seed),
+    thumbPath: seedParams.assetsThumbPathWithSeed(good.seed),
+  };
 }
 
 export const repository = new Repository(dapp);
@@ -46,8 +47,7 @@ const createStore = () => {
       ["goods"](state, goods) {
         goods = goods.map(good => {
           return {
-            ...good,
-            ...decorateGoodWithId(good.id),
+            ...decorateGoodWithId(good),
             isOwned: true,
           };
         });
@@ -71,8 +71,7 @@ const createStore = () => {
       ["friendGoods"](state, goods) {
         goods = goods.map(good => {
           return {
-            ...good,
-            ...decorateGoodWithId(good.id),
+            ...decorateGoodWithId(good),
             isOwned: false,
           };
         });
@@ -95,13 +94,12 @@ const createStore = () => {
         state.accountAddress = address;
       },
       ["addUnconfirmedTransaction"](state, goodID) {
-        // TODO(Giosue) refactor me
         state.unconfirmedTransactions = {
+          ...state.unconfirmedTransactions,
           [goodID]: {
             id: goodID,
             confirmed: false,
           },
-          ...state.unconfirmedTransactions,
         };
       },
       ["removeUnconfirmedTransaction"](state, goodID) {
@@ -409,11 +407,7 @@ const createStore = () => {
         for (let goodID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[goodID];
 
-          unconfirmedGoods.push({
-            id: transaction.goodID,
-            confirmed: false,
-            ...decorateGoodWithId(transaction.goodID),
-          });
+          unconfirmedGoods.push(decorateGoodWithId(transaction));
         }
 
         const goods = state.goods.filter(good => {
@@ -441,10 +435,7 @@ const createStore = () => {
           }
           if (transaction.to != friend.id) continue;
 
-          unconfirmedGoods.push({
-            ...decorateGoodWithId(transaction.goodID),
-            id: transaction.goodID,
-          });
+          unconfirmedGoods.push(decorateGoodWithId(transaction));
         }
 
         const goods = state.friendGoods.filter(good => {
