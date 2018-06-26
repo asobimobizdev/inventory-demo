@@ -18,7 +18,6 @@ contract Trade is ERC721Receiver {
         uint256 indexed _goodID
     );
     event TradeAccepted(address indexed _trader);
-    event TradeWithdrawn(address indexed _trader);
     event TradeCancelled(address indexed _trader);
     event TradeFinalized();
     event GoodsPulled(address indexed _trader);
@@ -81,18 +80,6 @@ contract Trade is ERC721Receiver {
         if (isFinal()) {
             emit TradeFinalized();
         }
-    }
-
-    /**
-      * @dev Withdraw trade acceptance
-      * @dev Can only be called by a trader
-      */
-    function withdraw() activeOnly() traderOnly() external {
-        require(traderAccepted[msg.sender]);
-        require(!isFinal());
-
-        traderAccepted[msg.sender] = false;
-        emit TradeWithdrawn(msg.sender);
     }
 
     /**

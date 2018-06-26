@@ -1,17 +1,17 @@
+import { dapp } from "@/lib/dapp";
+import Repository from "@/repository";
 import Vuex from "vuex";
-import { dapp } from "../lib/dapp";
-import Repository from "../lib/repository";
-// import { p2pManager } from "../lib/p2p.js";
+import live from "./live";
 import seedParams from "../lib/seedParams";
 import trade from "./trade";
-import live from "./live";
 
-export function decorateGoodWithId(id) {
-  let good = {};
-  good.seed = seedParams.seedFromString(id);
-  good.name = seedParams.nameForSeed(good.seed);
-  good.thumbPath = seedParams.assetsThumbPathWithSeed(good.seed);
-  return good;
+export function decorateGoodWithId(good) {
+  return {
+    ...good,
+    seed: seedParams.seedFromString(good.id),
+    name: seedParams.nameForSeed(good.seed),
+    thumbPath: seedParams.assetsThumbPathWithSeed(good.seed),
+  };
 }
 
 export const repository = new Repository(dapp);
@@ -25,8 +25,6 @@ const createStore = () => {
     },
     state: {
       dappInit: false,
-      isGoodsAdmin: false,
-      isAsobiCoinAdmin: false,
       accountAddress: null,
       goods: [],
       goodsLoading: false,
@@ -46,17 +44,10 @@ const createStore = () => {
       ["dapp/initialized"](state, isInit) {
         state.dappInit = isInit;
       },
-      ["isGoodsAdmin"](state, isGoodsAdmin) {
-        state.isGoodsAdmin = isGoodsAdmin;
-      },
-      ["isAsobiCoinAdmin"](state, isAsobiCoinAdmin) {
-        state.isAsobiCoinAdmin = isAsobiCoinAdmin;
-      },
       ["goods"](state, goods) {
         goods = goods.map(good => {
           return {
-            ...good,
-            ...decorateGoodWithId(good.id),
+            ...decorateGoodWithId(good),
             isOwned: true,
           };
         });
@@ -80,8 +71,7 @@ const createStore = () => {
       ["friendGoods"](state, goods) {
         goods = goods.map(good => {
           return {
-            ...good,
-            ...decorateGoodWithId(good.id),
+            ...decorateGoodWithId(good),
             isOwned: false,
           };
         });
@@ -103,20 +93,25 @@ const createStore = () => {
       ["accountAddress"](state, address) {
         state.accountAddress = address;
       },
-      ["addUnconfirmedTransaction"](state, transaction) {
-        // TODO(Giosue) refactor me
-        const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
+      ["addUnconfirmedTransaction"](state, goodID) {
         state.unconfirmedTransactions = {
-          [tID]: transaction,
           ...state.unconfirmedTransactions,
+          [goodID]: {
+            id: goodID,
+            confirmed: false,
+          },
         };
       },
-      ["removeUnconfirmedTransaction"](state, transaction) {
-        // TODO(Giosue) refactor me
-        const tID = `${transaction.from}-${transaction.to}-${transaction.goodID}`;
-        if (!state.unconfirmedTransactions[tID]) return;
-        delete state.unconfirmedTransactions[tID];
-        state.unconfirmedTransactions = { ...state.unconfirmedTransactions };
+      ["removeUnconfirmedTransaction"](state, goodID) {
+        if (!state.unconfirmedTransactions[goodID]) {
+          throw new Error(
+            `Could not find ${goodID} in ${state.unconfirmedTransactions}`,
+          );
+        }
+        delete state.unconfirmedTransactions[goodID];
+        state.unconfirmedTransactions = {
+          ...state.unconfirmedTransactions,
+        };
       },
       ["selectedGoodId"](state, id) {
         state.selectedGoodId = id;
@@ -151,7 +146,6 @@ const createStore = () => {
       selectedFriendId(context, id) {
         context.commit("selectedFriendId", id);
         context.dispatch("getSelectedFriendGoods", true);
-        // p2pManager.subscribe(id, context);
       },
 
       async getFriends(context) {
@@ -227,20 +221,24 @@ const createStore = () => {
           repository.createTradeRegistry(),
           repository.createUserRegistry(),
         ]);
-        const escrow = await repository.createEscrowContract(coin, goods);
-        const result = {
-          coin,
-          goods,
-          escrow,
-          tradeRegistry,
-          userRegistry,
-        };
+        const [escrow, shop] = await Promise.all([
+          repository.createEscrowContract(coin, goods),
+          repository.createShopContract(coin, goods),
+        ]);
+
+        await repository.transferOwnershipsToShop(coin, goods, shop);
+
+        const networkIdentifier = repository.networkIdentifier;
         console.log(`
-export const ASOBI_COIN_ADDRESS = "${coin}";
-export const GOODS_ADDRESS = "${goods}";
-export const ESCROW_ADDRESS = "${escrow}";
-export const TRADE_REGISTRY_ADDRESS = "${tradeRegistry}";
-export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
+  "${networkIdentifier}":
+    contracts:
+      AsobiCoin: "${coin}"
+      Escrow: "${escrow}"
+      Goods: "${goods}"
+      Shop: "${shop}"
+      TradeRegistry: "${tradeRegistry}"
+      UserRegistry: "${userRegistry}"
+`,
         );
       },
 
@@ -248,27 +246,17 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
         repository.loadGoodsContract();
 
         repository.goodsTransferEvents()
-          .on("data", async (data) => {
-
-            const transaction = {
-              from: data.returnValues._from,
-              to: data.returnValues._to,
-              goodID: data.returnValues._tokenId,
-              confirmed: true,
-            };
-
-            console.log("Good Transaction", transaction);
+          .on("data", async (event) => {
+            console.log("Good Transaction", event);
+            const goodID = event.returnValues._tokenId;
+            context.commit("removeUnconfirmedTransaction", goodID);
 
             await Promise.all([
               context.dispatch("getOwnGoods"),
               context.dispatch("getSelectedFriendGoods"),
             ]);
-
-            context.commit("removeUnconfirmedTransaction", transaction);
           })
           .on("error", console.log);
-
-        // p2pManager.subscribe(context.state.accountAddress, context);
       },
 
       getAsobiCoinContract(context) {
@@ -281,13 +269,17 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
 
       getEscrowContract(context) {
         repository.loadEscrowContract();
-        repository.escrowPriceSetEvents()
+        repository.escrowListedEvents()
           .on("data", (event) => {
-            console.log("Escrow PriceSet event", event);
+            console.log("Escrow Listed event", event);
             context.dispatch("getOwnGoods");
             context.dispatch("getSelectedFriendGoods");
           })
           .on("error", console.log);
+      },
+
+      getShopContract(context) {
+        repository.loadShopContract();
       },
 
       getUserRegistryContract(context) {
@@ -316,52 +308,19 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
 
         const goodID = good.id;
 
-        const transaction = {
-          from: context.state.accountAddress,
-          to: address,
-          goodID: good.id,
-        };
-
-        context.commit("addUnconfirmedTransaction", transaction);
-        // p2pManager.addUnconfirmedTransaction(
-        //   context.state.accountAddress,
-        //   address,
-        //   goodID,
-        // );
+        context.commit("addUnconfirmedTransaction", goodID);
 
         try {
           await repository.transferGood(
             context.state.accountAddress,
             address,
             goodID,
-            repository.c.goodsContract,
           );
         } catch (e) {
-          transaction.confirmed = false;
-          context.commit("removeUnconfirmedTransaction", transaction);
-          console.error(e);
-          // p2pManager.removeUnconfirmedTransaction(
-          //   context.state.accountAddress,
-          //   address,
-          //   goodID,
-          //   false,
-          // );
+          context.commit("removeUnconfirmedTransaction", goodID);
+          console.error("transferGoodToSelectedFriend", e);
         }
 
-      },
-
-      async checkGoodsAdmin(context) {
-        const isOwner = await repository.isGoodsAdmin(
-          context.state.accountAddress,
-        );
-        context.commit("isGoodsAdmin", isOwner);
-      },
-
-      async checkAsobiCoinAdmin(context) {
-        const isOwner = await repository.isAsobiCoinAdmin(
-          context.state.accountAddress,
-        );
-        context.commit("isAsobiCoinAdmin", isOwner);
       },
 
       async createGoodFor(context, address) {
@@ -387,37 +346,18 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
           );
         } catch (e) {
           context.commit("setGoodForSale", oldGoodState);
-          console.error(e);
+          console.error("setGoodForSale", e);
         }
       },
 
       async buyGood(context, { id }) {
-
-        const transaction = {
-          from: context.state.selectedFriendId,
-          to: context.state.accountAddress,
-          goodID: id,
-        };
-
-        context.commit("addUnconfirmedTransaction", transaction);
-        // p2pManager.addUnconfirmedTransaction(
-        //   transaction.from,
-        //   transaction.to,
-        //   transaction.goodID,
-        // );
+        context.commit("addUnconfirmedTransaction", id);
 
         try {
-          await repository.buyGood(id, context.state.accountAddress);
+          await repository.buyGood(id);
         } catch (e) {
-          transaction.confirmed = false;
-          context.commit("removeUnconfirmedTransaction", transaction);
-          console.error(e);
-          // p2pManager.removeUnconfirmedTransaction(
-          //   transaction.from,
-          //   transaction.to,
-          //   transaction.goodID,
-          //   false,
-          // );
+          context.commit("removeUnconfirmedTransaction", id);
+          console.error("buyGood", e);
         }
       },
 
@@ -426,6 +366,10 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
           friend.id,
           dapp.web3.utils.toWei(amount, "ether"),
         );
+      },
+
+      async buyAsobiCoinAndGoods(context) {
+        await repository.buyAsobiCoinAndGoods();
       },
     },
     getters: {
@@ -460,19 +404,10 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
         const unconfirmedGoods = [];
         const goodsToRemove = {};
 
-        for (let tID in state.unconfirmedTransactions) {
-          transaction = state.unconfirmedTransactions[tID];
+        for (let goodID in state.unconfirmedTransactions) {
+          transaction = state.unconfirmedTransactions[goodID];
 
-          if (transaction.from == state.accountAddress || transaction.to != state.accountAddress) {
-            goodsToRemove[transaction.goodID] = transaction.goodID;
-            continue;
-          }
-
-          unconfirmedGoods.push({
-            id: transaction.goodID,
-            confirmed: false,
-            ...decorateGoodWithId(transaction.goodID),
-          });
+          unconfirmedGoods.push(decorateGoodWithId(transaction));
         }
 
         const goods = state.goods.filter(good => {
@@ -492,19 +427,15 @@ export const USER_REGISTRY_ADDRESS = "${userRegistry}";`
         });
         if (!friend) return;
 
-        for (let tID in state.unconfirmedTransactions) {
-          transaction = state.unconfirmedTransactions[tID];
+        for (let goodID in state.unconfirmedTransactions) {
+          transaction = state.unconfirmedTransactions[goodID];
           if (transaction.from == friend.id) {
             goodsToRemove[transaction.goodID] = transaction.goodID;
             continue;
           }
           if (transaction.to != friend.id) continue;
 
-          unconfirmedGoods.push({
-            id: transaction.goodID,
-            confirmed: false,
-            ...decorateGoodWithId(transaction.goodID),
-          });
+          unconfirmedGoods.push(decorateGoodWithId(transaction));
         }
 
         const goods = state.friendGoods.filter(good => {

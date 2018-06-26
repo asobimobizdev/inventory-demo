@@ -1,10 +1,12 @@
 <template>
   <el-main class="full-centered-content">
-    <el-card class="create-contract-box full-centered-content">
+    <el-card class="box full-centered-content">
       <el-button
         type="primary"
         round
-        @click="createContracts()" >Create Contracts</el-button>
+        @click="buyAsobiCoinAndGoods()">
+        Buy AsobiCoin &amp; Goods
+      </el-button>
     </el-card>
   </el-main>
 </template>
@@ -15,22 +17,15 @@ import dappMixin from "@/mixins/dapp";
 
 export default {
   mixins: [dappMixin],
-  data() {
-    return {};
-  },
   methods: {
     ...mapActions([
-      "createContracts",
+      "buyAsobiCoinAndGoods",
     ]),
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-.add-contract
-  min-width 400px
-  margin-bottom 20px
-
-.create-contract-box
+.box
   min-width 400px
 </style>

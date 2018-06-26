@@ -188,11 +188,11 @@
 </template>
 
 <script>
-import GoodsCollection from "./../components/GoodsCollection.vue";
-import { mapActions, mapState, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import GoodItem from "./../components/GoodItem.vue";
-import draggable from "vuedraggable";
+import GoodsCollection from "./../components/GoodsCollection.vue";
 import dappMixin from "@/mixins/dapp";
+import draggable from "vuedraggable";
 
 export default {
   components: {
@@ -256,7 +256,6 @@ export default {
       "confirmTrade",
       "pullGoods",
       "startTradeWithSelectedUser",
-      "withdrawTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);

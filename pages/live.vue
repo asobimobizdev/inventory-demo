@@ -65,11 +65,11 @@
 </template>
 
 <script>
-import { sleep } from "../lib/utils";
-import { mapActions, mapState, mapGetters } from "vuex";
 import { clearTimeout } from "timers";
-import web3Utils from "web3-utils";
+import { mapActions, mapGetters, mapState } from "vuex";
+import { sleep } from "../lib/utils";
 import dappMixin from "@/mixins/dapp";
+import web3Utils from "web3-utils";
 
 export default {
   filters: {
@@ -91,7 +91,7 @@ export default {
       } else {
         result = this.$store.state.live.transfers.filter(
           transfer =>
-            this.usersFilter.find(userID => userID == transfer.from) != null
+            this.usersFilter.find(userID => userID == transfer.from) != null,
         );
       }
       return result.map(event => {

@@ -73,7 +73,7 @@ export default {
     "good-item": GoodItem,
   },
   props: {
-    good: {type: Object, default: null},
+    good: { type: Object, default: null },
   },
   computed: {
     open() {

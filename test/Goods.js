@@ -8,11 +8,11 @@ contract("Goods", accounts => {
   const account = accounts[0];
   const otherAccount = accounts[1];
   const thirdAccount = accounts[2];
-  const options = {from: account};
-  const otherOptions = {from: otherAccount};
-  const thirdOptions = {from: thirdAccount};
+  const options = { from: account };
+  const otherOptions = { from: otherAccount };
+  const thirdOptions = { from: thirdAccount };
 
-  const tokenId = 100;
+  const tokenId = 0;
 
   let token;
 
@@ -26,17 +26,17 @@ contract("Goods", accounts => {
 
   describe("minting", () => {
     it("will let the owner mint", async () => {
-      await token.mint(account, tokenId, options);
+      await token.mint(account, options);
     });
 
     it("won't let others mint", async () => {
-      await assertRejected(token.mint(otherAccount, tokenId, otherOptions));
+      await assertRejected(token.mint(otherAccount, otherOptions));
     });
   });
 
   describe("transferring", () => {
     beforeEach(async () => {
-      await token.mint(account, tokenId);
+      await token.mint(account);
     });
 
     it("lets users transfer tokens without approval", async () => {

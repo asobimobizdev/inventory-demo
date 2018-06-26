@@ -17,6 +17,7 @@ extends:
 - plugin:vue/recommended
 plugins:
 - vue
+- sort-imports-es6-autofix
 rules:
   indent:
     - error
@@ -30,9 +31,29 @@ rules:
   semi:
     - warn
     - always
-  no-console: warn
+  no-console:
+    - off
   comma-dangle:
     - warn
-    - always-multiline
+    - functions: always-multiline
+      objects: always-multiline
+      imports: always-multiline
+      exports: always-multiline
+      arrays: always-multiline
+  object-curly-spacing:
+    - warn
+    - always
+    - arraysInObjects: true
+      objectsInObjects: true
   no-unused-vars:
     - warn
+    - args: none
+  max-len:
+    - warn
+    - 80
+    - ignoreStrings: true
+  sort-imports-es6-autofix/sort-imports-es6:
+    - warn
+    - ignoreCase: false
+      ignoreMemberSort: false
+      memberSyntaxSortOrder: ["none", "all", "multiple", "single"]

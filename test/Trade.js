@@ -9,15 +9,15 @@ contract("Trade", accounts => {
   const traderA = accounts[1];
   const traderB = accounts[2];
   const thirdPerson = accounts[3];
-  const traderAOptions = {from: traderA};
-  const traderBOptions = {from: traderB};
-  const thirdPersonOptions = {from: thirdPerson};
+  const traderAOptions = { from: traderA };
+  const traderBOptions = { from: traderB };
+  const thirdPersonOptions = { from: thirdPerson };
 
-  const good1 = 1;
-  const good2 = 2;
-  const good3 = 3;
-  const good4 = 4;
-  const good5 = 5;
+  const good1 = 0;
+  const good2 = 1;
+  const good3 = 2;
+  const good4 = 3;
+  const good5 = 4;
 
   let goods;
   let trade;
@@ -74,11 +74,6 @@ contract("Trade", accounts => {
         assert.equal(await trade.numTradersAccepted(), 1);
       });
 
-      it("lets trader A withdraw", async () => {
-        await trade.withdraw(traderAOptions);
-        assert.equal(await trade.numTradersAccepted(), 0);
-      });
-
       it("won't let trader A cancel", async () => {
         await assertRejected(trade.cancel(traderAOptions));
       });
@@ -97,11 +92,11 @@ contract("Trade", accounts => {
 
   describe("goods", () => {
     beforeEach(async () => {
-      await goods.mint(traderA, good1);
-      await goods.mint(traderB, good2);
-      await goods.mint(traderB, good3);
-      await goods.mint(traderA, good4);
-      await goods.mint(thirdPerson, good5);
+      await goods.mint(traderA);
+      await goods.mint(traderB);
+      await goods.mint(traderB);
+      await goods.mint(traderA);
+      await goods.mint(thirdPerson);
     });
 
     it("won't let trader A add after accepting", async () => {
@@ -111,8 +106,8 @@ contract("Trade", accounts => {
           traderA,
           trade.address,
           good1,
-          traderAOptions
-        )
+          traderAOptions,
+        ),
       );
     });
 
@@ -131,7 +126,7 @@ contract("Trade", accounts => {
           traderA,
           trade.address,
           good1,
-          traderAOptions
+          traderAOptions,
         );
       });
 
@@ -223,11 +218,6 @@ contract("Trade", accounts => {
           assert.isTrue(await trade.traderPulledGoods(traderB));
         });
 
-        it("won't let traders withdraw", async () => {
-          await assertRejected(trade.withdraw(traderAOptions));
-          await assertRejected(trade.withdraw(traderBOptions));
-        });
-
         it("won't let traders remove goods", async () => {
           await assertRejected(trade.removeGood(traderAOptions));
         });
@@ -236,7 +226,7 @@ contract("Trade", accounts => {
           await assertRejected(
             goods.safeTransferFrom(
               traderA, trade.address, good4, traderAOptions,
-            )
+            ),
           );
         });
       });

@@ -21,6 +21,10 @@ contract Escrow is ERC721Receiver {
         uint256 indexed _tokenId,
         uint256 _price
     );
+    event Unlisted(
+        address indexed _seller,
+        uint256 indexed _tokenId
+    );
 
     ERC20 asobiCoin;
     ERC721 erc721;
@@ -29,6 +33,8 @@ contract Escrow is ERC721Receiver {
     mapping(uint256 => address) public sellerOf;
 
     constructor(ERC20 _asobiCoin, ERC721 _erc721) public {
+        require(_asobiCoin != address(0));
+        require(_erc721 != address(0));
         asobiCoin = _asobiCoin;
         erc721 = _erc721;
     }
@@ -48,8 +54,7 @@ contract Escrow is ERC721Receiver {
         require(asobiCoin.transferFrom(buyer, seller, _price));
         erc721.transferFrom(address(this), buyer, _tokenId);
 
-        delete priceOf[_tokenId];
-        delete sellerOf[_tokenId];
+        removeListing(_tokenId);
 
         emit Swapped(
             buyer,
@@ -57,6 +62,23 @@ contract Escrow is ERC721Receiver {
             _tokenId,
             _price
         );
+    }
+
+    /**
+      * @dev Unlist an item
+      * @dev Can only be called by the item seller
+      * @param _tokenId the item to unlist
+      */
+    function unlist(uint256 _tokenId) external {
+        require(isListed(_tokenId));
+        address seller = sellerOf[_tokenId];
+        require(seller == msg.sender);
+
+        erc721.transferFrom(address(this), seller, _tokenId);
+
+        removeListing(_tokenId);
+
+        emit Unlisted(seller, _tokenId);
     }
 
     /**
@@ -100,5 +122,14 @@ contract Escrow is ERC721Receiver {
             converted += digit * 256**index;
         }
         return converted;
+    }
+
+    /**
+      * @dev Convenience function to remove tokens from listing
+      * @param _tokenId the token to remove
+      */
+    function removeListing(uint256 _tokenId) internal {
+        delete priceOf[_tokenId];
+        delete sellerOf[_tokenId];
     }
 }

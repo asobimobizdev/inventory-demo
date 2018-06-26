@@ -37,6 +37,19 @@ module.exports = {
       }
       config.module.rules.push({
         enforce: "pre",
+        test: /\.yaml$/,
+        use: [
+          {
+            loader: require.resolve("json-loader"),
+          },
+          {
+            loader: require.resolve("yaml-loader"),
+          },
+        ],
+      });
+
+      config.module.rules.push({
+        enforce: "pre",
         test: /\.sol$/,
         // loader: 'solcLoader',
         loader: path.resolve(__dirname, "lib/solcLoader.js"),
