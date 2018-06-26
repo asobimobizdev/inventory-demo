@@ -139,14 +139,20 @@ export default class Repository extends BaseRepository {
   }
 
   async setGoodForSale(goodID, price, forSale) {
-    const priceWei = web3Utils.toWei(price, "ether");
-    const priceHex = web3Utils.padLeft(web3Utils.toHex(priceWei), 64);
-    await this.goods.safeTransferFrom(
-      this.defaultAccount,
-      this.escrow.address,
-      goodID,
-      priceHex,
-    ).send();
+    if (forSale) {
+      console.log("setGoodForSale: Listing goodID", goodID);
+      const priceWei = web3Utils.toWei(price, "ether");
+      const priceHex = web3Utils.padLeft(web3Utils.toHex(priceWei), 64);
+      await this.goods.safeTransferFrom(
+        this.defaultAccount,
+        this.escrow.address,
+        goodID,
+        priceHex,
+      ).send();
+    } else {
+      console.log("setGoodForSale: Unlisting goodID", goodID);
+      await this.escrow.unlist(goodID).send();
+    }
   }
 
   // Escrow
