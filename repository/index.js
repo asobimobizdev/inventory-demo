@@ -258,16 +258,14 @@ export default class Repository extends BaseRepository {
     const trade = await this.dapp.deployContract(
       Trade,
       [
-        this.goods.options.address,
+        this.goods.address,
         [
           userA,
           userB,
         ],
       ],
     );
-    await this.tradeRegistry.add(
-      trade.options.address,
-    ).send();
+    await this.tradeRegistry.add(trade).send();
   }
 
   async loadTrade(accountAddress) {
@@ -277,7 +275,7 @@ export default class Repository extends BaseRepository {
     if (tradeAddress == "0x0000000000000000000000000000000000000000") {
       return null;
     }
-    this.trade = this.dapp.getContractAt(Trade);
+    this.trade = this.dapp.getContract(Trade, tradeAddress);
 
     const [userA, userB] = await Promise.all([
       this.trade.traders(0).call(),
@@ -329,9 +327,7 @@ export default class Repository extends BaseRepository {
         trader,
       };
     };
-    const goodsRaw = await this.getGoodsForAddress(
-      this.trade.options.address,
-    );
+    const goodsRaw = await this.getGoodsForAddress(this.trade.address);
     return Promise.all(goodsRaw.map(getGoodOwner));
   }
 
@@ -340,11 +336,7 @@ export default class Repository extends BaseRepository {
   }
 
   async transferToTrade(accountAddress, goodID) {
-    await this.transferGood(
-      accountAddress,
-      this.trade.options.address,
-      goodID,
-    );
+    await this.transferGood(accountAddress, this.trade.address, goodID);
   }
 
   // Events
