@@ -1,4 +1,3 @@
-WEBSOCKET_NODE: wss://rinkeby.infura.io/_ws
 GAS_PRICE: "10"
 
 networks:
@@ -10,6 +9,7 @@ networks:
       Shop: "0xd19271319e71940a5AA0cAA1653A2444699ABa2C"
       TradeRegistry: "0x721F205842e04dd2c1977458Eceab17683Eb1d95"
       UserRegistry: "0x9e585789dc9B3AD5794849A1f04C2E62396f8f2C"
+    websocketNode: wss://rinkeby.infura.io/_ws
   "20001":
     contracts:
       AsobiCoin: "0x238d2ECf32C6Ea74Af1742d1047c826B2C17789a"
@@ -18,3 +18,4 @@ networks:
       Shop: "0x6bE0AE7bE65475bA0eef64E3B05cBdcE191B6D94"
       TradeRegistry: "0x0203a4e088b3F968d9991F282Ca55381D716d974"
       UserRegistry: "0xFDd6dF8527ED347e7db827FF43a4E29De0e5BC8A"
+    websocketNode: wss://ethereum.lab.asobimo.io/ws
