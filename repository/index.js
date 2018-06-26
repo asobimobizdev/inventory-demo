@@ -265,6 +265,7 @@ export default class Repository extends BaseRepository {
         ],
       ],
     );
+    console.log("Created trade at", trade);
     await this.tradeRegistry.add(trade).send();
   }
 
