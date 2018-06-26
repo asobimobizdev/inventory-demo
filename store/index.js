@@ -392,7 +392,7 @@ const createStore = () => {
         // );
 
         try {
-          await repository.buyGood(id, context.state.accountAddress);
+          await repository.buyGood(id);
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);

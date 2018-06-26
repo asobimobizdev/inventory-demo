@@ -180,34 +180,15 @@ export default class Repository extends BaseRepository {
     return Promise.all(goods.map(augmentGood));
   }
 
-  async buyGood(goodID, buyer) {
-    // Check whether we have already approved spending
-    const price = web3Utils.toBN(
-      await this.escrow.getPrice(goodID).call(),
-    );
-
-    const allowance = web3Utils.toBN(
-      await this.asobiCoin.allowance(
-        buyer,
-        this.escrow.options.address,
-      ).call(),
-    );
-
-    // Approve spending
-    if (allowance.lt(price)) {
-      await this.asobiCoin.approve(
-        this.escrow.options.address,
-        web3Utils.toWei(price, "ether"),
-      ).send();
-    } else {
-      console.log(
-        "Allowance",
-        allowance.toString(),
-        "sufficient for price",
-        price.toString(),
-      );
-    }
-    await this.escrow.swap(goodID).send();
+  async buyGood(goodID) {
+    const price = await this.escrow.priceOf(goodID).call();
+    const data = this.escrow.swap(goodID).encodeABI();
+    console.log("buyGood, goodID", goodID, "price", price, "data", data);
+    await this.asobiCoin.approveAndCall(
+      this.escrow.address,
+      price,
+      data,
+    ).send();
   }
 
   // User Registry
