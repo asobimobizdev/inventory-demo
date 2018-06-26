@@ -256,7 +256,6 @@ export default {
       "confirmTrade",
       "pullGoods",
       "startTradeWithSelectedUser",
-      "withdrawTrade",
     ]),
     userTableSelectionChanged(user) {
       this.$store.dispatch("selectedFriendId", user.id);

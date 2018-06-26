@@ -90,9 +90,6 @@ export default {
       await repository.confirmTrade();
       context.commit("resetTrade");
     },
-    async withdrawTrade(context) {
-      await repository.withdrawTrade();
-    },
     async pullGoods(context) {
       await repository.pullGoods();
       // ??

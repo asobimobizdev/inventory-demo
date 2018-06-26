@@ -74,11 +74,6 @@ contract("Trade", accounts => {
         assert.equal(await trade.numTradersAccepted(), 1);
       });
 
-      it("lets trader A withdraw", async () => {
-        await trade.withdraw(traderAOptions);
-        assert.equal(await trade.numTradersAccepted(), 0);
-      });
-
       it("won't let trader A cancel", async () => {
         await assertRejected(trade.cancel(traderAOptions));
       });
@@ -221,11 +216,6 @@ contract("Trade", accounts => {
           assert.equal(await goods.ownerOf(good3), trade.address);
           assert.equal(await goods.ownerOf(good4), traderB);
           assert.isTrue(await trade.traderPulledGoods(traderB));
-        });
-
-        it("won't let traders withdraw", async () => {
-          await assertRejected(trade.withdraw(traderAOptions));
-          await assertRejected(trade.withdraw(traderBOptions));
         });
 
         it("won't let traders remove goods", async () => {
