@@ -329,7 +329,7 @@ const createStore = () => {
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
-          console.error(e);
+          console.error("transferGoodToSelectedFriend", e);
         }
 
       },
@@ -357,7 +357,7 @@ const createStore = () => {
           );
         } catch (e) {
           context.commit("setGoodForSale", oldGoodState);
-          console.error(e);
+          console.error("setGoodForSale", e);
         }
       },
 
@@ -376,7 +376,7 @@ const createStore = () => {
         } catch (e) {
           transaction.confirmed = false;
           context.commit("removeUnconfirmedTransaction", transaction);
-          console.error(e);
+          console.error("buyGood", e);
         }
       },
 
