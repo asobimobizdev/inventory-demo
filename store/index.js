@@ -439,11 +439,13 @@ const createStore = () => {
           });
         }
 
-        const goods = state.goods.filter(good => {
+        let goods = state.goods.filter(good => {
           return !goodsToRemove[good.id];
         });
 
-        return [...goods, ...unconfirmedGoods];
+        goods = [...goods, ...unconfirmedGoods];
+        goods.sort((a, b) => a.id - b.id);
+        return goods;
       },
 
       allFriendGoods: state => {
@@ -470,11 +472,13 @@ const createStore = () => {
           });
         }
 
-        const goods = state.friendGoods.filter(good => {
+        let goods = state.friendGoods.filter(good => {
           return !goodsToRemove[good.id];
         });
 
-        return [...goods, ...unconfirmedGoods];
+        goods = [...goods, ...unconfirmedGoods];
+        goods.sort((a, b) => a.id - b.id);
+        return goods;
       },
     },
   });
