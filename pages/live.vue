@@ -94,15 +94,19 @@ export default {
             this.usersFilter.find(userID => userID == transfer.from) != null,
         );
       }
+      const friends = [
+        {id: "0x0000000000000000000000000000000000000000", name: "Shop"},
+        ...this.$store.state.friends,
+      ];
       return result.map(event => {
         return {
           ...event,
-          fromFriend: this.$store.state.friends.find(f => {
+          fromFriend: friends.find(f => {
             return f.id == event.from;
-          }) || { name: "Shop" },
-          toFriend: this.$store.state.friends.find(f => {
+          }) || { name: "Unknown" },
+          toFriend: friends.find(f => {
             return f.id == event.to;
-          }) || { name: "Shop" },
+          }) || { name: "Unknown" },
         };
       });
     },
