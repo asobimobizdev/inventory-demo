@@ -12,10 +12,10 @@ networks:
     websocketNode: wss://rinkeby.infura.io/_ws
   "20001":
     contracts:
-      AsobiCoin: "0x238d2ECf32C6Ea74Af1742d1047c826B2C17789a"
-      Escrow: "0xa7F7Af138fb5d49605734A61e2df88f9D430717C"
-      Goods: "0x601eD0A9edA9C778DeAd3F1EB8667eD12E309f7F"
-      Shop: "0x6bE0AE7bE65475bA0eef64E3B05cBdcE191B6D94"
-      TradeRegistry: "0x0203a4e088b3F968d9991F282Ca55381D716d974"
-      UserRegistry: "0xFDd6dF8527ED347e7db827FF43a4E29De0e5BC8A"
+      AsobiCoin: "0x29D55dD7D0240B2F5492eD3ce6C47Fab4b9b85A2"
+      Escrow: "0x3c3eFF7ca84083D385b88C98385D08B7298F3305"
+      Goods: "0x1870E4d884572826105e14527006D45FCDf05400"
+      Shop: "0xa0a6181616e04593d6F00EE6ed43037bB69848A6"
+      TradeRegistry: "0x925630803E45475323960540bE0d2e6530e911Aa"
+      UserRegistry: "0xFdbB132C43628a8A6F3776d1394AA3E96Ee4ADc1"
     websocketNode: wss://ethereum.lab.asobimo.io/ws
