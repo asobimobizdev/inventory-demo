@@ -194,7 +194,9 @@ export default {
           align-items stretch
 
           padding-bottom 16px
-
+          >*
+            >*
+              margin-right 8px
           >.buy
             >.price
               margin-right 8px

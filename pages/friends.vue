@@ -1,23 +1,7 @@
 <template>
 
   <el-main class="host full-centered-content">
-    <h1
-      class="title"
-      align="center">Friends List</h1>
-    <el-table
-      :data="friends"
-      style="width: 100%"
-      height="100"
-    >
-      <el-table-column
-        prop="name"
-        label="Name"
-        width="300px"/>
-      <el-table-column
-        prop="id"
-        label="Address"
-      />
-    </el-table>
+
     <el-card class="add-box">
       <div
         slot="header"
@@ -56,6 +40,24 @@
         </el-form-item>
       </el-form>
     </el-card>
+
+    <h1
+      class="title"
+      align="center">Friends List</h1>
+    <el-table
+      :data="friends"
+      style="width: 100%"
+      height="100"
+    >
+      <el-table-column
+        prop="name"
+        label="Name"
+        width="300px"/>
+      <el-table-column
+        prop="id"
+        label="Address"
+      />
+    </el-table>
   </el-main>
 </template>
 
@@ -123,6 +125,7 @@ export default {
 
 .add-box
   width 100%
+  margin 20px 0px 0px 0px
 
 .title
   margin-top 30px
