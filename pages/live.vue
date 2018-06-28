@@ -99,10 +99,10 @@ export default {
           ...event,
           fromFriend: this.$store.state.friends.find(f => {
             return f.id == event.from;
-          }) || { name: "Unknown" },
+          }) || { name: "Shop" },
           toFriend: this.$store.state.friends.find(f => {
             return f.id == event.to;
-          }) || { name: "Unknown" },
+          }) || { name: "Shop" },
         };
       });
     },
