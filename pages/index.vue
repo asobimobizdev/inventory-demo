@@ -17,8 +17,8 @@
             class="container"
             @end="onDrop">
             <div
-              v-for="(good,index) in allGoods"
-              :key="index"
+              v-for="good in allGoods"
+              :key="good.id"
               class="item"
               @click="selectGood(good)">
               <good-item
@@ -52,8 +52,8 @@
             :move="checkMoveFromFriendGoods"
             class="container">
             <div
-              v-for="(good, index) in allFriendGoods"
-              :key="index"
+              v-for="good in allFriendGoods"
+              :key="good.id"
               class="item"
               @click="selectGood(good)">
               <good-item
