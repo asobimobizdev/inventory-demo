@@ -18,6 +18,7 @@ export default {
   actions: {
     async getTransfers(context) {
       const transfers = await repository.getPastAsobiCoinTransfers();
+      transfers.reverse();
       console.log(transfers);
       context.commit("transfers", transfers);
     },
