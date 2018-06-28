@@ -9,8 +9,8 @@ import "contracts/Goods.sol";
   */
 contract Shop {
 
-    uint256 constant MINT_AMOUNT = 1000 ether;
-    uint8 constant GOODS_AMOUNT = 32;
+    uint256 constant MINT_AMOUNT = 100 ether;
+    uint8 constant GOODS_AMOUNT = 4;
 
     MintableToken asobiCoin;
     Goods erc721;
