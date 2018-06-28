@@ -5,13 +5,12 @@ import live from "./live";
 import seedParams from "../lib/seedParams";
 import trade from "./trade";
 
-export function decorateGoodWithId(good) {
-  return {
-    ...good,
-    seed: seedParams.seedFromString(good.id),
-    name: seedParams.nameForSeed(good.seed),
-    thumbPath: seedParams.assetsThumbPathWithSeed(good.seed),
-  };
+export function decorateGoodWithId(id) {
+  let good = {};
+  good.seed = seedParams.seedFromString(id);
+  good.name = seedParams.nameForSeed(good.seed);
+  good.thumbPath = seedParams.assetsThumbPathWithSeed(good.seed);
+  return good;
 }
 
 export const repository = new Repository(dapp);
@@ -47,7 +46,8 @@ const createStore = () => {
       ["goods"](state, goods) {
         goods = goods.map(good => {
           return {
-            ...decorateGoodWithId(good),
+            ...good,
+            ...decorateGoodWithId(good.id),
             isOwned: true,
           };
         });
@@ -71,7 +71,8 @@ const createStore = () => {
       ["friendGoods"](state, goods) {
         goods = goods.map(good => {
           return {
-            ...decorateGoodWithId(good),
+            ...good,
+            ...decorateGoodWithId(good.id),
             isOwned: false,
           };
         });
@@ -430,7 +431,11 @@ const createStore = () => {
             continue;
           }
 
-          unconfirmedGoods.push(decorateGoodWithId(transaction));
+          unconfirmedGoods.push({
+            id: transaction.goodID,
+            confirmed: false,
+            ...decorateGoodWithId(transaction.goodID),
+          });
         }
 
         const goods = state.goods.filter(good => {
@@ -459,9 +464,8 @@ const createStore = () => {
           if (transaction.to != friend.id) continue;
 
           unconfirmedGoods.push({
+            ...decorateGoodWithId(transaction.goodID),
             id: transaction.goodID,
-            confirmed: false,
-            ...decorateGoodWithId(transaction),
           });
         }
 
