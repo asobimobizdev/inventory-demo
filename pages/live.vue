@@ -95,7 +95,7 @@ export default {
         );
       }
       const friends = [
-        {id: "0x0000000000000000000000000000000000000000", name: "Shop"},
+        { id: "0x0000000000000000000000000000000000000000", name: "Shop" },
         ...this.$store.state.friends,
       ];
       return result.map(event => {

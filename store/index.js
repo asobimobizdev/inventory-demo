@@ -461,9 +461,9 @@ const createStore = () => {
         for (let tID in state.unconfirmedTransactions) {
           transaction = state.unconfirmedTransactions[tID];
           if (
-              transaction.from == friend.id
+            transaction.from == friend.id
               || transaction.from == repository.escrow.address
-            ) {
+          ) {
             goodsToRemove[transaction.goodID] = transaction.goodID;
             continue;
           }
