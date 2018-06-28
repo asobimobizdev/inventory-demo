@@ -365,7 +365,7 @@ const createStore = () => {
       async buyGood(context, { id }) {
 
         const transaction = {
-          from: context.state.selectedFriendId,
+          from: repository.escrow.address,
           to: context.state.accountAddress,
           goodID: id,
         };
