@@ -268,6 +268,7 @@ const createStore = () => {
         repository.asobiCoinTransferEvents((event) => {
           console.log("AsobiCoin Transfer event", event);
           context.dispatch("getBalance");
+          context.commit("live/addTransfer", event);
         });
       },
 
